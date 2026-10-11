@@ -3,510 +3,606 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>مصيبة في الفضاء 🚀</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Sooyah Racing</title>
 
 <style>
+:root {
+  --blue: #08aaff;
+  --dark: #050b18;
+  --panel: #101c30;
+}
 * { box-sizing: border-box; }
-
 body {
   margin: 0;
-  background: #09051b;
+  background: var(--dark);
   color: white;
-  font-family: Tahoma, Arial, sans-serif;
-  text-align: center;
+  font-family: Arial, Tahoma, sans-serif;
 }
-
-h1 {
-  color: #ffe66d;
-  margin: 15px 5px 5px;
-}
-
-p { color: #d7cfff; }
-
-.game {
-  width: min(95%, 800px);
-  margin: auto;
-}
-
-.hud {
-  display: flex;
-  justify-content: space-around;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin: 12px 0;
-}
-
-.box {
-  background: #21163f;
-  border: 1px solid #62449a;
-  border-radius: 12px;
-  padding: 10px 14px;
-}
-
-canvas {
-  display: block;
-  width: 100%;
-  height: auto;
-  background: #100b2c;
-  border: 3px solid #8b5cf6;
-  border-radius: 15px;
-  touch-action: none;
-}
-
+button, input { font: inherit; }
 button {
-  background: #8b5cf6;
-  color: white;
+  cursor: pointer;
   border: 0;
   border-radius: 10px;
-  padding: 12px 18px;
-  margin: 8px 4px;
-  font-size: 16px;
+  padding: 13px 24px;
   font-weight: bold;
-  cursor: pointer;
+  color: white;
+  background: linear-gradient(100deg, #087dff, #00c9ff);
+  box-shadow: 0 0 20px #009dff38;
 }
-
-button:hover { background: #a78bfa; }
-
-#message {
-  color: #ffe66d;
-  font-weight: bold;
-  min-height: 26px;
-}
-
-.controls {
+button:active { transform: scale(.97); }
+button:disabled { opacity: .4; cursor: default; }
+.screen {
   display: none;
-  direction: ltr;
-  flex-wrap: wrap;
+  min-height: 100svh;
+  padding: 24px;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden;
 }
+.screen.active { display: flex; }
+.eyebrow {
+  color: #62caff;
+  letter-spacing: 5px;
+  font-size: 12px;
+}
+.logo {
+  font-size: clamp(42px, 10vw, 90px);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -4px;
+  color: #eafaff;
+  text-shadow: 0 0 12px #00aaff, 0 0 45px #087dff;
+}
+.crown { font-size: 45px; color: #16bfff; }
+.intro {
+  background:
+    radial-gradient(ellipse at 50% 38%, #10416a 0%, transparent 50%),
+    linear-gradient(#050b18, #111a2c);
+}
+.intro h2 { font-size: clamp(25px, 5vw, 46px); }
+.intro p, .muted { color: #b7c9dc; line-height: 1.8; }
+.glow { animation: glow 2.5s infinite alternate; }
+@keyframes glow {
+  from { filter: drop-shadow(0 0 5px #08aaff); }
+  to { filter: drop-shadow(0 0 23px #08aaff); }
+}
+.panel {
+  width: min(650px, 100%);
+  background: #0e1b2c;
+  border: 1px solid #25405e;
+  border-radius: 20px;
+  padding: clamp(20px, 5vw, 36px);
+  box-shadow: 0 20px 70px #0008;
+}
+input {
+  width: 100%;
+  padding: 15px;
+  background: #081321;
+  border: 1px solid #3b668b;
+  color: white;
+  border-radius: 10px;
+  margin: 12px 0;
+  outline-color: var(--blue);
+  text-align: center;
+}
+h1, h2 { margin-top: 8px; }
+.cars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  width: min(900px, 100%);
+}
+.car-card {
+  border: 2px solid #293d57;
+  border-radius: 16px;
+  background: linear-gradient(#172942, #0b1423);
+  padding: 16px 6px;
+  min-width: 0;
+  transition: .2s;
+}
+.car-card.selected {
+  border-color: #00baff;
+  box-shadow: 0 0 24px #00aaff55;
+  background: #123252;
+}
+.car-art { font-size: clamp(43px, 10vw, 76px); }
+.car-card h3 { font-size: 15px; }
+.car-card p { font-size: 12px; color: #a9c4dc; }
+.car-card button { padding: 8px; font-size: 12px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
 
-@media (pointer: coarse) {
-  .controls { display: flex; }
+#driveScreen {
+  padding: 0;
+  min-height: 100svh;
+  justify-content: flex-start;
+  background: #91c9ed;
+}
+#hud {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px;
+  background: #06101deF;
+  z-index: 2;
+}
+.hud-pill {
+  background: #152942;
+  border: 1px solid #315577;
+  border-radius: 9px;
+  padding: 9px 12px;
+  font-size: 13px;
+}
+#game {
+  width: 100%;
+  flex: 1;
+  min-height: 260px;
+  display: block;
+  touch-action: none;
+}
+#mobileControls {
+  width: 100%;
+  padding: 10px;
+  background: #06101d;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 8px;
+}
+#mobileControls button {
+  width: 62px;
+  height: 54px;
+  padding: 0;
+  font-size: 23px;
+  background: #173453;
+  border: 1px solid #3477a8;
+  touch-action: none;
+  user-select: none;
+}
+#mobileControls .gas {
+  background: #087dff;
+  width: 82px;
+  font-size: 14px;
+}
+#mobileControls .brake { background: #9e3344; width: 72px; font-size: 14px; }
+.drive-note { color: #c3d8e9; font-size: 11px; margin: 0 0 8px; }
+@media (min-width: 800px) {
+  #mobileControls { max-width: 650px; margin: 0 auto; background: transparent; }
+  #game { max-height: calc(100svh - 150px); }
+}
+@media (max-width: 480px) {
+  .screen { padding: 16px; }
+  .cars { gap: 6px; }
+  .car-card { padding: 12px 3px; }
+  .car-card h3 { font-size: 12px; }
+  .hud-pill { padding: 8px 7px; font-size: 11px; }
 }
 </style>
 </head>
 
 <body>
 
-<h1>🚀 مصيبة في الفضاء 👽</h1>
-<p>أنقذ المجرة... واجمع البيتزا قبل ما الفضائيين ياكلوها!</p>
-
-<div class="game">
-
-  <div class="hud">
-    <div class="box">⭐ النقاط: <span id="score">0</span></div>
-    <div class="box">❤️ الأرواح: <span id="lives">3</span></div>
-    <div class="box">🍕 البيتزا: <span id="pizza">0</span></div>
+<!-- 1: INTRODUCTION -->
+<section id="intro" class="screen intro active">
+  <div class="eyebrow">WELCOME TO THE FUTURE</div>
+  <div class="crown glow">♛</div>
+  <div class="logo">Sooyah</div>
+  <div style="color:#16bfff;letter-spacing:5px;font-weight:bold">
+    RACING
   </div>
-
-  <canvas id="screen" width="800" height="520"></canvas>
-
-  <div id="message">جاهز يا كابتن؟ دوس ابدأ المعركة!</div>
-
-  <button id="start">🚀 ابدأ اللعبة</button>
-
-  <p>
-    الحركة: الأسهم أو WASD
-    <br>
-    اضرب الفضائيين: زر المسافة Space
+  <h2>YOUR ROAD. YOUR RULES.</h2>
+  <p>استعد لتجربة قيادة مفتوحة<br>السرعة تبدأ من هنا.</p>
+  <button onclick="showName()">NEXT &nbsp; ›</button>
+  <p class="muted" style="font-size:11px;letter-spacing:3px">
+    SOOYAH RACING · DRIVE YOUR LEGEND
   </p>
+</section>
 
-  <div class="controls">
-    <button data-key="ArrowLeft">⬅️</button>
-    <button data-key="ArrowUp">⬆️</button>
-    <button data-key="ArrowDown">⬇️</button>
-    <button data-key="ArrowRight">➡️</button>
-    <button data-key=" " style="background:#e84a9b">💥 اضرب!</button>
+<!-- 2: PLAYER NAME -->
+<section id="nameScreen" class="screen">
+  <div class="panel">
+    <div class="eyebrow">DRIVER REGISTRATION</div>
+    <h1>🏁 أهلاً بيك في الفريق</h1>
+    <p class="muted">اكتب اسمك عشان نسجّلك كسائق جديد.</p>
+    <input id="playerName" maxlength="20"
+      placeholder="اكتب اسم السائق هنا"
+      autocomplete="nickname">
+    <button onclick="registerPlayer()">CONTINUE ›</button>
+    <p id="nameError" style="color:#ff8993"></p>
+  </div>
+</section>
+
+<!-- 3: WELCOME -->
+<section id="welcomeScreen" class="screen intro">
+  <div class="crown">♛</div>
+  <div class="logo" style="font-size:48px">Sooyah</div>
+  <h1 id="hello">Hi, Driver!</h1>
+  <p>العالم المفتوح مستنيك.<br>اختار عربيتك واستعد للانطلاق.</p>
+  <button onclick="showCars()">CHOOSE YOUR CAR ›</button>
+</section>
+
+<!-- 4: CAR SELECT -->
+<section id="carScreen" class="screen">
+  <div class="eyebrow">GARAGE · SOOYAH RACING</div>
+  <h1>اختار عربيتك 🏎️</h1>
+  <p class="muted">اختار العربية اللي تناسب أسلوبك.</p>
+
+  <div class="cars">
+    <article class="car-card selected" data-car="0">
+      <div class="car-art">🏎️</div>
+      <h3>Blue Phantom</h3>
+      <p>متوازنة وسريعة</p>
+      <button onclick="selectCar(0)">اختارها</button>
+    </article>
+    <article class="car-card" data-car="1">
+      <div class="car-art">🚗</div>
+      <h3>Red Storm</h3>
+      <p>قيادة مستقرة</p>
+      <button onclick="selectCar(1)">اختارها</button>
+    </article>
+    <article class="car-card" data-car="2">
+      <div class="car-art">🏁</div>
+      <h3>Golden GT</h3>
+      <p>سرعة عالية</p>
+      <button onclick="selectCar(2)">اختارها</button>
+    </article>
   </div>
 
-</div>
+  <div class="row">
+    <button onclick="showWelcome()">BACK</button>
+    <button onclick="startDrive()">NEXT · START ENGINE 🚀</button>
+  </div>
+</section>
+
+<!-- 5: ENDLESS ROAD -->
+<section id="driveScreen" class="screen">
+  <div id="hud">
+    <div class="hud-pill" id="driverHud">DRIVER</div>
+    <div class="hud-pill">SPEED <b id="speed">0</b> km/h</div>
+    <div class="hud-pill">DISTANCE <b id="distance">0</b> m</div>
+    <button onclick="pauseDrive()" id="pauseBtn" style="padding:9px 12px">Ⅱ</button>
+  </div>
+
+  <canvas id="game"></canvas>
+
+  <div id="mobileControls">
+    <button data-control="left">◀</button>
+    <button data-control="right">▶</button>
+    <button class="brake" data-control="brake">BRAKE</button>
+    <button class="gas" data-control="gas">GAS ▲</button>
+  </div>
+  <p class="drive-note">الكمبيوتر: الأسهم أو WASD للتحرك · ↑ للتسارع · ↓ للفرامل</p>
+  <button onclick="backToGarage()" style="margin-bottom:8px">العودة للجراج</button>
+</section>
 
 <script>
-const canvas = document.getElementById("screen");
-const ctx = canvas.getContext("2d");
-
-const scoreText = document.getElementById("score");
-const livesText = document.getElementById("lives");
-const pizzaText = document.getElementById("pizza");
-const message = document.getElementById("message");
-
-const W = canvas.width;
-const H = canvas.height;
-
+const $ = id => document.getElementById(id);
+let playerName = "";
+let selectedCar = 0;
+let running = false;
+let paused = false;
+let animation = 0;
+let lastTime = 0;
+let distance = 0;
+let speed = 0;
+let roadOffset = 0;
+let steering = 0;
 const keys = new Set();
 
-let player;
-let aliens = [];
-let shots = [];
-let snacks = [];
-let stars = [];
-let particles = [];
-
-let score = 0;
-let lives = 3;
-let pizza = 0;
-let running = false;
-let lastTime = 0;
-let alienTimer = 0;
-let snackTimer = 0;
-let shotTimer = 0;
-let invincible = 0;
-let animationId = 0;
-
-const alienFaces = ["👽", "👾", "🤖", "💩"];
-const jokes = [
-  "الفضائي ده نازل من غير رخصة 😂",
-  "يا نهار أبيض! ده بياكل كوكب الأرض!",
-  "الحق البيتزا قبل ما تختفي 🍕",
-  "الفضائيين عاملين حفلة من غير إذن!",
-  "إنت طيار ولا دليفري بيتزا؟"
+const carSettings = [
+  {name:"Blue Phantom", color:"#13aaff", maxSpeed:220, emoji:"🏎️"},
+  {name:"Red Storm", color:"#ff4058", maxSpeed:195, emoji:"🚗"},
+  {name:"Golden GT", color:"#ffd04a", maxSpeed:245, emoji:"🏁"}
 ];
 
-function makeStars() {
-  stars = [];
-  for (let i = 0; i < 100; i++) {
-    stars.push({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      size: Math.random() * 2 + 0.5,
-      speed: Math.random() * 35 + 10
-    });
+const canvas = $("game");
+const ctx = canvas.getContext("2d");
+let carX = 0;
+let viewWidth = 800;
+let viewHeight = 520;
+let lastRoad = 0;
+
+function showScreen(id) {
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  $(id).classList.add("active");
+}
+
+function showName() {
+  showScreen("nameScreen");
+  $("playerName").focus();
+}
+
+function registerPlayer() {
+  const value = $("playerName").value.trim();
+  if (!value) {
+    $("nameError").textContent = "اكتب اسمك الأول يا كابتن!";
+    return;
   }
+  playerName = value;
+  $("hello").textContent = "Hi, " + playerName + "!";
+  $("driverHud").textContent = "🏁 " + playerName;
+  showScreen("welcomeScreen");
 }
 
-function resetGame() {
-  player = { x: W / 2, y: H - 65, speed: 270 };
-  aliens = [];
-  shots = [];
-  snacks = [];
-  particles = [];
-  score = 0;
-  lives = 3;
-  pizza = 0;
-  alienTimer = 0;
-  snackTimer = 0;
-  shotTimer = 0;
-  invincible = 0;
-  updateHUD();
-  message.textContent = "اضرب الفضائيين واجمع البيتزا! 🍕";
+function showCars() {
+  showScreen("carScreen");
 }
 
-function updateHUD() {
-  scoreText.textContent = score;
-  livesText.textContent = lives;
-  pizzaText.textContent = pizza;
+function showWelcome() {
+  showScreen("welcomeScreen");
 }
 
-function startGame() {
-  cancelAnimationFrame(animationId);
-  resetGame();
+function selectCar(index) {
+  selectedCar = index;
+  document.querySelectorAll(".car-card").forEach(card => {
+    card.classList.toggle("selected", Number(card.dataset.car) === index);
+  });
+}
+
+function resizeCanvas() {
+  const rect = canvas.getBoundingClientRect();
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  viewWidth = Math.max(320, rect.width);
+  viewHeight = Math.max(260, rect.height);
+  canvas.width = Math.round(viewWidth * dpr);
+  canvas.height = Math.round(viewHeight * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function startDrive() {
+  cancelAnimationFrame(animation);
+  showScreen("driveScreen");
+  resizeCanvas();
   running = true;
+  paused = false;
+  distance = 0;
+  speed = 0;
+  steering = 0;
+  roadOffset = 0;
+  carX = 0;
   lastTime = performance.now();
-  animationId = requestAnimationFrame(loop);
+  $("pauseBtn").textContent = "Ⅱ";
+  animation = requestAnimationFrame(loop);
 }
 
-function shoot() {
-  if (!running || shotTimer > 0) return;
-
-  shots.push({
-    x: player.x,
-    y: player.y - 25,
-    speed: 440
-  });
-
-  shotTimer = 0.22;
-}
-
-function spawnAlien() {
-  aliens.push({
-    x: 30 + Math.random() * (W - 60),
-    y: -35,
-    speed: 65 + Math.random() * 70 + score * 0.025,
-    face: alienFaces[Math.floor(Math.random() * alienFaces.length)],
-    size: 30,
-    wiggle: Math.random() * 6
-  });
-}
-
-function spawnPizza() {
-  snacks.push({
-    x: 25 + Math.random() * (W - 50),
-    y: -25,
-    speed: 90 + Math.random() * 40
-  });
-}
-
-function explode(x, y) {
-  for (let i = 0; i < 10; i++) {
-    particles.push({
-      x, y,
-      vx: (Math.random() - 0.5) * 240,
-      vy: (Math.random() - 0.5) * 240,
-      life: 0.5 + Math.random() * 0.4
-    });
+function pauseDrive() {
+  if (!running) return;
+  paused = !paused;
+  $("pauseBtn").textContent = paused ? "▶" : "Ⅱ";
+  if (!paused) {
+    lastTime = performance.now();
+    animation = requestAnimationFrame(loop);
   }
 }
 
-function endGame(won = false) {
+function backToGarage() {
   running = false;
+  cancelAnimationFrame(animation);
+  keys.clear();
+  showScreen("carScreen");
+}
 
-  message.textContent = won
-    ? "🏆 انتصرت! المجرة مدينة ليك ببيتزا كبيرة!"
-    : "😂 خلصت الأرواح! الفضائيين أخدوا البيتزا!";
+function drawRoad(dt) {
+  const w = viewWidth, h = viewHeight;
+  const horizon = h * 0.35;
+  const center = w / 2;
+  const roadTop = w * 0.09;
+  const roadBottom = w * 0.46;
 
-  draw();
-  ctx.fillStyle = "rgba(8, 4, 25, 0.82)";
-  ctx.fillRect(0, 0, W, H);
+  // Sky
+  const sky = ctx.createLinearGradient(0, 0, 0, h);
+  sky.addColorStop(0, "#58a9df");
+  sky.addColorStop(0.65, "#d4edff");
+  sky.addColorStop(1, "#6c9e55");
+  ctx.fillStyle = sky;
+  ctx.fillRect(0, 0, w, h);
 
-  ctx.textAlign = "center";
-  ctx.fillStyle = "#ffe66d";
-  ctx.font = "bold 38px Tahoma";
-  ctx.fillText(won ? "أنت بطل المجرة!" : "انتهت المهمة!", W / 2, H / 2 - 20);
+  // Sun
+  ctx.fillStyle = "#fff0b2";
+  ctx.beginPath();
+  ctx.arc(w * 0.78, h * 0.12, Math.min(w,h) * 0.055, 0, Math.PI*2);
+  ctx.fill();
 
-  ctx.fillStyle = "white";
-  ctx.font = "22px Tahoma";
-  ctx.fillText("نقاطك: " + score, W / 2, H / 2 + 25);
-  ctx.fillText("اضغط ابدأ عشان تلعب تاني", W / 2, H / 2 + 65);
+  // Distant hills
+  ctx.fillStyle = "#638d76";
+  ctx.beginPath();
+  ctx.moveTo(0, horizon + 35);
+  for (let x=0; x<=w; x+=w/8) {
+    ctx.lineTo(x, horizon - 15 - Math.sin(x*0.014)*22);
+  }
+  ctx.lineTo(w, h);
+  ctx.lineTo(0, h);
+  ctx.fill();
+
+  // Road trapezoid
+  ctx.fillStyle = "#373c44";
+  ctx.beginPath();
+  ctx.moveTo(center-roadTop, horizon);
+  ctx.lineTo(center+roadTop, horizon);
+  ctx.lineTo(center+roadBottom, h);
+  ctx.lineTo(center-roadBottom, h);
+  ctx.closePath();
+  ctx.fill();
+
+  // Road shoulders
+  for (let side of [-1,1]) {
+    ctx.strokeStyle = "#f4f4f4";
+    ctx.lineWidth = Math.max(2, w*0.005);
+    ctx.beginPath();
+    ctx.moveTo(center + side*roadTop, horizon);
+    ctx.lineTo(center + side*roadBottom, h);
+    ctx.stroke();
+
+    ctx.strokeStyle = "#d73d3d";
+    ctx.lineWidth = Math.max(3, w*0.012);
+    ctx.beginPath();
+    ctx.moveTo(center + side*(roadTop+4), horizon);
+    ctx.lineTo(center + side*(roadBottom+4), h);
+    ctx.stroke();
+  }
+
+  // Endless moving lane marks
+  roadOffset = (roadOffset + dt * (0.2 + speed/70)) % 1;
+  for (let i=0; i<18; i++) {
+    const p = ((i/18 + roadOffset) % 1);
+    const y = horizon + (h-horizon)*p*p;
+    const halfWidth = roadTop + (roadBottom-roadTop)*p;
+    const dashH = 3 + p*26;
+    const dashW = 1 + p*5;
+    ctx.fillStyle = "#f5f2db";
+    for (let lane=1; lane<=2; lane++) {
+      const x = center - halfWidth + (halfWidth*2)*(lane/3);
+      ctx.fillRect(x-dashW/2, y, dashW, dashH);
+    }
+  }
+
+  // Roadside markers
+  for (let i=0; i<14; i++) {
+    const p = ((i/14 + roadOffset*0.7) % 1);
+    const y = horizon + (h-horizon)*p*p;
+    const roadWidth = roadTop + (roadBottom-roadTop)*p;
+    for (const side of [-1,1]) {
+      const x = center + side*(roadWidth + 12 + p*25);
+      const size = 2 + p*16;
+      ctx.fillStyle = i%2 ? "#f8f5e8" : "#df4a4a";
+      ctx.fillRect(x-size/2, y-size, size, size*1.8);
+    }
+  }
+
+  // Player car: stylized vector sports car
+  const car = carSettings[selectedCar];
+  const cx = center + carX * roadBottom * 0.77;
+  const cy = h * 0.79;
+  const cw = Math.min(w*0.18, 116);
+  const ch = cw*1.52;
+
+  ctx.save();
+  ctx.translate(cx, cy);
+
+  // Shadow
+  ctx.fillStyle = "#10141b88";
+  ctx.beginPath();
+  ctx.ellipse(0, ch*0.35, cw*0.64, ch*0.19, 0, 0, Math.PI*2);
+  ctx.fill();
+
+  // Body
+  ctx.fillStyle = car.color;
+  ctx.beginPath();
+  ctx.moveTo(-cw*0.42, ch*0.46);
+  ctx.lineTo(-cw*0.49, ch*0.08);
+  ctx.lineTo(-cw*0.30, -ch*0.34);
+  ctx.quadraticCurveTo(0, -ch*0.53, cw*0.30, -ch*0.34);
+  ctx.lineTo(cw*0.49, ch*0.08);
+  ctx.lineTo(cw*0.42, ch*0.46);
+  ctx.quadraticCurveTo(0, ch*0.58, -cw*0.42, ch*0.46);
+  ctx.fill();
+
+  // Windshield
+  ctx.fillStyle = "#142b42";
+  ctx.beginPath();
+  ctx.moveTo(-cw*0.29, -ch*0.24);
+  ctx.lineTo(cw*0.29, -ch*0.24);
+  ctx.lineTo(cw*0.37, ch*0.04);
+  ctx.lineTo(-cw*0.37, ch*0.04);
+  ctx.closePath();
+  ctx.fill();
+
+  // Reflections and headlights
+  ctx.fillStyle = "#a5edff";
+  ctx.fillRect(-cw*0.38, ch*0.27, cw*0.18, ch*0.06);
+  ctx.fillRect(cw*0.20, ch*0.27, cw*0.18, ch*0.06);
+
+  ctx.fillStyle = "#101923";
+  ctx.fillRect(-cw*0.43, ch*0.38, cw*0.86, ch*0.09);
+
+  ctx.fillStyle = "#ffe17b";
+  ctx.fillRect(-cw*0.08, ch*0.43, cw*0.16, ch*0.04);
+
+  ctx.restore();
+
+  // Distance/speed HUD
+  $("speed").textContent = Math.round(speed);
+  $("distance").textContent = Math.floor(distance);
 }
 
 function update(dt) {
-  if (!running) return;
+  const car = carSettings[selectedCar];
+  const gas = keys.has("ArrowUp") || keys.has("w") || keys.has("W") ||
+              keys.has("gas");
+  const brake = keys.has("ArrowDown") || keys.has("s") || keys.has("S") ||
+                keys.has("brake");
+  const left = keys.has("ArrowLeft") || keys.has("a") || keys.has("A") ||
+               keys.has("left");
+  const right = keys.has("ArrowRight") || keys.has("d") || keys.has("D") ||
+                keys.has("right");
 
-  shotTimer = Math.max(0, shotTimer - dt);
-  invincible = Math.max(0, invincible - dt);
+  if (gas) speed = Math.min(car.maxSpeed, speed + 80*dt);
+  else speed = Math.max(65, speed - 12*dt);
 
-  let dx = 0;
-  let dy = 0;
+  if (brake) speed = Math.max(0, speed - 150*dt);
 
-  if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) dx--;
-  if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) dx++;
-  if (keys.has("ArrowUp") || keys.has("w") || keys.has("W")) dy--;
-  if (keys.has("ArrowDown") || keys.has("s") || keys.has("S")) dy++;
+  steering = (left ? -1 : 0) + (right ? 1 : 0);
+  carX += steering * dt * (0.65 + speed/200);
 
-  if (dx || dy) {
-    const length = Math.hypot(dx, dy);
-    player.x += (dx / length) * player.speed * dt;
-    player.y += (dy / length) * player.speed * dt;
-  }
+  // Road boundaries
+  carX = Math.max(-0.84, Math.min(0.84, carX));
+  if (Math.abs(carX) > 0.72) speed = Math.max(40, speed - 50*dt);
 
-  player.x = Math.max(25, Math.min(W - 25, player.x));
-  player.y = Math.max(30, Math.min(H - 25, player.y));
-
-  if (keys.has(" ")) shoot();
-
-  alienTimer += dt;
-  snackTimer += dt;
-
-  if (alienTimer > Math.max(0.38, 1.05 - score / 1200)) {
-    spawnAlien();
-    alienTimer = 0;
-  }
-
-  if (snackTimer > 2.8) {
-    spawnPizza();
-    snackTimer = 0;
-  }
-
-  stars.forEach(s => {
-    s.y += s.speed * dt;
-    if (s.y > H) {
-      s.y = 0;
-      s.x = Math.random() * W;
-    }
-  });
-
-  shots.forEach(s => s.y -= s.speed * dt);
-  shots = shots.filter(s => s.y > -20);
-
-  aliens.forEach(a => {
-    a.y += a.speed * dt;
-    a.x += Math.sin(a.y * 0.025 + a.wiggle) * 45 * dt;
-  });
-
-  snacks.forEach(s => s.y += s.speed * dt);
-
-  for (let i = aliens.length - 1; i >= 0; i--) {
-    const a = aliens[i];
-
-    for (let j = shots.length - 1; j >= 0; j--) {
-      const s = shots[j];
-
-      if (Math.hypot(a.x - s.x, a.y - s.y) < 30) {
-        explode(a.x, a.y);
-        aliens.splice(i, 1);
-        shots.splice(j, 1);
-        score += 10;
-        updateHUD();
-
-        if (Math.random() < 0.35) {
-          message.textContent =
-            jokes[Math.floor(Math.random() * jokes.length)];
-        }
-        break;
-      }
-    }
-
-    if (!aliens[i]) continue;
-
-    if (
-      invincible <= 0 &&
-      Math.hypot(aliens[i].x - player.x, aliens[i].y - player.y) < 38
-    ) {
-      aliens.splice(i, 1);
-      lives--;
-      invincible = 1.5;
-      explode(player.x, player.y);
-      updateHUD();
-      message.textContent = "يا ساتر! اتخبطت في فضائي! 😵";
-
-      if (lives <= 0) {
-        endGame();
-        return;
-      }
-      continue;
-    }
-
-    if (a.y > H + 40) aliens.splice(i, 1);
-  }
-
-  for (let i = snacks.length - 1; i >= 0; i--) {
-    const s = snacks[i];
-
-    if (Math.hypot(s.x - player.x, s.y - player.y) < 32) {
-      snacks.splice(i, 1);
-      pizza++;
-      score += 25;
-      updateHUD();
-      message.textContent = "بيتزااا! 🍕 +25 نقطة";
-    } else if (s.y > H + 30) {
-      snacks.splice(i, 1);
-    }
-  }
-
-  particles.forEach(p => {
-    p.x += p.vx * dt;
-    p.y += p.vy * dt;
-    p.life -= dt;
-  });
-  particles = particles.filter(p => p.life > 0);
-
-  if (score >= 300) {
-    endGame(true);
-  }
-}
-
-function draw() {
-  ctx.clearRect(0, 0, W, H);
-
-  ctx.fillStyle = "#100b2c";
-  ctx.fillRect(0, 0, W, H);
-
-  stars.forEach(s => {
-    ctx.fillStyle = "#c7b9ff";
-    ctx.globalAlpha = 0.45 + Math.random() * 0.5;
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-
-  // البيتزا
-  snacks.forEach(s => {
-    ctx.font = "27px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText("🍕", s.x, s.y + 10);
-  });
-
-  // الفضائيون
-  aliens.forEach(a => {
-    ctx.font = "31px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(a.face, a.x, a.y + 10);
-  });
-
-  // الطلقات
-  shots.forEach(s => {
-    ctx.fillStyle = "#ffe66d";
-    ctx.shadowColor = "#ff9f43";
-    ctx.shadowBlur = 12;
-    ctx.beginPath();
-    ctx.ellipse(s.x, s.y, 4, 11, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-  });
-
-  // الانفجارات
-  particles.forEach(p => {
-    ctx.globalAlpha = Math.max(0, p.life);
-    ctx.fillStyle = "#ffb347";
-    ctx.beginPath();
-    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
-    ctx.fill();
-  });
-  ctx.globalAlpha = 1;
-
-  // مركبة اللاعب
-  if (player && (invincible <= 0 || Math.floor(invincible * 10) % 2 === 0)) {
-    ctx.textAlign = "center";
-    ctx.font = "42px Arial";
-    ctx.fillText("🚀", player.x, player.y + 15);
-  }
-
-  // لوحة بسيطة
-  ctx.textAlign = "left";
-  ctx.font = "14px Tahoma";
-  ctx.fillStyle = "#bcaeff";
-  ctx.fillText("الهدف: 300 نقطة", 15, 25);
+  distance += speed * dt / 3.6;
 }
 
 function loop(now) {
-  const dt = Math.min((now - lastTime) / 1000, 0.04);
+  if (!running || paused) return;
+  const dt = Math.min((now-lastTime)/1000, 0.04);
   lastTime = now;
 
   update(dt);
-  draw();
-
-  if (running) {
-    animationId = requestAnimationFrame(loop);
-  }
+  drawRoad(dt);
+  animation = requestAnimationFrame(loop);
 }
 
+window.addEventListener("resize", () => {
+  if ($("driveScreen").classList.contains("active")) {
+    resizeCanvas();
+    drawRoad(0);
+  }
+});
+
 window.addEventListener("keydown", e => {
-  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(e.key)) {
+  if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key)) {
     e.preventDefault();
   }
-
   keys.add(e.key);
-
-  if (e.key === " ") shoot();
 });
 
 window.addEventListener("keyup", e => keys.delete(e.key));
 window.addEventListener("blur", () => keys.clear());
 
-document.querySelectorAll("[data-key]").forEach(button => {
-  const key = button.dataset.key;
-
+document.querySelectorAll("[data-control]").forEach(button => {
+  const control = button.dataset.control;
   button.addEventListener("pointerdown", e => {
     e.preventDefault();
-    keys.add(key);
+    keys.add(control);
+    button.setPointerCapture(e.pointerId);
   });
-
-  ["pointerup", "pointercancel", "pointerleave"].forEach(eventName => {
-    button.addEventListener(eventName, e => {
-      e.preventDefault();
-      keys.delete(key);
-    });
-  });
+  const release = e => {
+    e.preventDefault();
+    keys.delete(control);
+  };
+  button.addEventListener("pointerup", release);
+  button.addEventListener("pointercancel", release);
+  button.addEventListener("lostpointercapture", release);
 });
 
-document.getElementById("start").addEventListener("click", startGame);
+$("playerName").addEventListener("keydown", e => {
+  if (e.key === "Enter") registerPlayer();
+});
 
-makeStars();
-resetGame();
-draw();
+selectCar(0);
 </script>
 
 </body>
