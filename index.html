@@ -1,0 +1,513 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مصيبة في الفضاء 🚀</title>
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: #09051b;
+  color: white;
+  font-family: Tahoma, Arial, sans-serif;
+  text-align: center;
+}
+
+h1 {
+  color: #ffe66d;
+  margin: 15px 5px 5px;
+}
+
+p { color: #d7cfff; }
+
+.game {
+  width: min(95%, 800px);
+  margin: auto;
+}
+
+.hud {
+  display: flex;
+  justify-content: space-around;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 12px 0;
+}
+
+.box {
+  background: #21163f;
+  border: 1px solid #62449a;
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #100b2c;
+  border: 3px solid #8b5cf6;
+  border-radius: 15px;
+  touch-action: none;
+}
+
+button {
+  background: #8b5cf6;
+  color: white;
+  border: 0;
+  border-radius: 10px;
+  padding: 12px 18px;
+  margin: 8px 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover { background: #a78bfa; }
+
+#message {
+  color: #ffe66d;
+  font-weight: bold;
+  min-height: 26px;
+}
+
+.controls {
+  display: none;
+  direction: ltr;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+@media (pointer: coarse) {
+  .controls { display: flex; }
+}
+</style>
+</head>
+
+<body>
+
+<h1>🚀 مصيبة في الفضاء 👽</h1>
+<p>أنقذ المجرة... واجمع البيتزا قبل ما الفضائيين ياكلوها!</p>
+
+<div class="game">
+
+  <div class="hud">
+    <div class="box">⭐ النقاط: <span id="score">0</span></div>
+    <div class="box">❤️ الأرواح: <span id="lives">3</span></div>
+    <div class="box">🍕 البيتزا: <span id="pizza">0</span></div>
+  </div>
+
+  <canvas id="screen" width="800" height="520"></canvas>
+
+  <div id="message">جاهز يا كابتن؟ دوس ابدأ المعركة!</div>
+
+  <button id="start">🚀 ابدأ اللعبة</button>
+
+  <p>
+    الحركة: الأسهم أو WASD
+    <br>
+    اضرب الفضائيين: زر المسافة Space
+  </p>
+
+  <div class="controls">
+    <button data-key="ArrowLeft">⬅️</button>
+    <button data-key="ArrowUp">⬆️</button>
+    <button data-key="ArrowDown">⬇️</button>
+    <button data-key="ArrowRight">➡️</button>
+    <button data-key=" " style="background:#e84a9b">💥 اضرب!</button>
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("screen");
+const ctx = canvas.getContext("2d");
+
+const scoreText = document.getElementById("score");
+const livesText = document.getElementById("lives");
+const pizzaText = document.getElementById("pizza");
+const message = document.getElementById("message");
+
+const W = canvas.width;
+const H = canvas.height;
+
+const keys = new Set();
+
+let player;
+let aliens = [];
+let shots = [];
+let snacks = [];
+let stars = [];
+let particles = [];
+
+let score = 0;
+let lives = 3;
+let pizza = 0;
+let running = false;
+let lastTime = 0;
+let alienTimer = 0;
+let snackTimer = 0;
+let shotTimer = 0;
+let invincible = 0;
+let animationId = 0;
+
+const alienFaces = ["👽", "👾", "🤖", "💩"];
+const jokes = [
+  "الفضائي ده نازل من غير رخصة 😂",
+  "يا نهار أبيض! ده بياكل كوكب الأرض!",
+  "الحق البيتزا قبل ما تختفي 🍕",
+  "الفضائيين عاملين حفلة من غير إذن!",
+  "إنت طيار ولا دليفري بيتزا؟"
+];
+
+function makeStars() {
+  stars = [];
+  for (let i = 0; i < 100; i++) {
+    stars.push({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      size: Math.random() * 2 + 0.5,
+      speed: Math.random() * 35 + 10
+    });
+  }
+}
+
+function resetGame() {
+  player = { x: W / 2, y: H - 65, speed: 270 };
+  aliens = [];
+  shots = [];
+  snacks = [];
+  particles = [];
+  score = 0;
+  lives = 3;
+  pizza = 0;
+  alienTimer = 0;
+  snackTimer = 0;
+  shotTimer = 0;
+  invincible = 0;
+  updateHUD();
+  message.textContent = "اضرب الفضائيين واجمع البيتزا! 🍕";
+}
+
+function updateHUD() {
+  scoreText.textContent = score;
+  livesText.textContent = lives;
+  pizzaText.textContent = pizza;
+}
+
+function startGame() {
+  cancelAnimationFrame(animationId);
+  resetGame();
+  running = true;
+  lastTime = performance.now();
+  animationId = requestAnimationFrame(loop);
+}
+
+function shoot() {
+  if (!running || shotTimer > 0) return;
+
+  shots.push({
+    x: player.x,
+    y: player.y - 25,
+    speed: 440
+  });
+
+  shotTimer = 0.22;
+}
+
+function spawnAlien() {
+  aliens.push({
+    x: 30 + Math.random() * (W - 60),
+    y: -35,
+    speed: 65 + Math.random() * 70 + score * 0.025,
+    face: alienFaces[Math.floor(Math.random() * alienFaces.length)],
+    size: 30,
+    wiggle: Math.random() * 6
+  });
+}
+
+function spawnPizza() {
+  snacks.push({
+    x: 25 + Math.random() * (W - 50),
+    y: -25,
+    speed: 90 + Math.random() * 40
+  });
+}
+
+function explode(x, y) {
+  for (let i = 0; i < 10; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 240,
+      vy: (Math.random() - 0.5) * 240,
+      life: 0.5 + Math.random() * 0.4
+    });
+  }
+}
+
+function endGame(won = false) {
+  running = false;
+
+  message.textContent = won
+    ? "🏆 انتصرت! المجرة مدينة ليك ببيتزا كبيرة!"
+    : "😂 خلصت الأرواح! الفضائيين أخدوا البيتزا!";
+
+  draw();
+  ctx.fillStyle = "rgba(8, 4, 25, 0.82)";
+  ctx.fillRect(0, 0, W, H);
+
+  ctx.textAlign = "center";
+  ctx.fillStyle = "#ffe66d";
+  ctx.font = "bold 38px Tahoma";
+  ctx.fillText(won ? "أنت بطل المجرة!" : "انتهت المهمة!", W / 2, H / 2 - 20);
+
+  ctx.fillStyle = "white";
+  ctx.font = "22px Tahoma";
+  ctx.fillText("نقاطك: " + score, W / 2, H / 2 + 25);
+  ctx.fillText("اضغط ابدأ عشان تلعب تاني", W / 2, H / 2 + 65);
+}
+
+function update(dt) {
+  if (!running) return;
+
+  shotTimer = Math.max(0, shotTimer - dt);
+  invincible = Math.max(0, invincible - dt);
+
+  let dx = 0;
+  let dy = 0;
+
+  if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) dx--;
+  if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) dx++;
+  if (keys.has("ArrowUp") || keys.has("w") || keys.has("W")) dy--;
+  if (keys.has("ArrowDown") || keys.has("s") || keys.has("S")) dy++;
+
+  if (dx || dy) {
+    const length = Math.hypot(dx, dy);
+    player.x += (dx / length) * player.speed * dt;
+    player.y += (dy / length) * player.speed * dt;
+  }
+
+  player.x = Math.max(25, Math.min(W - 25, player.x));
+  player.y = Math.max(30, Math.min(H - 25, player.y));
+
+  if (keys.has(" ")) shoot();
+
+  alienTimer += dt;
+  snackTimer += dt;
+
+  if (alienTimer > Math.max(0.38, 1.05 - score / 1200)) {
+    spawnAlien();
+    alienTimer = 0;
+  }
+
+  if (snackTimer > 2.8) {
+    spawnPizza();
+    snackTimer = 0;
+  }
+
+  stars.forEach(s => {
+    s.y += s.speed * dt;
+    if (s.y > H) {
+      s.y = 0;
+      s.x = Math.random() * W;
+    }
+  });
+
+  shots.forEach(s => s.y -= s.speed * dt);
+  shots = shots.filter(s => s.y > -20);
+
+  aliens.forEach(a => {
+    a.y += a.speed * dt;
+    a.x += Math.sin(a.y * 0.025 + a.wiggle) * 45 * dt;
+  });
+
+  snacks.forEach(s => s.y += s.speed * dt);
+
+  for (let i = aliens.length - 1; i >= 0; i--) {
+    const a = aliens[i];
+
+    for (let j = shots.length - 1; j >= 0; j--) {
+      const s = shots[j];
+
+      if (Math.hypot(a.x - s.x, a.y - s.y) < 30) {
+        explode(a.x, a.y);
+        aliens.splice(i, 1);
+        shots.splice(j, 1);
+        score += 10;
+        updateHUD();
+
+        if (Math.random() < 0.35) {
+          message.textContent =
+            jokes[Math.floor(Math.random() * jokes.length)];
+        }
+        break;
+      }
+    }
+
+    if (!aliens[i]) continue;
+
+    if (
+      invincible <= 0 &&
+      Math.hypot(aliens[i].x - player.x, aliens[i].y - player.y) < 38
+    ) {
+      aliens.splice(i, 1);
+      lives--;
+      invincible = 1.5;
+      explode(player.x, player.y);
+      updateHUD();
+      message.textContent = "يا ساتر! اتخبطت في فضائي! 😵";
+
+      if (lives <= 0) {
+        endGame();
+        return;
+      }
+      continue;
+    }
+
+    if (a.y > H + 40) aliens.splice(i, 1);
+  }
+
+  for (let i = snacks.length - 1; i >= 0; i--) {
+    const s = snacks[i];
+
+    if (Math.hypot(s.x - player.x, s.y - player.y) < 32) {
+      snacks.splice(i, 1);
+      pizza++;
+      score += 25;
+      updateHUD();
+      message.textContent = "بيتزااا! 🍕 +25 نقطة";
+    } else if (s.y > H + 30) {
+      snacks.splice(i, 1);
+    }
+  }
+
+  particles.forEach(p => {
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= dt;
+  });
+  particles = particles.filter(p => p.life > 0);
+
+  if (score >= 300) {
+    endGame(true);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+
+  ctx.fillStyle = "#100b2c";
+  ctx.fillRect(0, 0, W, H);
+
+  stars.forEach(s => {
+    ctx.fillStyle = "#c7b9ff";
+    ctx.globalAlpha = 0.45 + Math.random() * 0.5;
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  // البيتزا
+  snacks.forEach(s => {
+    ctx.font = "27px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("🍕", s.x, s.y + 10);
+  });
+
+  // الفضائيون
+  aliens.forEach(a => {
+    ctx.font = "31px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(a.face, a.x, a.y + 10);
+  });
+
+  // الطلقات
+  shots.forEach(s => {
+    ctx.fillStyle = "#ffe66d";
+    ctx.shadowColor = "#ff9f43";
+    ctx.shadowBlur = 12;
+    ctx.beginPath();
+    ctx.ellipse(s.x, s.y, 4, 11, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  });
+
+  // الانفجارات
+  particles.forEach(p => {
+    ctx.globalAlpha = Math.max(0, p.life);
+    ctx.fillStyle = "#ffb347";
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+
+  // مركبة اللاعب
+  if (player && (invincible <= 0 || Math.floor(invincible * 10) % 2 === 0)) {
+    ctx.textAlign = "center";
+    ctx.font = "42px Arial";
+    ctx.fillText("🚀", player.x, player.y + 15);
+  }
+
+  // لوحة بسيطة
+  ctx.textAlign = "left";
+  ctx.font = "14px Tahoma";
+  ctx.fillStyle = "#bcaeff";
+  ctx.fillText("الهدف: 300 نقطة", 15, 25);
+}
+
+function loop(now) {
+  const dt = Math.min((now - lastTime) / 1000, 0.04);
+  lastTime = now;
+
+  update(dt);
+  draw();
+
+  if (running) {
+    animationId = requestAnimationFrame(loop);
+  }
+}
+
+window.addEventListener("keydown", e => {
+  if (["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown", " "].includes(e.key)) {
+    e.preventDefault();
+  }
+
+  keys.add(e.key);
+
+  if (e.key === " ") shoot();
+});
+
+window.addEventListener("keyup", e => keys.delete(e.key));
+window.addEventListener("blur", () => keys.clear());
+
+document.querySelectorAll("[data-key]").forEach(button => {
+  const key = button.dataset.key;
+
+  button.addEventListener("pointerdown", e => {
+    e.preventDefault();
+    keys.add(key);
+  });
+
+  ["pointerup", "pointercancel", "pointerleave"].forEach(eventName => {
+    button.addEventListener(eventName, e => {
+      e.preventDefault();
+      keys.delete(key);
+    });
+  });
+});
+
+document.getElementById("start").addEventListener("click", startGame);
+
+makeStars();
+resetGame();
+draw();
+</script>
+
+</body>
+</html>
