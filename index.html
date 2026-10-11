@@ -3,664 +3,451 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Sooyah Racing | Open Road</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Sooyah Racing 2.0</title>
 <style>
-:root {
-  --blue:#08b9ff;
-  --dark:#050b16;
-  --panel:#101c30;
-}
-* { box-sizing:border-box; }
-body {
-  margin:0; background:var(--dark); color:white;
-  font-family:Arial,Tahoma,sans-serif;
-}
-button,input { font:inherit; }
-button {
-  cursor:pointer; border:1px solid #54caff55; border-radius:11px;
-  padding:13px 21px; color:white; font-weight:bold;
-  background:linear-gradient(110deg,#087dff,#00c9ed);
-  box-shadow:0 5px 25px #008cff22;
-}
-button:active { transform:scale(.97); }
-button:disabled { opacity:.5; }
-.screen {
-  display:none; min-height:100svh; padding:22px;
-  align-items:center; justify-content:center;
-  flex-direction:column; text-align:center;
-}
-.screen.active { display:flex; }
-.intro {
-  background:radial-gradient(ellipse at 50% 35%,#104c7d,transparent 53%),
-  linear-gradient(145deg,#040914,#101d32 60%,#050a14);
-}
-.eyebrow { color:#6dd9ff; letter-spacing:4px; font-size:12px; }
-.logo {
-  font-size:clamp(54px,12vw,108px); font-weight:900;
-  font-style:italic; letter-spacing:-5px; color:#f4fcff;
-  text-shadow:0 0 10px #009dff,0 0 36px #008cff,4px 5px #0758a0;
-}
-.crown { color:#00baff; font-size:45px; }
-.racing { color:#00baff; letter-spacing:8px; font-weight:bold; }
-h1 { font-size:clamp(25px,5vw,42px); }
-.muted { color:#b6c9dd; line-height:1.9; }
-.panel {
-  width:min(650px,100%); padding:clamp(20px,5vw,38px);
-  border:1px solid #2b4b6d; border-radius:22px;
-  background:linear-gradient(145deg,#12233a,#091321);
-  box-shadow:0 20px 80px #0007;
-}
-input {
-  width:100%; padding:15px; margin:14px 0;
-  border:1px solid #42678b; border-radius:10px;
-  background:#07111f; color:white; text-align:center;
-}
-.cars {
-  display:grid; grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:12px; width:min(900px,100%);
-}
-.car-card {
-  border:2px solid #263c55; border-radius:16px;
-  padding:15px 7px; background:linear-gradient(#182b43,#091422);
-}
-.car-card.selected {
-  border-color:#00caff; box-shadow:0 0 22px #00aaff55;
-}
-.car-art { font-size:clamp(43px,10vw,76px); margin:8px 0; }
-.car-card h3 { font-size:14px; }
-.car-card p { font-size:12px; color:#abc5df; min-height:30px; }
-.car-card button { font-size:12px; padding:9px 5px; }
-.row { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:22px; }
-#driveScreen { padding:0; min-height:100svh; justify-content:flex-start; background:#8ec9ee; }
-#hud {
-  width:100%; padding:9px; display:flex; align-items:center;
-  justify-content:space-around; flex-wrap:wrap; gap:7px;
-  background:#07111ff5; z-index:2;
-}
-.hud-pill {
-  padding:9px 11px; border:1px solid #34516e;
-  border-radius:9px; background:#14263c; font-size:12px;
-}
-#game {
-  display:block; width:100%; flex:1; min-height:300px;
-  touch-action:none;
-}
-#mobileControls {
-  display:flex; justify-content:center; align-items:center;
-  gap:10px; width:100%; padding:10px; background:#07111f;
-}
-#mobileControls button {
-  width:62px; height:54px; padding:0; font-size:22px;
-  touch-action:none; user-select:none; background:#173654;
-}
-#mobileControls .gas { width:84px; font-size:13px; background:#087dff; }
-#mobileControls .brake { width:72px; font-size:12px; background:#a42e43; }
-.drive-note { color:#d4e7f5; font-size:11px; padding:0 8px; }
-#message {
-  position:absolute; top:75px; left:50%; transform:translateX(-50%);
-  padding:10px 16px; background:#07111fdd; border-radius:10px;
-  color:#fff; font-weight:bold; display:none; pointer-events:none;
-}
-#gameWrap { width:100%; flex:1; min-height:0; position:relative; display:flex; }
-@media(min-width:800px) {
-  #game { max-height:calc(100svh - 155px); }
-  #mobileControls { background:transparent; }
-}
-@media(max-width:480px) {
-  .screen { padding:15px; }
-  .cars { gap:6px; }
-  .car-card { padding:10px 3px; }
-  .car-card h3 { font-size:11px; }
-  .hud-pill { padding:8px 6px; font-size:10px; }
-  #game { min-height:260px; }
-}
+*{box-sizing:border-box}
+:root{--blue:#00c5ff;--bg:#060c17}
+body{margin:0;background:var(--bg);color:#fff;font-family:Arial,Tahoma,sans-serif}
+button,input{font:inherit}
+button{border:1px solid #48cfff66;background:linear-gradient(110deg,#087cff,#00c5ff);color:#fff;border-radius:11px;padding:13px 20px;font-weight:bold;cursor:pointer}
+button:active{transform:scale(.97)}
+.screen{display:none;min-height:100svh;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:20px}
+.screen.active{display:flex}
+.hero{background:radial-gradient(ellipse at 50% 35%,#104b7d,transparent 52%),linear-gradient(145deg,#030710,#13233b,#030710)}
+.logo{font-size:clamp(55px,12vw,100px);font-weight:900;font-style:italic;letter-spacing:-5px;color:#fff;text-shadow:0 0 14px #00baff,0 0 45px #007bff}
+.crown{font-size:48px;color:#12caff}
+.eyebrow{color:#68d9ff;letter-spacing:4px;font-size:12px}
+h1{font-size:clamp(25px,5vw,40px)}
+.muted{color:#b9cee2;line-height:1.8}
+.panel{width:min(760px,100%);padding:25px;border:1px solid #2c4e70;border-radius:20px;background:linear-gradient(145deg,#14263e,#091320);box-shadow:0 20px 70px #0008}
+input{width:100%;padding:15px;border:1px solid #42678b;border-radius:10px;background:#07111f;color:white;text-align:center;margin:15px 0}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:min(900px,100%)}
+.choice{border:2px solid #29425c;background:linear-gradient(#192e48,#081321);border-radius:15px;padding:12px 6px;cursor:pointer;min-width:0}
+.choice.selected{border-color:#00caff;box-shadow:0 0 22px #00aaff66;background:#123354}
+.choice h3{font-size:14px}
+.choice p{font-size:12px;color:#b5cde2;min-height:30px}
+.preview{height:105px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.choice button{padding:8px;font-size:12px}
+.row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px;margin-top:20px}
+#race{padding:0;justify-content:flex-start;background:#101b2a}
+#hud{display:flex;width:100%;gap:6px;justify-content:space-around;align-items:center;flex-wrap:wrap;padding:8px;background:#06101df5;z-index:2}
+.pill{background:#142740;border:1px solid #34506c;padding:8px;border-radius:8px;font-size:12px}
+#gameWrap{position:relative;display:flex;flex:1;min-height:0;width:100%;overflow:hidden}
+#game{width:100%;height:100%;display:block;touch-action:none}
+#raceMessage{position:absolute;left:50%;top:24%;transform:translateX(-50%);background:#06101ddd;border:1px solid #ffffff55;border-radius:12px;padding:12px 18px;display:none;white-space:nowrap;font-weight:bold}
+#controls{display:flex;justify-content:center;align-items:center;gap:10px;padding:8px;background:#06101f;width:100%}
+#controls button{width:58px;height:52px;padding:0;font-size:22px;touch-action:none;user-select:none;background:#173654}
+#controls .gas{width:83px;font-size:13px;background:#087dff}
+#controls .brake{width:70px;font-size:12px;background:#a22d42}
+#crash{position:absolute;inset:0;background:linear-gradient(145deg,#19080dF5,#080b16F7);z-index:5;display:none;align-items:center;justify-content:center;flex-direction:column;padding:20px;text-align:center}
+#crash h1{font-size:clamp(35px,9vw,68px);color:#ff4b58;text-shadow:0 0 25px #f00}
+#crash p{line-height:1.9;color:#dce5ef}
+#crash .panel{max-width:500px}
+.note{font-size:11px;color:#b7cbde;margin:5px}
+@media(max-width:480px){.screen{padding:13px}.grid{gap:5px}.choice{padding:8px 3px}.choice h3{font-size:11px}.choice p{font-size:10px}.preview{height:82px}.panel{padding:18px}.pill{font-size:10px;padding:7px 5px}}
 </style>
 </head>
 <body>
 
-<!-- INTRO -->
-<section id="intro" class="screen intro active">
+<section id="intro" class="screen hero active">
   <div class="eyebrow">WELCOME TO THE FUTURE</div>
   <div class="crown">♛</div>
   <div class="logo">Sooyah</div>
-  <div class="racing">R A C I N G</div>
-  <h1>YOUR ROAD. YOUR RULES.</h1>
-  <p class="muted">الطريق ملكك. السرعة اختيارك.<br>استعد لتجربة قيادة مفتوحة!</p>
-  <button onclick="showName()">NEXT &nbsp; ›</button>
-  <p class="eyebrow" style="margin-top:35px">SOOYAH RACING STUDIO</p>
+  <div class="eyebrow">R A C I N G</div>
+  <h1>THE ROAD IS YOURS</h1>
+  <p class="muted">اختار عربيتك، اختار طريقك، واكسب السباق!</p>
+  <button onclick="go('name')">NEXT ›</button>
 </section>
 
-<!-- NAME -->
-<section id="nameScreen" class="screen">
+<section id="name" class="screen">
   <div class="panel">
     <div class="eyebrow">DRIVER REGISTRATION</div>
-    <h1>🏁 سجّل اسمك يا كابتن</h1>
-    <p class="muted">اسمك هيظهر في اللعبة.</p>
-    <input id="playerName" maxlength="20" placeholder="اكتب اسم السائق">
-    <button onclick="registerPlayer()">CONTINUE ›</button>
-    <p id="nameError" style="color:#ff929e"></p>
+    <h1>🏁 سجّل اسمك</h1>
+    <input id="nameInput" maxlength="20" placeholder="اسم السائق">
+    <p id="nameError" style="color:#ff8993"></p>
+    <button onclick="register()">CONTINUE ›</button>
   </div>
 </section>
 
-<!-- WELCOME -->
-<section id="welcomeScreen" class="screen intro">
-  <div class="crown">♛</div>
-  <div class="logo" style="font-size:54px">Sooyah</div>
+<section id="welcome" class="screen hero">
+  <div class="logo" style="font-size:52px">Sooyah</div>
   <h1 id="hello">Hi, Driver!</h1>
-  <p class="muted">العالم المفتوح مستنيك.<br>اختار عربيتك وانطلق!</p>
-  <button onclick="showCars()">CHOOSE YOUR CAR ›</button>
+  <p class="muted">المنافسة بدأت. هل أنت مستعد؟</p>
+  <button onclick="go('cars')">ENTER GARAGE ›</button>
 </section>
 
-<!-- GARAGE -->
-<section id="carScreen" class="screen">
-  <div class="eyebrow">SOOYAH RACING · GARAGE</div>
+<section id="cars" class="screen">
+  <div class="eyebrow">CHOOSE YOUR MACHINE</div>
   <h1>اختار عربيتك 🏎️</h1>
-  <p class="muted">اختار واحدة من 3 عربيات سباق.</p>
-  <div class="cars">
-    <article class="car-card selected" data-car="0">
-      <div class="car-art">🏎️</div>
-      <h3>BLUE PHANTOM</h3>
-      <p>سريعة ومتوازنة</p>
-      <button onclick="selectCar(0)">اختيار</button>
-    </article>
-    <article class="car-card" data-car="1">
-      <div class="car-art">🚗</div>
-      <h3>RED STORM</h3>
-      <p>تحكم ثابت</p>
-      <button onclick="selectCar(1)">اختيار</button>
-    </article>
-    <article class="car-card" data-car="2">
-      <div class="car-art">🏁</div>
-      <h3>GOLDEN GT</h3>
-      <p>سرعة قصوى أعلى</p>
-      <button onclick="selectCar(2)">اختيار</button>
-    </article>
-  </div>
-  <div class="row">
-    <button onclick="showScreen('welcomeScreen')">BACK</button>
-    <button onclick="startDrive()">NEXT · START ENGINE 🚀</button>
-  </div>
+  <p class="muted">كل عربية لها شكل مختلف.</p>
+  <div class="grid" id="carGrid"></div>
+  <div class="row"><button onclick="go('welcome')">BACK</button><button onclick="go('roads')">NEXT ›</button></div>
 </section>
 
-<!-- DRIVING -->
-<section id="driveScreen" class="screen">
+<section id="roads" class="screen">
+  <div class="eyebrow">CHOOSE YOUR TRACK</div>
+  <h1>اختار طريق السباق 🛣️</h1>
+  <div class="grid" id="roadGrid"></div>
+  <div class="row"><button onclick="go('cars')">BACK</button><button onclick="startRace()">START RACE 🏁</button></div>
+</section>
+
+<section id="race" class="screen">
   <div id="hud">
-    <div class="hud-pill" id="driverHud">DRIVER</div>
-    <div class="hud-pill">SPEED <b id="speed">0</b> km/h</div>
-    <div class="hud-pill">DISTANCE <b id="distance">0</b> m</div>
-    <div class="hud-pill">TRAFFIC <b id="trafficCount">0</b></div>
-    <button id="pauseBtn" onclick="pauseDrive()" style="padding:8px 13px">Ⅱ</button>
+    <div class="pill" id="driver">DRIVER</div>
+    <div class="pill">SPEED <b id="speed">0</b></div>
+    <div class="pill">PLACE <b id="place">3</b>/3</div>
+    <div class="pill">DISTANCE <b id="dist">0</b> m</div>
+    <button onclick="pause()" id="pauseBtn" style="padding:7px 11px">Ⅱ</button>
   </div>
   <div id="gameWrap">
     <canvas id="game"></canvas>
-    <div id="message">BRAKE!</div>
+    <div id="raceMessage"></div>
+    <div id="crash">
+      <div class="panel">
+        <div style="font-size:54px">💥</div>
+        <h1>لقد اصطدمت!</h1>
+        <p id="crashReason">اصطدمت بعائق على الطريق.</p>
+        <p>السباق انتهى، لكن تقدر تحاول من جديد.</p>
+        <div class="row">
+          <button onclick="startRace()">🔄 العب مرة أخرى</button>
+          <button onclick="go('cars')">تغيير العربية</button>
+        </div>
+        <button onclick="go('roads')" style="margin-top:10px;background:#263c55">تغيير الطريق</button>
+      </div>
+    </div>
   </div>
-  <div id="mobileControls">
-    <button data-control="left">◀</button>
-    <button data-control="right">▶</button>
-    <button class="brake" data-control="brake">BRAKE</button>
-    <button class="gas" data-control="gas">GAS ▲</button>
+  <div id="controls">
+    <button data-key="left">◀</button>
+    <button data-key="right">▶</button>
+    <button class="brake" data-key="brake">BRAKE</button>
+    <button class="gas" data-key="gas">GAS ▲</button>
   </div>
-  <p class="drive-note">الكمبيوتر: الأسهم أو WASD — الموبايل: استخدم الأزرار.</p>
-  <button onclick="backToGarage()" style="margin:0 0 8px">العودة للجراج</button>
+  <p class="note">الكمبيوتر: الأسهم أو WASD · الموبايل: أزرار التحكم</p>
 </section>
 
 <script>
-const $ = id => document.getElementById(id);
-
-let playerName = "";
-let selectedCar = 0;
-let running = false;
-let paused = false;
-let animation = 0;
-let lastTime = 0;
-let distance = 0;
-let speed = 0;
-let roadOffset = 0;
-let carX = 0;
-let collisionCooldown = 0;
-let trafficTimer = 0;
-let sceneryOffset = 0;
-let trees = [];
-let traffic = [];
-const keys = new Set();
-
-const cars = [
-  {name:"Blue Phantom",color:"#12aaff",maxSpeed:230},
-  {name:"Red Storm",color:"#ff4058",maxSpeed:200},
-  {name:"Golden GT",color:"#ffd04a",maxSpeed:260}
+const $=id=>document.getElementById(id);
+const carData=[
+ {name:"BLUE PHANTOM",color:"#10baff",roof:"#17638b",body:"sport",max:235},
+ {name:"RED BEAST",color:"#ff394e",roof:"#a51f35",body:"muscle",max:215},
+ {name:"GOLDEN GT",color:"#ffcf49",roof:"#a77b17",body:"gt",max:255}
 ];
-
-const trafficTypes = [
-  {color:"#ed394b",width:.78,height:1.0},
-  {color:"#e9e9ed",width:.72,height:1.0},
-  {color:"#f4c544",width:.75,height:1.0},
-  {color:"#2ac4a0",width:.74,height:1.0},
-  {color:"#5275ef",width:.78,height:1.0},
-  {color:"#adb7c5",width:1.05,height:1.55}
+const roadData=[
+ {name:"DESERT HIGHWAY",desc:"طريق صحراوي طويل",sky:"#eaa56c",grass:"#c7a268",ground:"#ad8955",road:"#45464a",type:0},
+ {name:"NEON CITY",desc:"مدينة وأضواء ليلية",sky:"#101d43",grass:"#202b3c",ground:"#172131",road:"#30333e",type:1},
+ {name:"MOUNTAIN ROAD",desc:"جبال ومنعطفات",sky:"#83c5ed",grass:"#4f8c5c",ground:"#3e7549",road:"#44484d",type:2}
 ];
+let playerName="Driver",selectedCar=0,selectedRoad=0;
+let running=false,paused=false,raf=0,last=0;
+let W=800,H=500,speed=0,distance=0,carX=0,roadOffset=0;
+let traffic=[],trafficClock=0,collisionLock=0,keys=new Set();
+let opponentA={x:-.35,progress:0,speed:0},opponentB={x:.35,progress:0,speed:0};
+let obstacles=[],obstacleClock=0,finishDistance=5000;
+const canvas=$("game"),ctx=canvas.getContext("2d");
 
-const canvas = $("game");
-const ctx = canvas.getContext("2d");
-let W = 800, H = 500;
-
-function showScreen(id) {
-  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
-  $(id).classList.add("active");
+function go(id){
+ if(id!=="race"){running=false;cancelAnimationFrame(raf);keys.clear()}
+ document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+ $(id).classList.add("active");
 }
-
-function showName() {
-  showScreen("nameScreen");
-  $("playerName").focus();
+function register(){
+ const n=$("nameInput").value.trim();
+ if(!n){$("nameError").textContent="اكتب اسمك الأول يا كابتن!";return}
+ playerName=n;$("hello").textContent="Hi, "+n+"!";$("driver").textContent="🏁 "+n;go("welcome");
 }
-
-function registerPlayer() {
-  const name = $("playerName").value.trim();
-  if (!name) {
-    $("nameError").textContent = "اكتب اسمك الأول!";
+function makeCarArt(i){
+ const c=carData[i];
+ return `<svg viewBox="0 0 180 100" width="100%" height="100%">
+ <defs><linearGradient id="paint${i}" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff" stop-opacity=".6"/><stop offset=".4" stop-color="${c.color}"/><stop offset="1" stop-color="${c.roof}"/></linearGradient></defs>
+ <ellipse cx="90" cy="82" rx="70" ry="10" fill="#0008"/>
+ <path d="${i===1?"M12 72 L22 47 L47 43 L63 22 L119 22 L143 43 L160 49 L170 72 Z":i===2?"M10 72 L22 50 L50 42 L66 24 L120 24 L145 44 L165 50 L172 72 Z":"M12 72 L20 49 L45 44 L63 22 L116 22 L143 44 L162 49 L170 72 Z"}" fill="url(#paint${i})" stroke="#d8f7ff" stroke-opacity=".7" stroke-width="2"/>
+ <path d="M53 42 L69 27 L112 27 L132 43 Z" fill="#10273c" stroke="#a9ecff"/>
+ <path d="M90 28 L90 42" stroke="#91dfff" stroke-opacity=".5" stroke-width="2"/>
+ <path d="M20 58 L40 56 M140 56 L160 59" stroke="#fff" stroke-opacity=".55" stroke-width="3"/>
+ <rect x="22" y="63" width="20" height="8" rx="2" fill="#ff3546"/><rect x="139" y="63" width="20" height="8" rx="2" fill="#ff3546"/>
+ <circle cx="48" cy="72" r="14" fill="#111820" stroke="#9eb5c7" stroke-width="4"/><circle cx="48" cy="72" r="6" fill="#a5bbcd"/>
+ <circle cx="136" cy="72" r="14" fill="#111820" stroke="#9eb5c7" stroke-width="4"/><circle cx="136" cy="72" r="6" fill="#a5bbcd"/>
+ </svg>`;
+}
+function buildChoices(){
+ $("carGrid").innerHTML=carData.map((c,i)=>`
+ <div class="choice ${i===selectedCar?"selected":""}" data-car="${i}">
+ <div class="preview">${makeCarArt(i)}</div><h3>${c.name}</h3>
+ <p>تصميم ${["رياضي أزرق","عضلات حمراء","GT ذهبي"][i]}</p>
+ <button onclick="chooseCar(${i})">${i===selectedCar?"تم الاختيار":"اختيار العربية"}</button>
+ </div>`).join("");
+ $("roadGrid").innerHTML=roadData.map((r,i)=>`
+ <div class="choice ${i===selectedRoad?"selected":""}" onclick="chooseRoad(${i})">
+ <div class="preview">${roadPreview(i)}</div><h3>${r.name}</h3><p>${r.desc}</p>
+ <button>${i===selectedRoad?"تم الاختيار":"اختيار الطريق"}</button></div>`).join("");
+}
+function chooseCar(i){selectedCar=i;buildChoices()}
+function chooseRoad(i){selectedRoad=i;buildChoices()}
+function roadPreview(i){
+ const sky=roadData[i].sky;
+ const extras=i===0?'<circle cx="130" cy="20" r="11" fill="#ffe6a3"/><path d="M0 70 L35 35 L70 70 L105 40 L150 70" fill="#a77d52"/>':i===1?'<path d="M0 70V28H24V70 M42 70V10H70V70 M95 70V32H125V70 M145 70V18H170V70" fill="#27395c" stroke="#24aaff"/>':'<path d="M0 70 L40 12 L80 70 L120 6 L180 70" fill="#5d8290"/>';
+ return `<svg viewBox="0 0 180 90" width="100%" height="100%"><rect width="180" height="90" fill="${sky}"/>${extras}<path d="M72 90L82 50H98L108 90" fill="${roadData[i].road}"/><path d="M90 90V50" stroke="#fff" stroke-dasharray="7 5"/></svg>`;
+}
+function resize(){
+ const r=canvas.getBoundingClientRect(),dpr=Math.min(devicePixelRatio||1,2);
+ W=Math.max(320,r.width);H=Math.max(260,r.height);
+ canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+}
+function startRace(){
+ go("race");resize();
+ running=true;paused=false;speed=0;distance=0;carX=0;roadOffset=0;
+ traffic=[];obstacles=[];trafficClock=0;obstacleClock=0;collisionLock=0;
+ opponentA={x:-.32,progress:0,speed:125+Math.random()*40};
+ opponentB={x:.32,progress:0,speed:130+Math.random()*45};
+ $("crash").style.display="none";$("pauseBtn").textContent="Ⅱ";
+ $("raceMessage").style.display="none";keys.clear();
+ last=performance.now();raf=requestAnimationFrame(loop);
+}
+function pause(){
+ if(!running)return;
+ paused=!paused;keys.clear();
+ $("pauseBtn").textContent=paused?"▶":"Ⅱ";
+ if(!paused){last=performance.now();raf=requestAnimationFrame(loop)}
+}
+function crash(reason){
+ if(!running)return;
+ running=false;cancelAnimationFrame(raf);keys.clear();
+ $("crashReason").textContent=reason;
+ $("crash").style.display="flex";
+}
+function roadAt(p){
+ return {y:H*.32+(H-H*.32)*p*p,half:W*.075+(W*.43-W*.075)*p};
+}
+function poly(points,color){
+ ctx.fillStyle=color;ctx.beginPath();ctx.moveTo(...points[0]);
+ points.slice(1).forEach(p=>ctx.lineTo(...p));ctx.closePath();ctx.fill();
+}
+function drawEnvironment(dt){
+ const road=roadData[selectedRoad],cx=W/2,horizon=H*.32;
+ const sky=ctx.createLinearGradient(0,0,0,H);
+ sky.addColorStop(0,road.sky);sky.addColorStop(1,road.type===1?"#48536a":"#e2eddf");
+ ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);
+ if(road.type!==1){
+  ctx.fillStyle="#ffefb0";ctx.beginPath();ctx.arc(W*.79,H*.12,Math.min(W,H)*.05,0,7);ctx.fill();
+ }else{
+  // Neon moon
+  ctx.fillStyle="#c7ddff";ctx.beginPath();ctx.arc(W*.8,H*.12,Math.min(W,H)*.035,0,7);ctx.fill();
+ }
+ // distant scenery
+ if(road.type===2){
+  poly([[0,horizon+50],[W*.16,horizon-30],[W*.33,horizon+35],[W*.55,horizon-48],[W*.77,horizon+30],[W,horizon-20],[W,H],[0,H]],"#547b80");
+  poly([[0,horizon+70],[W*.25,horizon+5],[W*.43,horizon+65],[W*.69,horizon-4],[W,horizon+60],[W,H],[0,H]],"#507e53");
+ }else if(road.type===0){
+  poly([[0,horizon+35],[W*.2,horizon-10],[W*.4,horizon+25],[W*.65,horizon-15],[W,horizon+30],[W,H],[0,H]],"#bd955e");
+ }else{
+  ctx.fillStyle="#1c2a42";ctx.fillRect(0,horizon,W,H-horizon);
+  for(let i=0;i<15;i++){
+   const x=i*W/14,y=horizon+15+(i%3)*14;
+   ctx.fillStyle=i%2?"#2e3d5a":"#23324b";
+   ctx.fillRect(x,y,Math.max(5,W*.035),H-y);
+   ctx.fillStyle="#00d9ff88";
+   ctx.fillRect(x+3,y+7,3,4);
+   ctx.fillRect(x+8,y+17,3,4);
+  }
+ }
+ // road surface
+ const top=W*.075,bottom=W*.43;
+ poly([[cx-top,horizon],[cx+top,horizon],[cx+bottom,H],[cx-bottom,H]],road.road);
+ // road shoulders
+ for(const side of [-1,1]){
+  ctx.strokeStyle=road.type===1?"#16baff":"#fff";
+  ctx.lineWidth=Math.max(2,W*.005);
+  ctx.beginPath();ctx.moveTo(cx+side*top,horizon);ctx.lineTo(cx+side*bottom,H);ctx.stroke();
+  if(road.type!==1){
+   ctx.strokeStyle="#e84b4b";ctx.lineWidth=Math.max(3,W*.012);
+   ctx.beginPath();ctx.moveTo(cx+side*(top+4),horizon);ctx.lineTo(cx+side*(bottom+4),H);ctx.stroke();
+  }
+ }
+ roadOffset=(roadOffset+dt*(.15+speed/80))%1;
+ for(let i=0;i<24;i++){
+  const p=(i/24+roadOffset)%1,g=roadAt(p);
+  const dashH=2+p*p*34,dashW=1+p*5;
+  ctx.fillStyle=road.type===1?"#00dfff":"#fff4cf";
+  for(let lane=1;lane<=2;lane++){
+   const x=cx-g.half+g.half*2*lane/3;
+   ctx.fillRect(x-dashW/2,g.y,dashW,dashH);
+  }
+ }
+ // roadside objects approach as road scrolls
+ for(let i=0;i<18;i++){
+  const p=(i/18+roadOffset*.7)%1,g=roadAt(p);
+  const size=3+p*34;
+  for(const side of [-1,1]){
+   const x=cx+side*(g.half+size*.8+12);
+   if(road.type===1){
+    ctx.fillStyle=i%2?"#14baff":"#e04aff";
+    ctx.fillRect(x-size*.3,g.y-size*2,size*.6,size*2);
+    ctx.fillStyle="#fff8a9";
+    ctx.fillRect(x-size*.15,g.y-size*1.5,size*.12,size*.12);
+    ctx.fillRect(x+size*.06,g.y-size*1.5,size*.12,size*.12);
+   }else if(i%3===0){
+    ctx.fillStyle="#65482f";ctx.fillRect(x-size*.06,g.y-size*.8,size*.12,size*.8);
+    ctx.fillStyle="#2b864b";ctx.beginPath();ctx.arc(x,g.y-size*.85,size*.42,0,7);ctx.fill();
+    ctx.fillStyle="#48a65b";ctx.beginPath();ctx.arc(x-size*.13,g.y-size,size*.23,0,7);ctx.fill();
+   }else{
+    ctx.fillStyle=road.type===0?"#d6b17a":"#8caaa0";
+    ctx.fillRect(x-size*.32,g.y-size*1.5,size*.64,size*1.5);
+   }
+  }
+ }
+}
+function drawCar(x,y,w,color,style="sport",player=false){
+ const h=w*(style==="bus"?1.75:1.5);
+ ctx.save();ctx.translate(x,y);
+ ctx.fillStyle="#0008";ctx.beginPath();ctx.ellipse(0,h*.34,w*.65,h*.17,0,0,7);ctx.fill();
+ ctx.fillStyle=color;
+ ctx.beginPath();
+ if(style==="bus"){
+  ctx.moveTo(-w*.48,h*.42);ctx.lineTo(-w*.48,-h*.48);ctx.lineTo(w*.48,-h*.48);ctx.lineTo(w*.48,h*.42);
+ }else if(style==="muscle"){
+  ctx.moveTo(-w*.47,h*.43);ctx.lineTo(-w*.48,h*.02);ctx.lineTo(-w*.33,-h*.28);ctx.lineTo(-w*.24,-h*.38);ctx.lineTo(w*.25,-h*.38);ctx.lineTo(w*.4,-h*.16);ctx.lineTo(w*.48,h*.05);ctx.lineTo(w*.43,h*.43);
+ }else{
+  ctx.moveTo(-w*.42,h*.44);ctx.lineTo(-w*.48,h*.08);ctx.lineTo(-w*.3,-h*.34);ctx.quadraticCurveTo(0,-h*.52,w*.3,-h*.34);ctx.lineTo(w*.48,h*.08);ctx.lineTo(w*.42,h*.44);
+ }
+ ctx.closePath();ctx.fill();
+ ctx.strokeStyle="#ffffff77";ctx.lineWidth=Math.max(1,w*.025);ctx.stroke();
+ ctx.fillStyle="#10283e";
+ ctx.beginPath();
+ if(style==="bus"){
+  ctx.rect(-w*.36,-h*.39,w*.72,h*.3);
+ }else{
+  ctx.moveTo(-w*.28,-h*.26);ctx.lineTo(w*.28,-h*.26);ctx.lineTo(w*.37,h*.04);ctx.lineTo(-w*.37,h*.04);
+ }
+ ctx.closePath();ctx.fill();
+ if(style==="bus"){
+  ctx.strokeStyle="#a9eaff";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(0,-h*.39);ctx.lineTo(0,-h*.09);ctx.stroke();
+  ctx.fillStyle="#1a2029";ctx.fillRect(-w*.4,h*.12,w*.8,h*.05);
+ }
+ ctx.fillStyle=player?"#fff0a0":"#ff283c";
+ ctx.fillRect(-w*.41,h*.27,w*.16,h*.08);ctx.fillRect(w*.25,h*.27,w*.16,h*.08);
+ ctx.fillStyle="#131923";ctx.fillRect(-w*.44,h*.39,w*.88,h*.09);
+ ctx.fillStyle="#b9c8d4";
+ ctx.fillRect(-w*.37,h*.40,w*.14,h*.04);ctx.fillRect(w*.23,h*.40,w*.14,h*.04);
+ if(player){
+  ctx.fillStyle="#e7faff";ctx.fillRect(-w*.1,h*.43,w*.2,h*.035);
+ }
+ ctx.restore();
+}
+function spawnTraffic(){
+ const lane=[-.66,0,.66][Math.floor(Math.random()*3)];
+ if(traffic.some(c=>c.lane===lane&&c.depth<.22))return;
+ const bus=Math.random()<.22;
+ const colors=["#f43e4e","#eeeeef","#f7c644","#24c4a0","#5d7dff"];
+ traffic.push({
+  lane,depth:.01,speed:bus?30+Math.random()*25:45+Math.random()*65,
+  color:bus?"#e7b73e":colors[Math.floor(Math.random()*colors.length)],
+  style:bus?"bus":Math.random()<.5?"muscle":"sport",passed:false
+ });
+}
+function spawnObstacle(){
+ obstacles.push({lane:[-.65,0,.65][Math.floor(Math.random()*3)],depth:.01});
+}
+function update(dt){
+ const c=cars[selectedCar];
+ const gas=keys.has("ArrowUp")||keys.has("w")||keys.has("W")||keys.has("gas");
+ const brake=keys.has("ArrowDown")||keys.has("s")||keys.has("S")||keys.has("brake");
+ const left=keys.has("ArrowLeft")||keys.has("a")||keys.has("A")||keys.has("left");
+ const right=keys.has("ArrowRight")||keys.has("d")||keys.has("D")||keys.has("right");
+ if(gas)speed=Math.min(c.max,speed+95*dt);
+ else speed=Math.max(45,speed-7*dt);
+ if(brake)speed=Math.max(0,speed-180*dt);
+ carX+=((right?1:0)-(left?1:0))*dt*(.55+speed/180);
+ carX=Math.max(-.85,Math.min(.85,carX));
+ if(Math.abs(carX)>.76)speed=Math.max(25,speed-70*dt);
+ distance+=speed*dt/3.6;
+ opponentA.progress+=opponentA.speed*dt/3.6;
+ opponentB.progress+=opponentB.speed*dt/3.6;
+ opponentA.x=-.34+Math.sin(distance/110+1)*.07;
+ opponentB.x=.34+Math.sin(distance/140+2)*.07;
+ collisionLock=Math.max(0,collisionLock-dt);
+ trafficClock+=dt;obstacleClock+=dt;
+ if(trafficClock>Math.max(.75,1.8-speed/230)){spawnTraffic();trafficClock=0}
+ if(obstacleClock>3.7){if(Math.random()<.65)spawnObstacle();obstacleClock=0}
+ for(let i=traffic.length-1;i>=0;i--){
+  const t=traffic[i];t.depth+=dt*(.13+speed/680+t.speed/1200);
+  if(t.depth>.82&&!t.passed){
+   t.passed=true;
+   if(Math.abs(t.lane-carX)<.32&&collisionLock<=0){
+    crash(t.style==="bus"?"لقد خبطت في الأتوبيس!":"لقد خبطت في عربية المرور!");
     return;
+   }
   }
-  playerName = name;
-  $("hello").textContent = "Hi, " + playerName + "!";
-  $("driverHud").textContent = "🏁 " + playerName;
-  showScreen("welcomeScreen");
-}
-
-function showCars() { showScreen("carScreen"); }
-
-function selectCar(i) {
-  selectedCar = i;
-  document.querySelectorAll(".car-card").forEach(card=>
-    card.classList.toggle("selected",Number(card.dataset.car)===i)
-  );
-}
-
-function resizeCanvas() {
-  const r = canvas.getBoundingClientRect();
-  const dpr = Math.min(window.devicePixelRatio || 1,2);
-  W = Math.max(320,r.width);
-  H = Math.max(260,r.height);
-  canvas.width = Math.round(W*dpr);
-  canvas.height = Math.round(H*dpr);
-  ctx.setTransform(dpr,0,0,dpr,0,0);
-}
-
-function startDrive() {
-  cancelAnimationFrame(animation);
-  showScreen("driveScreen");
-  resizeCanvas();
-  running = true;
-  paused = false;
-  distance = 0;
-  speed = 0;
-  carX = 0;
-  roadOffset = 0;
-  sceneryOffset = 0;
-  trafficTimer = 0;
-  collisionCooldown = 0;
-  traffic = [];
-  trees = [];
-  lastTime = performance.now();
-  $("pauseBtn").textContent = "Ⅱ";
-  $("message").style.display = "none";
-  animation = requestAnimationFrame(loop);
-}
-
-function pauseDrive() {
-  if (!running) return;
-  paused = !paused;
-  $("pauseBtn").textContent = paused ? "▶" : "Ⅱ";
-  if (!paused) {
-    lastTime = performance.now();
-    animation = requestAnimationFrame(loop);
-  } else {
-    keys.clear();
+  if(t.depth>1.1)traffic.splice(i,1);
+ }
+ for(let i=obstacles.length-1;i>=0;i--){
+  const o=obstacles[i];o.depth+=dt*(.12+speed/700);
+  if(o.depth>.83){
+   if(Math.abs(o.lane-carX)<.30){crash("لقد خبطت في حاجز الطريق!");return}
+   obstacles.splice(i,1);
   }
+  if(o.depth>1.1)obstacles.splice(i,1);
+ }
+ if(distance>=finishDistance){crash("وصلت لنهاية السباق! اضغط العب مرة أخرى لتبدأ سباقًا جديدًا.");return}
+ $("speed").textContent=Math.round(speed);
+ $("dist").textContent=Math.floor(distance);
+ const rank=1+(opponentA.progress>distance?1:0)+(opponentB.progress>distance?1:0);
+ $("place").textContent=rank;
 }
-
-function backToGarage() {
-  running = false;
-  cancelAnimationFrame(animation);
-  keys.clear();
-  showScreen("carScreen");
+function drawRace(dt){
+ drawEnvironment(dt);
+ const center=W/2;
+ // traffic and buses
+ traffic.slice().sort((a,b)=>a.depth-b.depth).forEach(t=>{
+  const p=t.depth,g=roadAt(p),x=center+t.lane*g.half;
+  drawCar(x,g.y,W*(t.style==="bus"?.12:.095)*(.18+p*1.5),t.color,t.style,false);
+ });
+ // obstacles
+ obstacles.slice().sort((a,b)=>a.depth-b.depth).forEach(o=>{
+  const p=o.depth,g=roadAt(p),x=center+o.lane*g.half,s=4+p*28;
+  ctx.fillStyle="#ff9e26";
+  ctx.beginPath();ctx.moveTo(x-s,g.y);ctx.lineTo(x,g.y-s*1.5);ctx.lineTo(x+s,g.y);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#f4e8d1";ctx.fillRect(x-s*.7,g.y-s*.4,s*1.4,s*.16);
+ });
+ // opponents ahead: two distinct cars
+ const g=roadAt(.43);
+ drawCar(center+opponentA.x*g.half,g.y,W*.083,cars[(selectedCar+1)%3].color,"muscle",false);
+ drawCar(center+opponentB.x*g.half,g.y+H*.045,W*.092,cars[(selectedCar+2)%3].color,"sport",false);
+ // player
+ drawCar(center+carX*W*.34,H*.81,Math.min(W*.17,105),cars[selectedCar].color,cars[selectedCar].body,true);
 }
-
-function polygon(points,color) {
-  ctx.fillStyle = color;
-  ctx.beginPath();
-  ctx.moveTo(points[0][0],points[0][1]);
-  for(let i=1;i<points.length;i++) ctx.lineTo(points[i][0],points[i][1]);
-  ctx.closePath();
-  ctx.fill();
+function loop(now){
+ if(!running||paused)return;
+ const dt=Math.min((now-last)/1000,.04);last=now;
+ update(dt);
+ if(!running)return;
+ drawRace(dt);
+ raf=requestAnimationFrame(loop);
 }
-
-function roadGeometry(p) {
-  const horizon = H*.34;
-  return {
-    y:horizon+(H-horizon)*p*p,
-    half:W*.085+(W*.45-W*.085)*p
-  };
-}
-
-function drawScenery(dt) {
-  const horizon = H*.34;
-  sceneryOffset = (sceneryOffset+dt*(.07+speed/450))%1;
-
-  // Rolling hills
-  polygon([[0,horizon+25],[W*.12,horizon-35],[W*.27,horizon+16],
-    [W*.43,horizon-40],[W*.62,horizon+14],[W*.82,horizon-28],
-    [W,horizon+20],[W,H],[0,H]],"#779d79");
-
-  // Trees and buildings that approach the player
-  for(let i=0;i<18;i++) {
-    const p=((i/18+sceneryOffset)%1);
-    const geo=roadGeometry(p);
-    const size=5+p*46;
-    for(const side of [-1,1]) {
-      const x=W/2+side*(geo.half+size*.9+10);
-      if(i%4===0) {
-        ctx.fillStyle="#647d92";
-        ctx.fillRect(x-size*.36,geo.y-size*2,size*.72,size*2);
-        ctx.fillStyle="#ffdf91";
-        for(let row=0;row<3;row++) for(let col=0;col<2;col++)
-          ctx.fillRect(x-size*.24+col*size*.26,
-            geo.y-size*1.7+row*size*.46,size*.1,size*.15);
-        ctx.fillStyle="#445a70";
-        ctx.fillRect(x-size*.43,geo.y-size*2.1,size*.86,size*.14);
-      } else {
-        ctx.fillStyle="#65452d";
-        ctx.fillRect(x-size*.065,geo.y-size*.75,size*.13,size*.75);
-        ctx.fillStyle=i%2?"#247548":"#368b51";
-        ctx.beginPath();
-        ctx.arc(x,geo.y-size*.83,size*.43,0,Math.PI*2);
-        ctx.fill();
-        ctx.fillStyle="#56a75e";
-        ctx.beginPath();
-        ctx.arc(x-size*.16,geo.y-size*.94,size*.24,0,Math.PI*2);
-        ctx.fill();
-      }
-    }
-  }
-}
-
-function drawRoad(dt) {
-  const horizon=H*.34, center=W/2;
-  const top=W*.085, bottom=W*.45;
-
-  // Sky
-  const sky=ctx.createLinearGradient(0,0,0,H);
-  sky.addColorStop(0,"#54a5df");
-  sky.addColorStop(.6,"#d5edff");
-  sky.addColorStop(1,"#d9e8ca");
-  ctx.fillStyle=sky;
-  ctx.fillRect(0,0,W,H);
-
-  // Sun and distant clouds
-  ctx.fillStyle="#fff0b5";
-  ctx.beginPath();
-  ctx.arc(W*.79,H*.12,Math.min(W,H)*.055,0,Math.PI*2);
-  ctx.fill();
-
-  ctx.fillStyle="#ffffff88";
-  for(let i=0;i<4;i++) {
-    const x=(W*(.12+i*.24)+(sceneryOffset*W*.08))%W;
-    ctx.beginPath();
-    ctx.ellipse(x,H*(.10+(i%2)*.07),W*.045,H*.018,0,0,Math.PI*2);
-    ctx.fill();
-  }
-
-  drawScenery(dt);
-
-  // Road surface
-  polygon([[center-top,horizon],[center+top,horizon],
-    [center+bottom,H],[center-bottom,H]],"#373c45");
-
-  // Shoulders and road boundaries
-  for(const side of [-1,1]) {
-    ctx.strokeStyle="#f8f7ed";
-    ctx.lineWidth=Math.max(2,W*.006);
-    ctx.beginPath();
-    ctx.moveTo(center+side*top,horizon);
-    ctx.lineTo(center+side*bottom,H);
-    ctx.stroke();
-
-    ctx.strokeStyle="#e84a48";
-    ctx.lineWidth=Math.max(3,W*.012);
-    ctx.beginPath();
-    ctx.moveTo(center+side*(top+4),horizon);
-    ctx.lineTo(center+side*(bottom+4),H);
-    ctx.stroke();
-  }
-
-  // Moving lane dividers
-  roadOffset=(roadOffset+dt*(.18+speed/80))%1;
-  for(let i=0;i<22;i++) {
-    const p=(i/22+roadOffset)%1;
-    const geo=roadGeometry(p);
-    const dashH=2+p*p*34;
-    const dashW=1+p*5;
-    ctx.fillStyle="#f8f3d9";
-    for(let lane=1;lane<=2;lane++) {
-      const x=center-geo.half+geo.half*2*lane/3;
-      ctx.fillRect(x-dashW/2,geo.y,dashW,dashH);
-    }
-  }
-
-  // Roadside reflector posts
-  for(let i=0;i<16;i++) {
-    const p=(i/16+roadOffset*.75)%1;
-    const geo=roadGeometry(p);
-    const size=2+p*13;
-    for(const side of [-1,1]) {
-      const x=center+side*(geo.half+8+p*20);
-      ctx.fillStyle=i%2?"#fff7e6":"#e44d4d";
-      ctx.fillRect(x-size/2,geo.y-size,size,size*1.8);
-    }
-  }
-}
-
-function drawCar(x,y,w,color,truck=false,player=false) {
-  const h=w*(truck?1.75:1.45);
-  ctx.save();
-  ctx.translate(x,y);
-
-  // Shadow
-  ctx.fillStyle="#080c1380";
-  ctx.beginPath();
-  ctx.ellipse(0,h*.34,w*.65,h*.17,0,0,Math.PI*2);
-  ctx.fill();
-
-  // Body
-  ctx.fillStyle=color;
-  ctx.beginPath();
-  if(truck) {
-    ctx.moveTo(-w*.48,h*.42); ctx.lineTo(-w*.48,-h*.36);
-    ctx.lineTo(w*.48,-h*.36); ctx.lineTo(w*.48,h*.42);
-  } else {
-    ctx.moveTo(-w*.42,h*.44); ctx.lineTo(-w*.48,h*.08);
-    ctx.lineTo(-w*.3,-h*.34);
-    ctx.quadraticCurveTo(0,-h*.52,w*.3,-h*.34);
-    ctx.lineTo(w*.48,h*.08); ctx.lineTo(w*.42,h*.44);
-  }
-  ctx.closePath(); ctx.fill();
-
-  // Windows
-  ctx.fillStyle="#152c42";
-  ctx.beginPath();
-  if(truck) {
-    ctx.moveTo(-w*.37,-h*.27); ctx.lineTo(w*.37,-h*.27);
-    ctx.lineTo(w*.37,-h*.02); ctx.lineTo(-w*.37,-h*.02);
-  } else {
-    ctx.moveTo(-w*.28,-h*.25); ctx.lineTo(w*.28,-h*.25);
-    ctx.lineTo(w*.37,h*.04); ctx.lineTo(-w*.37,h*.04);
-  }
-  ctx.closePath(); ctx.fill();
-
-  // Body highlights
-  ctx.fillStyle="#ffffff44";
-  ctx.fillRect(-w*.32,h*.13,w*.64,h*.035);
-
-  // Tail lights or headlights
-  ctx.fillStyle=player?"#e7faff":"#ff253d";
-  ctx.fillRect(-w*.41,h*.26,w*.16,h*.09);
-  ctx.fillRect(w*.25,h*.26,w*.16,h*.09);
-
-  ctx.fillStyle="#151c27";
-  ctx.fillRect(-w*.45,h*.39,w*.9,h*.08);
-
-  if(player) {
-    ctx.fillStyle="#fff1a0";
-    ctx.fillRect(-w*.09,h*.43,w*.18,h*.035);
-  }
-  ctx.restore();
-}
-
-function spawnTraffic() {
-  const type=trafficTypes[Math.floor(Math.random()*trafficTypes.length)];
-  const lanes=[-.65,0,.65];
-  const lane=lanes[Math.floor(Math.random()*lanes.length)];
-
-  // Avoid starting a new car directly on another one
-  if(traffic.some(c=>c.lane===lane&&c.depth<.20)) return;
-
-  traffic.push({
-    lane,depth:.015,
-    speed:35+Math.random()*90,
-    type,passed:false
-  });
-}
-
-function updateTraffic(dt) {
-  trafficTimer+=dt;
-  if(trafficTimer>Math.max(.65,1.7-speed/220)) {
-    spawnTraffic();
-    trafficTimer=0;
-  }
-
-  collisionCooldown=Math.max(0,collisionCooldown-dt);
-  const playerDepth=.88;
-
-  for(let i=traffic.length-1;i>=0;i--) {
-    const car=traffic[i];
-    car.depth+=dt*(.12+speed/650+car.speed/1100);
-
-    if(!car.passed&&car.depth>=playerDepth&&car.depth<playerDepth+.10) {
-      if(Math.abs(car.lane-carX)<.34&&collisionCooldown<=0) {
-        speed=Math.max(0,speed*.48);
-        collisionCooldown=1.2;
-        car.passed=true;
-        $("message").textContent="💥 اصطدام! خفّف السرعة";
-        $("message").style.display="block";
-        setTimeout(()=>$("message").style.display="none",900);
-      } else if(!car.passed) {
-        car.passed=true;
-      }
-    }
-
-    if(car.depth>1.15) traffic.splice(i,1);
-  }
-
-  $("trafficCount").textContent=traffic.length;
-}
-
-function drawTraffic() {
-  const horizon=H*.34,center=W/2;
-  const top=W*.085,bottom=W*.45;
-  const sorted=[...traffic].sort((a,b)=>a.depth-b.depth);
-
-  for(const car of sorted) {
-    const p=car.depth;
-    const y=horizon+(H-horizon)*p*p;
-    const half=top+(bottom-top)*p;
-    const x=center+car.lane*half;
-    const w=W*(car.type.width*.10)*(.18+p*1.5);
-    drawCar(x,y,w,car.type.color,car.type.height>1.3,false);
-  }
-}
-
-function update(dt) {
-  const car=cars[selectedCar];
-  const gas=keys.has("ArrowUp")||keys.has("w")||keys.has("W")||keys.has("gas");
-  const brake=keys.has("ArrowDown")||keys.has("s")||keys.has("S")||keys.has("brake");
-  const left=keys.has("ArrowLeft")||keys.has("a")||keys.has("A")||keys.has("left");
-  const right=keys.has("ArrowRight")||keys.has("d")||keys.has("D")||keys.has("right");
-
-  if(gas) speed=Math.min(car.maxSpeed,speed+95*dt);
-  else speed=Math.max(0,speed-9*dt);
-
-  if(brake) speed=Math.max(0,speed-170*dt);
-
-  const steer=(left?-1:0)+(right?1:0);
-  carX+=steer*dt*(.55+speed/180);
-  carX=Math.max(-.86,Math.min(.86,carX));
-
-  if(Math.abs(carX)>.76) speed=Math.max(30,speed-65*dt);
-
-  distance+=speed*dt/3.6;
-  updateTraffic(dt);
-}
-
-function drawFrame(dt) {
-  drawRoad(dt);
-  drawTraffic();
-
-  const playerX=W/2+carX*(W*.45)*.77;
-  const playerY=H*.81;
-  const playerW=Math.min(W*.19,112);
-  drawCar(playerX,playerY,playerW,cars[selectedCar].color,false,true);
-
-  $("speed").textContent=Math.round(speed);
-  $("distance").textContent=Math.floor(distance);
-}
-
-function loop(now) {
-  if(!running||paused) return;
-  const dt=Math.min((now-lastTime)/1000,.04);
-  lastTime=now;
-  update(dt);
-  drawFrame(dt);
-  animation=requestAnimationFrame(loop);
-}
-
+function replay(){startRace()}
 window.addEventListener("resize",()=>{
-  if($("driveScreen").classList.contains("active")) {
-    resizeCanvas();
-    drawFrame(0);
-  }
+ if($("race").classList.contains("active")){resize();drawRace(0)}
 });
-
 window.addEventListener("keydown",e=>{
-  if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))
-    e.preventDefault();
-  keys.add(e.key);
+ if(["ArrowUp","ArrowDown","ArrowLeft","ArrowRight"," "].includes(e.key))e.preventDefault();
+ keys.add(e.key);
 });
 window.addEventListener("keyup",e=>keys.delete(e.key));
 window.addEventListener("blur",()=>keys.clear());
-
-document.querySelectorAll("[data-control]").forEach(btn=>{
-  const control=btn.dataset.control;
-
-  btn.addEventListener("pointerdown",e=>{
-    e.preventDefault();
-    keys.add(control);
-    btn.setPointerCapture(e.pointerId);
-  });
-
-  const release=e=>{
-    e.preventDefault();
-    keys.delete(control);
-  };
-  btn.addEventListener("pointerup",release);
-  btn.addEventListener("pointercancel",release);
-  btn.addEventListener("lostpointercapture",release);
+document.querySelectorAll("[data-key]").forEach(btn=>{
+ const k=btn.dataset.key;
+ btn.addEventListener("pointerdown",e=>{
+  e.preventDefault();keys.add(k);btn.setPointerCapture(e.pointerId);
+ });
+ const release=e=>{e.preventDefault();keys.delete(k)};
+ btn.addEventListener("pointerup",release);
+ btn.addEventListener("pointercancel",release);
+ btn.addEventListener("lostpointercapture",release);
 });
-
-$("playerName").addEventListener("keydown",e=>{
-  if(e.key==="Enter") registerPlayer();
-});
-
-selectCar(0);
+$("nameInput").addEventListener("keydown",e=>{if(e.key==="Enter")register()});
+buildChoices();
 </script>
 </body>
 </html>
