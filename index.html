@@ -2,589 +2,826 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<title>سويا ريس - Soiya Race</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>سويا ريسينج - SOYA RACING</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
   body {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    background: #000;
     color: #fff;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
   }
-
   .screen {
-    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    max-width: 1000px;
-    padding: 30px;
-    text-align: center;
-    animation: fadeIn 0.6s ease;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease;
+    z-index: 10;
   }
-  .screen.active { display: block; }
-
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(30px); }
-    to { opacity: 1; transform: translateY(0); }
+  .hidden {
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
   }
-
-  h1 {
-    font-size: 3rem;
-    background: linear-gradient(90deg, #ff6b00, #ffcc00, #ff6b00);
+  /* Intro */
+  #intro {
+    background: radial-gradient(circle at center, #1a1a2e 0%, #000 100%);
+    overflow: hidden;
+  }
+  #intro::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: repeating-linear-gradient(0deg, transparent, transparent 50px, rgba(0, 255, 255, 0.05) 50px, rgba(0, 255, 255, 0.05) 51px);
+    animation: moveLines 2s linear infinite;
+  }
+  @keyframes moveLines {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(51px); }
+  }
+  #intro h1 {
+    font-size: 5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 10px;
+    background: linear-gradient(45deg, #00f, #0ff, #f0f, #ff0);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 10px;
-    animation: glow 2s infinite alternate;
+    animation: glow 2s ease-in-out infinite alternate;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    z-index: 1;
+  }
+  #intro h2 {
+    font-size: 2.5rem;
+    margin-top: 10px;
+    color: #0ff;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    z-index: 1;
   }
   @keyframes glow {
-    from { filter: drop-shadow(0 0 10px #ff6b00); }
-    to { filter: drop-shadow(0 0 25px #ffcc00); }
+    from { filter: drop-shadow(0 0 10px #0ff); }
+    to { filter: drop-shadow(0 0 30px #f0f); }
   }
-
-  .subtitle {
-    color: #ffcc00;
-    font-size: 1.2rem;
-    margin-bottom: 40px;
-    letter-spacing: 3px;
-  }
-
-  input[type="text"] {
-    width: 80%;
-    max-width: 400px;
-    padding: 15px 20px;
-    font-size: 1.2rem;
-    border: 2px solid #ff6b00;
-    border-radius: 50px;
-    background: rgba(255,255,255,0.1);
-    color: #fff;
-    text-align: center;
-    outline: none;
-    transition: 0.3s;
-  }
-  input[type="text"]:focus {
-    box-shadow: 0 0 25px #ff6b00;
-    background: rgba(255,255,255,0.15);
-  }
-  input::placeholder { color: #aaa; }
-
-  .btn {
-    display: inline-block;
-    margin-top: 25px;
+  #startBtn {
+    margin-top: 50px;
     padding: 15px 50px;
-    font-size: 1.3rem;
+    font-size: 1.5rem;
     font-weight: bold;
+    background: transparent;
+    color: #0ff;
+    border: 2px solid #0ff;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    z-index: 1;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+  }
+  #startBtn:hover {
+    background: #0ff;
+    color: #000;
+    box-shadow: 0 0 30px #0ff;
+    transform: scale(1.05);
+  }
+  /* Name Screen */
+  #nameScreen {
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+  }
+  #nameScreen h2 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
     color: #fff;
-    background: linear-gradient(135deg, #ff6b00, #ff0040);
+    text-shadow: 0 0 10px #0ff;
+  }
+  #playerName {
+    padding: 15px 25px;
+    font-size: 1.5rem;
+    border: 2px solid #0ff;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    outline: none;
+    text-align: center;
+    width: 300px;
+    transition: all 0.3s;
+  }
+  #playerName:focus {
+    box-shadow: 0 0 20px #0ff;
+    border-color: #f0f;
+  }
+  #nameScreen p {
+    margin-top: 20px;
+    color: #aaa;
+    font-size: 1.1rem;
+  }
+  /* Car & Track Screens */
+  #carScreen, #trackScreen {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+  }
+  .options-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+  }
+  .option-card {
+    width: 180px;
+    height: 180px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    position: relative;
+    overflow: hidden;
+  }
+  .option-card:hover {
+    transform: translateY(-10px) scale(1.05);
+    border-color: #0ff;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    background: rgba(0, 255, 255, 0.1);
+  }
+  .option-card.selected {
+    border-color: #f0f;
+    box-shadow: 0 0 40px #f0f;
+    background: rgba(255, 0, 255, 0.1);
+  }
+  .option-card h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-top: 10px;
+    text-shadow: 0 0 5px #0ff;
+  }
+  .option-card .icon {
+    font-size: 4rem;
+    margin-bottom: 10px;
+  }
+  #carScreen h2, #trackScreen h2 {
+    font-size: 2.5rem;
+    color: #fff;
+    text-shadow: 0 0 10px #0ff;
+    margin-bottom: 20px;
+  }
+  /* Game Screen */
+  #gameScreen {
+    background: #000;
+    padding: 0;
+    display: block;
+  }
+  #gameCanvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  #hud {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    right: 20px;
+    display: flex;
+    justify-content: space-between;
+    color: #fff;
+    font-size: 1.2rem;
+    text-shadow: 0 0 10px #0ff;
+    pointer-events: none;
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    backdrop-filter: blur(5px);
+  }
+  #hud div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  #hud span {
+    font-weight: bold;
+    color: #0ff;
+  }
+  #restartBtn {
+    position: absolute;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 30px;
+    font-size: 1.2rem;
+    background: #f00;
+    color: #fff;
     border: none;
     border-radius: 50px;
     cursor: pointer;
-    transition: 0.3s;
-    box-shadow: 0 8px 25px rgba(255, 107, 0, 0.5);
+    box-shadow: 0 0 20px #f00;
+    transition: all 0.3s;
+    z-index: 30;
+    display: none;
   }
-  .btn:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 12px 35px rgba(255, 107, 0, 0.8);
+  #restartBtn:hover {
+    background: #ff4444;
+    box-shadow: 0 0 40px #f00;
+    transform: translateX(-50%) scale(1.1);
   }
-  .btn:active { transform: scale(0.97); }
-
-  #welcomeMsg {
-    font-size: 2rem;
-    color: #ffcc00;
-    margin: 30px 0;
-    text-shadow: 0 0 20px rgba(255,204,0,0.6);
-  }
-
-  /* ============ CAR SELECTION ============ */
-  .cars-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: 25px;
-    margin-top: 40px;
-  }
-
-  .car-card {
-    background: rgba(255,255,255,0.05);
-    border: 2px solid rgba(255,107,0,0.3);
-    border-radius: 20px;
-    padding: 20px;
-    cursor: pointer;
-    transition: 0.3s;
-  }
-  .car-card:hover {
-    border-color: #ffcc00;
-    transform: translateY(-10px);
-    box-shadow: 0 20px 50px rgba(255,204,0,0.3);
-  }
-  .car-card.selected {
-    border-color: #00ff88;
-    box-shadow: 0 0 40px #00ff88;
-  }
-  .car-card h3 {
-    margin-top: 15px;
-    font-size: 1.2rem;
-    color: #ffcc00;
-  }
-
-  /* ====== 2D CARTOON VEHICLES (SVG style) ====== */
-  .vehicle-2d {
-    width: 160px;
-    height: 100px;
-    margin: 0 auto;
-    position: relative;
-  }
-
-  /* Car 2D */
-  .car-shape {
+  .game-over-text {
     position: absolute;
-    bottom: 20px;
-    left: 10px;
-    width: 140px;
-    height: 45px;
-    border-radius: 12px 12px 8px 8px;
-  }
-  .car-roof {
-    position: absolute;
-    bottom: 62px;
-    left: 40px;
-    width: 80px;
-    height: 28px;
-    border-radius: 18px 18px 0 0;
-  }
-  .car-window {
-    position: absolute;
-    bottom: 66px;
-    width: 32px;
-    height: 20px;
-    background: rgba(150,220,255,0.85);
-    border-radius: 6px 6px 0 0;
-  }
-  .car-window.w1 { left: 46px; }
-  .car-window.w2 { right: 46px; }
-  .wheel2d {
-    position: absolute;
-    bottom: 10px;
-    width: 30px;
-    height: 30px;
-    background: #111;
-    border-radius: 50%;
-    border: 4px solid #444;
-  }
-  .wheel2d::after {
-    content: '';
-    position: absolute;
-    width: 10px;
-    height: 10px;
-    background: #999;
-    border-radius: 50%;
-    top: 50%; left: 50%;
-    transform: translate(-50%,-50%);
-  }
-  .wheel2d.wl { left: 20px; }
-  .wheel2d.wr { right: 20px; }
-
-  /* BMW colors */
-  .bmw .car-shape    { background: linear-gradient(180deg,#2196f3,#0d47a1); box-shadow: 0 0 15px #2196f3; }
-  .bmw .car-roof     { background: #1976d2; }
-
-  /* Mercedes */
-  .mercedes .car-shape { background: linear-gradient(180deg,#e0e0e0,#9e9e9e); box-shadow: 0 0 15px #e0e0e0; }
-  .mercedes .car-roof  { background: #bdbdbd; }
-
-  /* Ferrari */
-  .ferrari .car-shape  { background: linear-gradient(180deg,#f44336,#b71c1c); box-shadow: 0 0 15px #f44336; }
-  .ferrari .car-roof   { background: #d32f2f; }
-
-  /* Motorcycle 2D */
-  .moto-shape {
-    position: absolute;
-    bottom: 42px;
-    left: 30px;
-    width: 100px;
-    height: 18px;
-    background: #e53935;
-    border-radius: 10px;
-    transform: rotate(-6deg);
-  }
-  .moto-seat2d {
-    position: absolute;
-    bottom: 55px;
-    left: 15px;
-    width: 40px;
-    height: 14px;
-    background: #212121;
-    border-radius: 8px;
-  }
-  .moto-handle2d {
-    position: absolute;
-    bottom: 60px;
-    right: 18px;
-    width: 42px;
-    height: 5px;
-    background: #333;
-    border-radius: 3px;
-    transform: rotate(-25deg);
-  }
-  .moto-wheel2d {
-    position: absolute;
-    bottom: 8px;
-    width: 34px;
-    height: 34px;
-    background: radial-gradient(circle, #555 30%, #111 70%);
-    border: 3px solid #222;
-    border-radius: 50%;
-  }
-  .moto-wheel2d.mw1 { left: 15px; }
-  .moto-wheel2d.mw2 { right: 15px; }
-
-  /* ====== RACE SCREEN ====== */
-  #raceScreen { max-width: 100%; }
-
-  .race-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 15px;
-    margin-bottom: 15px;
-    font-size: 1.1rem;
-  }
-  .race-header span { color: #ffcc00; font-weight: bold; }
-
-  .road {
-    position: relative;
-    width: 100%;
-    height: 500px;
-    background: #2b2b2b;
-    border-radius: 15px;
-    overflow: hidden;
-    border: 4px solid #444;
-    box-shadow: inset 0 0 60px #000;
-  }
-
-  /* Road center dash */
-  .road::before {
-    content: '';
-    position: absolute;
+    top: 50%;
     left: 50%;
-    top: 0; bottom: 0;
-    width: 8px;
-    transform: translateX(-50%);
-    background: repeating-linear-gradient(
-      to bottom,
-      #ffcc00 0 30px,
-      transparent 30px 60px
-    );
-    animation: roadMove 0.4s linear infinite;
-  }
-  @keyframes roadMove {
-    from { background-position-y: 0; }
-    to   { background-position-y: 60px; }
-  }
-
-  /* Road edges */
-  .road-edge {
-    position: absolute;
-    top: 0; bottom: 0;
-    width: 12px;
-    background: repeating-linear-gradient(
-      to bottom,
-      #fff 0 20px,
-      #e53935 20px 40px
-    );
-    animation: roadMove 0.4s linear infinite;
-  }
-  .road-edge.left  { left: 0; }
-  .road-edge.right { right: 0; }
-
-  /* Finish line at top */
-  .finish-line {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 25px;
-    background: repeating-linear-gradient(
-      90deg,
-      #fff 0 20px,
-      #000 20px 40px
-    );
-    z-index: 3;
-  }
-
-  /* Player & enemy vehicles */
-  .racer {
-    position: absolute;
-    bottom: 20px;
-    font-size: 3.5rem;
-    z-index: 5;
-    transition: bottom 0.08s linear;
-    filter: drop-shadow(0 5px 8px rgba(0,0,0,0.6));
-  }
-  .racer.player { left: 25%; transform: translateX(-50%); }
-  .racer.enemy  { right: 25%; transform: translateX(50%); }
-
-  .race-info {
-    display: flex;
-    justify-content: space-around;
-    font-size: 1.3rem;
-    margin: 15px 0;
-  }
-  .race-info span { color: #ffcc00; font-weight: bold; }
-
-  .progress-bar {
-    height: 16px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 6px 0;
-  }
-  .progress-fill {
-    height: 100%;
-    width: 0%;
-    background: linear-gradient(90deg, #00ff88, #00c853);
-    transition: width 0.1s linear;
-  }
-  .progress-fill.enemy {
-    background: linear-gradient(90deg, #ff5252, #b71c1c);
-  }
-
-  #resultMsg {
-    font-size: 2.5rem;
-    margin-top: 20px;
-    animation: glow 1s infinite alternate;
-  }
-  .win  { color: #00ff88; }
-  .lose { color: #ff0040; }
-
-  .controls {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    flex-wrap: wrap;
-    margin-top: 15px;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    color: #f00;
+    text-shadow: 0 0 30px #f00, 0 0 60px #f00;
+    z-index: 25;
+    display: none;
+    font-weight: bold;
+    text-align: center;
   }
 </style>
 </head>
 <body>
-
-<!-- Screen 1: Enter Name -->
-<div class="screen active" id="nameScreen">
-  <h1>🏁 سويا ريس 🏁</h1>
-  <p class="subtitle">SOIYA RACE</p>
-  <div style="margin: 40px 0;">
-    <input type="text" id="playerName" placeholder="اكتب اسم المتسابق..." maxlength="20">
+  <!-- Intro Screen -->
+  <div id="intro" class="screen">
+    <h1 dir="ltr">SOYA RACING</h1>
+    <h2>سويا ريسينج</h2>
+    <button id="startBtn">ابدأ</button>
   </div>
-  <button class="btn" onclick="enterName()">ادخل 🚀</button>
-</div>
 
-<!-- Screen 2: Welcome -->
-<div class="screen" id="welcomeScreen">
-  <h1>🏁 سويا ريس 🏁</h1>
-  <div id="welcomeMsg"></div>
-  <button class="btn" onclick="showCars()">اختر عربيتك 🏎️</button>
-</div>
+  <!-- Name Screen -->
+  <div id="nameScreen" class="screen hidden">
+    <h2>ادخل اسم المتسابق</h2>
+    <input type="text" id="playerName" placeholder="اكتب اسمك هنا..." autofocus>
+    <p>اضغط Enter للمتابعة</p>
+  </div>
 
-<!-- Screen 3: Car Selection -->
-<div class="screen" id="carScreen">
-  <h1>اختر عربيتك</h1>
-  <p class="subtitle">Choose Your Ride</p>
-  <div class="cars-grid">
-
-    <!-- Motorcycle -->
-    <div class="car-card" onclick="selectCar(this,'🏍️','موتوسيكل')">
-      <div class="vehicle-2d">
-        <div class="moto-wheel2d mw1"></div>
-        <div class="moto-wheel2d mw2"></div>
-        <div class="moto-seat2d"></div>
-        <div class="moto-shape"></div>
-        <div class="moto-handle2d"></div>
+  <!-- Car Screen -->
+  <div id="carScreen" class="screen hidden">
+    <h2>اختر عربيتك</h2>
+    <div class="options-container">
+      <div class="option-card" data-car="mercedes">
+        <div class="icon">🚗</div>
+        <h3>مرسيدس</h3>
       </div>
-      <h3>🏍️ موتوسيكل</h3>
-    </div>
-
-    <!-- BMW -->
-    <div class="car-card bmw" onclick="selectCar(this,'🏎️','BMW')">
-      <div class="vehicle-2d">
-        <div class="wheel2d wl"></div>
-        <div class="wheel2d wr"></div>
-        <div class="car-shape"></div>
-        <div class="car-roof"></div>
-        <div class="car-window w1"></div>
-        <div class="car-window w2"></div>
+      <div class="option-card" data-car="motorcycle">
+        <div class="icon">🏍️</div>
+        <h3>موتوسيكل</h3>
       </div>
-      <h3>🚗 BMW</h3>
-    </div>
-
-    <!-- Mercedes -->
-    <div class="car-card mercedes" onclick="selectCar(this,'🚙','مرسيدس')">
-      <div class="vehicle-2d">
-        <div class="wheel2d wl"></div>
-        <div class="wheel2d wr"></div>
-        <div class="car-shape"></div>
-        <div class="car-roof"></div>
-        <div class="car-window w1"></div>
-        <div class="car-window w2"></div>
+      <div class="option-card" data-car="lada">
+        <div class="icon">🚙</div>
+        <h3>لادا</h3>
       </div>
-      <h3>🚙 مرسيدس</h3>
-    </div>
-
-    <!-- Ferrari -->
-    <div class="car-card ferrari" onclick="selectCar(this,'🏎️','فيراري')">
-      <div class="vehicle-2d">
-        <div class="wheel2d wl"></div>
-        <div class="wheel2d wr"></div>
-        <div class="car-shape"></div>
-        <div class="car-roof"></div>
-        <div class="car-window w1"></div>
-        <div class="car-window w2"></div>
+      <div class="option-card" data-car="bmw">
+        <div class="icon">🚘</div>
+        <h3>بي إم دبليو</h3>
       </div>
-      <h3>🏎️ فيراري</h3>
     </div>
-
-  </div>
-</div>
-
-<!-- Screen 4: Race -->
-<div class="screen" id="raceScreen">
-  <div class="race-header">
-    <div>👤 اللاعب: <span id="raceName"></span></div>
-    <div>🚗 العربية: <span id="raceCar"></span></div>
   </div>
 
-  <div class="road">
-    <div class="finish-line"></div>
-    <div class="road-edge left"></div>
-    <div class="road-edge right"></div>
-    <div class="racer player" id="playerRacer">🏎️</div>
-    <div class="racer enemy"  id="enemyRacer">🚙</div>
+  <!-- Track Screen -->
+  <div id="trackScreen" class="screen hidden">
+    <h2>اختر نوع الطريق</h2>
+    <div class="options-container">
+      <div class="option-card" data-track="rough">
+        <div class="icon">🏔️</div>
+        <h3>طريق وعر</h3>
+      </div>
+      <div class="option-card" data-track="infinite">
+        <div class="icon">♾️</div>
+        <h3>طريق لا نهائي</h3>
+      </div>
+      <div class="option-card" data-track="race">
+        <div class="icon">🏁</div>
+        <h3>طريق سباق</h3>
+      </div>
+    </div>
   </div>
 
-  <div class="race-info">
-    <div>أنت: <span id="playerPct">0%</span></div>
-    <div>الخصم: <span id="enemyPct">0%</span></div>
+  <!-- Game Screen -->
+  <div id="gameScreen" class="screen hidden">
+    <canvas id="gameCanvas"></canvas>
+    <div id="hud">
+      <div>المتسابق: <span id="hudName"></span></div>
+      <div>السرعة: <span id="hudSpeed">0</span> كم/س</div>
+      <div>المسافة: <span id="hudDistance">0</span> م</div>
+      <div>النقاط: <span id="hudScore">0</span></div>
+    </div>
+    <div class="game-over-text" id="gameOverText">انتهت اللعبة!</div>
+    <button id="restartBtn">إعادة المحاولة</button>
   </div>
-  <div class="progress-bar"><div class="progress-fill" id="playerBar"></div></div>
-  <div class="progress-bar"><div class="progress-fill enemy" id="enemyBar"></div></div>
-
-  <div class="controls">
-    <button class="btn" id="boostBtn" onclick="boost()">🚀 نترو!</button>
-    <button class="btn" id="againBtn" style="display:none;" onclick="location.reload()">🔄 العب تاني</button>
-  </div>
-
-  <div id="resultMsg"></div>
-</div>
 
 <script>
-  let playerName = "";
-  let playerCarEmoji = "";
-  let playerCarName = "";
+// ========== Game Logic ==========
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-  // Screen transitions
-  function enterName() {
-    const name = document.getElementById("playerName").value.trim();
-    if (!name) { alert("اكتب اسمك يا بطل!"); return; }
-    playerName = name;
-    document.getElementById("welcomeMsg").innerHTML =
-      `👋 أهلاً <span style="color:#ff6b00">${name}</span>!<br>يلا نبدأ السباق!`;
-    switchScreen("welcomeScreen");
+// Screens
+const intro = document.getElementById('intro');
+const nameScreen = document.getElementById('nameScreen');
+const carScreen = document.getElementById('carScreen');
+const trackScreen = document.getElementById('trackScreen');
+const gameScreen = document.getElementById('gameScreen');
+
+// Buttons and inputs
+const startBtn = document.getElementById('startBtn');
+const playerNameInput = document.getElementById('playerName');
+const restartBtn = document.getElementById('restartBtn');
+const gameOverText = document.getElementById('gameOverText');
+
+// HUD elements
+const hudName = document.getElementById('hudName');
+const hudSpeed = document.getElementById('hudSpeed');
+const hudDistance = document.getElementById('hudDistance');
+const hudScore = document.getElementById('hudScore');
+
+// State
+let state = {
+  playerName: '',
+  car: '',
+  track: '',
+  game: {
+    running: false,
+    gameOver: false,
+    score: 0,
+    distance: 0,
+    speed: 0,
+    baseSpeed: 200, // pixels per second
+    playerX: 0,
+    playerY: 0,
+    playerWidth: 40,
+    playerHeight: 70,
+    obstacles: [],
+    particles: [],
+    roadOffset: 0,
+    lastTime: 0,
+    shake: 0,
+    keys: { left: false, right: false }
   }
+};
 
-  function showCars() { switchScreen("carScreen"); }
+// Car specs
+const carSpecs = {
+  mercedes: { speed: 1.0, handling: 1.0, width: 40, height: 70, color: '#333', accent: '#ccc', isMoto: false },
+  motorcycle: { speed: 1.3, handling: 1.5, width: 20, height: 50, color: '#c00', accent: '#fff', isMoto: true },
+  lada: { speed: 0.8, handling: 0.8, width: 45, height: 75, color: '#8B4513', accent: '#ddd', isMoto: false },
+  bmw: { speed: 1.2, handling: 1.2, width: 42, height: 72, color: '#003366', accent: '#00aaff', isMoto: false }
+};
 
-  function selectCar(card, emoji, name) {
-    document.querySelectorAll(".car-card").forEach(c => c.classList.remove("selected"));
-    card.classList.add("selected");
-    playerCarEmoji = emoji;
-    playerCarName  = name;
-    setTimeout(startRace, 400);
-  }
+// Track specs
+const trackSpecs = {
+  rough: { speedMultiplier: 0.8, obstacleRate: 0.03, shake: true, bgColor: '#3a2a1a', roadColor: '#5a4a3a', lineColor: '#aa8' },
+  infinite: { speedMultiplier: 1.0, obstacleRate: 0.02, shake: false, bgColor: '#1a2a3a', roadColor: '#2a3a4a', lineColor: '#8af' },
+  race: { speedMultiplier: 1.5, obstacleRate: 0.04, shake: false, bgColor: '#0a0a1a', roadColor: '#1a1a2a', lineColor: '#f0f' }
+};
 
-  // Race logic
-  let playerPos = 0, enemyPos = 0;
-  let gameLoop = null, boostPower = 0, raceOver = false;
-  let autoBoostTimer = null;
+// Resize canvas
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+resizeCanvas();
 
-  function startRace() {
-    switchScreen("raceScreen");
-    document.getElementById("raceName").textContent = playerName;
-    document.getElementById("raceCar").textContent  = playerCarName;
-    document.getElementById("playerRacer").textContent = playerCarEmoji;
+// Screen transitions
+function showScreen(screen) {
+  [intro, nameScreen, carScreen, trackScreen, gameScreen].forEach(s => s.classList.add('hidden'));
+  screen.classList.remove('hidden');
+}
 
-    const enemies = ["🏎️","🚙","🚗","🏍️","🚕"];
-    document.getElementById("enemyRacer").textContent =
-      enemies[Math.floor(Math.random()*enemies.length)];
+// Intro -> Name
+startBtn.addEventListener('click', () => {
+  showScreen(nameScreen);
+  playerNameInput.focus();
+});
 
-    playerPos = 0; enemyPos = 0; boostPower = 0; raceOver = false;
-
-    gameLoop = setInterval(updateRace, 50);
-    autoBoostTimer = setInterval(() => {
-      boostPower = Math.max(0, boostPower - 2);
-    }, 3000);
-  }
-
-  function boost() {
-    if (raceOver) return;
-    boostPower = 20;
-  }
-
-  function updateRace() {
-    if (raceOver) return;
-
-    const playerSpeed = 0.35 + Math.random() * 0.5 + boostPower * 0.08;
-    const enemySpeed  = 0.45 + Math.random() * 0.5;
-
-    playerPos += playerSpeed;
-    enemyPos  += enemySpeed;
-
-    if (boostPower > 0) boostPower -= 0.3;
-
-    if (playerPos > 100) playerPos = 100;
-    if (enemyPos  > 100) enemyPos  = 100;
-
-    // Move vehicles on the road (max = road height - some padding)
-    const roadHeight = 500;
-    const padding = 20;
-    const maxTravel = roadHeight - 100 - padding;
-    document.getElementById("playerRacer").style.bottom =
-      (padding + (playerPos/100) * maxTravel) + "px";
-    document.getElementById("enemyRacer").style.bottom =
-      (padding + (enemyPos/100)  * maxTravel) + "px";
-
-    // Progress bars
-    document.getElementById("playerPct").textContent = Math.floor(playerPos) + "%";
-    document.getElementById("enemyPct").textContent  = Math.floor(enemyPos)  + "%";
-    document.getElementById("playerBar").style.width = playerPos + "%";
-    document.getElementById("enemyBar").style.width  = enemyPos  + "%";
-
-    if (playerPos >= 100 || enemyPos >= 100) {
-      raceOver = true;
-      clearInterval(gameLoop);
-      clearInterval(autoBoostTimer);
-
-      const result = document.getElementById("resultMsg");
-      if (playerPos >= enemyPos) {
-        result.textContent = "🏆 " + playerName + " كسب! 🏆";
-        result.className = "win";
-      } else {
-        result.textContent = "😢 " + playerName + " خسر! 😢";
-        result.className = "lose";
-      }
-      document.getElementById("boostBtn").style.display = "none";
-      document.getElementById("againBtn").style.display = "inline-block";
+// Name -> Car
+playerNameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') {
+    const name = playerNameInput.value.trim();
+    if (name) {
+      state.playerName = name;
+      showScreen(carScreen);
+    } else {
+      alert('من فضلك ادخل اسم المتسابق');
     }
   }
+});
 
-  function switchScreen(id) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-  }
-
-  // Enter key support
-  document.getElementById("playerName").addEventListener("keypress", e => {
-    if (e.key === "Enter") enterName();
+// Car selection
+document.querySelectorAll('[data-car]').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('[data-car]').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.car = card.dataset.car;
+    // Optional: auto advance after short delay
+    setTimeout(() => {
+      showScreen(trackScreen);
+    }, 300);
   });
+});
+
+// Track selection
+document.querySelectorAll('[data-track]').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('[data-track]').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    state.track = card.dataset.track;
+    setTimeout(() => {
+      startGame();
+    }, 300);
+  });
+});
+
+// Start Game
+function startGame() {
+  showScreen(gameScreen);
+  resizeCanvas(); // ensure canvas is full size
+  const spec = carSpecs[state.car];
+  const track = trackSpecs[state.track];
+  
+  state.game = {
+    running: true,
+    gameOver: false,
+    score: 0,
+    distance: 0,
+    speed: state.game.baseSpeed * spec.speed * track.speedMultiplier,
+    baseSpeed: state.game.baseSpeed * spec.speed * track.speedMultiplier,
+    playerX: canvas.width / 2,
+    playerY: canvas.height - 120,
+    playerWidth: spec.width,
+    playerHeight: spec.height,
+    obstacles: [],
+    particles: [],
+    roadOffset: 0,
+    lastTime: performance.now(),
+    shake: 0,
+    keys: { left: false, right: false },
+    spec: spec,
+    track: track
+  };
+  
+  hudName.textContent = state.playerName;
+  gameOverText.style.display = 'none';
+  restartBtn.style.display = 'none';
+  
+  // Reset keys
+  state.game.keys.left = false;
+  state.game.keys.right = false;
+  
+  // Start loop
+  requestAnimationFrame(gameLoop);
+}
+
+// Input handling
+window.addEventListener('keydown', (e) => {
+  if (!state.game.running || state.game.gameOver) return;
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') state.game.keys.left = true;
+  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') state.game.keys.right = true;
+});
+window.addEventListener('keyup', (e) => {
+  if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') state.game.keys.left = false;
+  if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') state.game.keys.right = false;
+});
+
+// Touch controls (simple)
+let touchStartX = 0;
+canvas.addEventListener('touchstart', (e) => {
+  touchStartX = e.touches[0].clientX;
+});
+canvas.addEventListener('touchmove', (e) => {
+  e.preventDefault();
+  const touchX = e.touches[0].clientX;
+  const diff = touchX - touchStartX;
+  if (diff < -20) { state.game.keys.left = true; state.game.keys.right = false; }
+  else if (diff > 20) { state.game.keys.right = true; state.game.keys.left = false; }
+  else { state.game.keys.left = false; state.game.keys.right = false; }
+  touchStartX = touchX;
+}, { passive: false });
+canvas.addEventListener('touchend', () => {
+  state.game.keys.left = false;
+  state.game.keys.right = false;
+});
+
+// Restart
+restartBtn.addEventListener('click', () => {
+  startGame();
+});
+
+// Game Loop
+function gameLoop(timestamp) {
+  if (!state.game.running) return;
+  
+  const dt = Math.min((timestamp - state.game.lastTime) / 1000, 0.1); // seconds
+  state.game.lastTime = timestamp;
+  
+  if (!state.game.gameOver) {
+    update(dt);
+  }
+  render();
+  
+  requestAnimationFrame(gameLoop);
+}
+
+function update(dt) {
+  const g = state.game;
+  const spec = g.spec;
+  const track = g.track;
+  
+  // Increase speed gradually
+  g.speed += 10 * dt;
+  if (g.speed > g.baseSpeed * 1.5) g.speed = g.baseSpeed * 1.5;
+  
+  // Distance
+  g.distance += g.speed * dt * 0.1; // arbitrary scale
+  g.score = Math.floor(g.distance);
+  
+  // Road offset for scrolling
+  g.roadOffset = (g.roadOffset + g.speed * dt) % 100;
+  
+  // Player movement
+  const moveSpeed = 400 * spec.handling * dt;
+  if (g.keys.left) g.playerX -= moveSpeed;
+  if (g.keys.right) g.playerX += moveSpeed;
+  
+  // Boundaries (road is 60% of canvas width, centered)
+  const roadWidth = canvas.width * 0.6;
+  const roadLeft = (canvas.width - roadWidth) / 2;
+  const roadRight = roadLeft + roadWidth;
+  const playerHalf = g.playerWidth / 2;
+  if (g.playerX - playerHalf < roadLeft) g.playerX = roadLeft + playerHalf;
+  if (g.playerX + playerHalf > roadRight) g.playerX = roadRight - playerHalf;
+  
+  // Shake effect for rough road
+  if (track.shake) {
+    g.shake = (Math.random() - 0.5) * 5;
+  } else {
+    g.shake = 0;
+  }
+  
+  // Spawn obstacles
+  if (Math.random() < track.obstacleRate * 60 * dt) {
+    const obsWidth = 40 + Math.random() * 30;
+    const obsHeight = 60 + Math.random() * 40;
+    const obsX = roadLeft + obsWidth/2 + Math.random() * (roadWidth - obsWidth);
+    g.obstacles.push({
+      x: obsX,
+      y: -obsHeight,
+      width: obsWidth,
+      height: obsHeight,
+      color: track.rough ? '#654321' : '#555',
+      speed: g.speed * 0.8
+    });
+  }
+  
+  // Update obstacles
+  for (let i = g.obstacles.length - 1; i >= 0; i--) {
+    const obs = g.obstacles[i];
+    obs.y += (g.speed + obs.speed) * dt;
+    if (obs.y > canvas.height + 100) {
+      g.obstacles.splice(i, 1);
+    }
+  }
+  
+  // Collision detection
+  for (const obs of g.obstacles) {
+    if (
+      g.playerX - g.playerWidth/2 < obs.x + obs.width/2 &&
+      g.playerX + g.playerWidth/2 > obs.x - obs.width/2 &&
+      g.playerY - g.playerHeight/2 < obs.y + obs.height/2 &&
+      g.playerY + g.playerHeight/2 > obs.y - obs.height/2
+    ) {
+      // Game Over
+      g.gameOver = true;
+      g.running = false;
+      gameOverText.style.display = 'block';
+      restartBtn.style.display = 'block';
+      break;
+    }
+  }
+  
+  // Exhaust particles
+  if (Math.random() < 0.5) {
+    g.particles.push({
+      x: g.playerX + (Math.random() - 0.5) * g.playerWidth * 0.5,
+      y: g.playerY + g.playerHeight/2,
+      vx: (Math.random() - 0.5) * 50,
+      vy: 100 + Math.random() * 100,
+      life: 0.5 + Math.random() * 0.5,
+      maxLife: 1,
+      size: 2 + Math.random() * 3,
+      color: 'rgba(200, 200, 200, '
+    });
+  }
+  
+  // Update particles
+  for (let i = g.particles.length - 1; i >= 0; i--) {
+    const p = g.particles[i];
+    p.x += p.vx * dt;
+    p.y += p.vy * dt;
+    p.life -= dt;
+    if (p.life <= 0) g.particles.splice(i, 1);
+  }
+  
+  // Update HUD
+  hudSpeed.textContent = Math.floor(g.speed / 2);
+  hudDistance.textContent = Math.floor(g.distance);
+  hudScore.textContent = g.score;
+}
+
+function render() {
+  const g = state.game;
+  const track = g.track;
+  
+  // Clear
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Apply shake
+  ctx.save();
+  if (g.shake) {
+    ctx.translate(g.shake, g.shake);
+  }
+  
+  // Background
+  const bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  bgGradient.addColorStop(0, track.bgColor);
+  bgGradient.addColorStop(1, '#000');
+  ctx.fillStyle = bgGradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw scenery (simple trees on sides)
+  const roadWidth = canvas.width * 0.6;
+  const roadLeft = (canvas.width - roadWidth) / 2;
+  const roadRight = roadLeft + roadWidth;
+  
+  // Draw road
+  ctx.fillStyle = track.roadColor;
+  ctx.fillRect(roadLeft, 0, roadWidth, canvas.height);
+  
+  // Road edges
+  ctx.strokeStyle = track.lineColor;
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.moveTo(roadLeft, 0);
+  ctx.lineTo(roadLeft, canvas.height);
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.moveTo(roadRight, 0);
+  ctx.lineTo(roadRight, canvas.height);
+  ctx.stroke();
+  
+  // Dashed center line
+  ctx.strokeStyle = track.lineColor;
+  ctx.lineWidth = 4;
+  ctx.setLineDash([40, 40]);
+  ctx.lineDashOffset = -g.roadOffset;
+  ctx.beginPath();
+  ctx.moveTo(canvas.width/2, 0);
+  ctx.lineTo(canvas.width/2, canvas.height);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  
+  // Draw obstacles
+  for (const obs of g.obstacles) {
+    ctx.save();
+    ctx.translate(obs.x, obs.y);
+    // Simple obstacle car/rock
+    ctx.fillStyle = obs.color;
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.roundRect(-obs.width/2, -obs.height/2, obs.width, obs.height, 10);
+    ctx.fill();
+    // Details
+    ctx.fillStyle = '#222';
+    ctx.fillRect(-obs.width/2 + 5, -obs.height/2 + 5, obs.width - 10, 10);
+    ctx.fillRect(-obs.width/2 + 5, obs.height/2 - 15, obs.width - 10, 10);
+    ctx.restore();
+  }
+  
+  // Draw particles
+  for (const p of g.particles) {
+    const alpha = p.life / p.maxLife;
+    ctx.fillStyle = p.color + alpha + ')';
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.size * alpha, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  
+  // Draw player
+  drawCar(ctx, g.playerX, g.playerY, g.playerWidth, g.playerHeight, g.spec.color, g.spec.accent, g.spec.isMoto);
+  
+  ctx.restore();
+}
+
+// Draw car or motorcycle
+function drawCar(ctx, x, y, w, h, color, accent, isMoto) {
+  ctx.save();
+  ctx.translate(x, y);
+  
+  if (isMoto) {
+    // Motorcycle
+    // Body
+    ctx.fillStyle = color;
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.roundRect(-w/2, -h/2, w, h, 5);
+    ctx.fill();
+    // Rider
+    ctx.fillStyle = '#222';
+    ctx.beginPath();
+    ctx.arc(0, -h/4, w*0.8, 0, Math.PI*2);
+    ctx.fill();
+    // Wheels
+    ctx.fillStyle = '#111';
+    ctx.beginPath();
+    ctx.ellipse(0, -h/2 + 5, w/2 + 2, 8, 0, 0, Math.PI*2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.ellipse(0, h/2 - 5, w/2 + 2, 8, 0, 0, Math.PI*2);
+    ctx.fill();
+    // Accent
+    ctx.fillStyle = accent;
+    ctx.fillRect(-w/2 + 2, -h/2 + 10, w - 4, 5);
+  } else {
+    // Car
+    // Body
+    ctx.fillStyle = color;
+    ctx.shadowColor = 'rgba(0,0,0,0.5)';
+    ctx.shadowBlur = 15;
+    ctx.beginPath();
+    ctx.roundRect(-w/2, -h/2, w, h, 10);
+    ctx.fill();
+    // Windshield
+    ctx.fillStyle = 'rgba(150, 200, 255, 0.6)';
+    ctx.beginPath();
+    ctx.roundRect(-w/2 + 5, -h/2 + 10, w - 10, h*0.3, 5);
+    ctx.fill();
+    // Rear window
+    ctx.beginPath();
+    ctx.roundRect(-w/2 + 5, h/2 - h*0.35, w - 10, h*0.25, 5);
+    ctx.fill();
+    // Accent stripe
+    ctx.fillStyle = accent;
+    ctx.fillRect(-w/2 + 5, -5, w - 10, 6);
+    // Wheels
+    ctx.fillStyle = '#111';
+    ctx.shadowBlur = 5;
+    ctx.beginPath();
+    ctx.roundRect(-w/2 - 3, -h/2 + 10, 6, 15, 3);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(w/2 - 3, -h/2 + 10, 6, 15, 3);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(-w/2 - 3, h/2 - 25, 6, 15, 3);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.roundRect(w/2 - 3, h/2 - 25, 6, 15, 3);
+    ctx.fill();
+  }
+  
+  ctx.restore();
+}
+
+// Polyfill for roundRect
+if (!CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+    if (w < 2 * r) r = w / 2;
+    if (h < 2 * r) r = h / 2;
+    this.beginPath();
+    this.moveTo(x + r, y);
+    this.arcTo(x + w, y, x + w, y + h, r);
+    this.arcTo(x + w, y + h, x, y + h, r);
+    this.arcTo(x, y + h, x, y, r);
+    this.arcTo(x, y, x + w, y, r);
+    this.closePath();
+    return this;
+  };
+}
+
+// Initialize
+showScreen(intro);
 </script>
 </body>
 </html>
