@@ -1,0 +1,1 @@
+Drift: 40 double-decker red buses distributed across Alexandria road routes, AI traffic free-flow speed 120–150 km/h (subject to safe braking and bus stops). Install as PWA only when hosted over HTTPS. All forty buses are NPC only.
