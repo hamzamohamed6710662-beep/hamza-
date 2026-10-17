@@ -1,14 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="utf-8">
 <link rel="icon" type="image/jpeg" href="./1.jpg">
 <link rel="shortcut icon" type="image/jpeg" href="./1.jpg">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#090912">
-<meta name="description" content="SOYA RACING - racing and city driving game">
+<meta name="description" content="درفت - لعبة سباقات وقيادة في المدينة">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>SOYA RACING</title>
+<title>درفت</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
@@ -79,52 +79,52 @@ input.bad{animation:sh .3s;border-color:#ff0}
 <canvas id="cv"></canvas>
 
 <div id="intro" class="screen on">
-<img id="brandLogo" class="brand-logo" src="./1.jpg" alt="SOYA RACING" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='block'">
-<h1 id="logoFallback" class="logo" style="display:none">SOYA<br>RACING</h1>
-<p class="tag">DRIFT · BURN · WIN</p>
-<button class="btn" id="installApp" style="display:none">⬇ INSTALL AS APP</button>
-<button class="btn" data-go="name">NEXT ▶</button>
+<img id="brandLogo" class="brand-logo" src="./1.jpg" alt="درفت" onerror="this.style.display='none';document.getElementById('logoFallback').style.display='block'">
+<h1 id="logoFallback" class="logo" style="display:none">درفت</h1>
+<p class="tag">درفت · انطلق · اكسب</p>
+<button class="btn" id="installApp" style="display:none">⬇ تثبيت اللعبة</button>
+<button class="btn" data-go="name">التالي ▶</button>
 </div>
 
 <div id="name" class="screen"><div class="panel">
-<h2>ENTER YOUR RACER NAME</h2>
-<input id="nm" maxlength="14" placeholder="Your name" autocomplete="off">
-<button class="btn" id="n1">NEXT ▶</button>
+<h2>اكتب اسم المتسابق</h2>
+<input id="nm" maxlength="14" placeholder="اسمك" autocomplete="off">
+<button class="btn" id="n1">التالي ▶</button>
 </div></div>
 
 <div id="hello" class="screen"><div class="panel">
-<h2 id="hi"></h2><p>Ready to rule the road?</p>
-<button class="btn" data-go="veh">NEXT ▶</button>
+<h2 id="hi"></h2><p>جاهز تسيطر على الطريق؟</p>
+<button class="btn" data-go="veh">التالي ▶</button>
 </div></div>
 
 <div id="veh" class="screen">
-<h2>CHOOSE YOUR RIDE</h2><div class="row" id="vc"></div>
-<button class="btn" data-go="mode">NEXT ▶</button>
+<h2>اختار مركبتك</h2><div class="row" id="vc"></div>
+<button class="btn" data-go="mode">التالي ▶</button>
 </div>
 
 <div id="mode" class="screen">
-<h2>CHOOSE YOUR ROAD</h2><div class="row">
-<div class="card" data-m="off"><span class="big">🏜️</span><b>OFF-ROAD</b><span>Rocks, logs &amp; cars crossing from left and right</span></div>
-<div class="card" data-m="end"><span class="big">♾️</span><b>ENDLESS ROAD</b><span>Dodge traffic as far as you can</span></div>
-<div class="card" data-m="race"><span class="big">🏁</span><b>RACE</b><span>3 cars fight for 1st place</span></div>
+<h2>اختار الطريق</h2><div class="row">
+<div class="card" data-m="off"><span class="big">🏜️</span><b>طرق وعرة</b><span>صخور وجذوع وسيارات تعبر من اليمين واليسار</span></div>
+<div class="card" data-m="end"><span class="big">♾️</span><b>طريق لا نهائي</b><span>تفادى السيارات لأطول مسافة تقدر عليها</span></div>
+<div class="card" data-m="race"><span class="big">🏁</span><b>سباق</b><span>٣ سيارات بتتنافس على المركز الأول</span></div>
 </div></div>
 
 <div id="diff" class="screen"><div class="panel">
-<h2>DIFFICULTY</h2>
+<h2>مستوى الصعوبة</h2>
 <div id="trf" class="row">
-<button class="pill on" data-t="same">SAME DIRECTION</button>
-<button class="pill" data-t="two">TWO-WAY (ONCOMING)</button>
+<button class="pill on" data-t="same">نفس الاتجاه</button>
+<button class="pill" data-t="two">اتجاهين (سيارات مقابلة)</button>
 </div>
 <div class="row">
-<button class="btn g" data-d="0">EASY</button>
-<button class="btn o" data-d="1">HARD</button>
-<button class="btn r" data-d="2">IMPOSSIBLE</button>
+<button class="btn g" data-d="0">سهل</button>
+<button class="btn o" data-d="1">صعب</button>
+<button class="btn r" data-d="2">مستحيل</button>
 </div>
 </div></div>
 
 <div id="over" class="screen" style="background:#000a"><div class="panel">
 <h2 id="ot"></h2><p id="os"></p>
-<div class="row"><button class="btn" id="retry">RETRY</button><button class="btn alt" id="menu">MENU</button></div>
+<div class="row"><button class="btn" id="retry">إعادة اللعب</button><button class="btn alt" id="menu">القائمة</button></div>
 </div></div>
 
 <div id="ui">
@@ -133,14 +133,14 @@ input.bad{animation:sh .3s;border-color:#ff0}
 <button id="quit">⚙</button><div><div id="stat"></div><div id="dmg">سلامة العربية: 5/5</div></div>
 </div>
 <div id="sel">
-<button class="pill on" data-sm="wheel">WHEEL</button>
-<button class="pill" data-sm="arrows">ARROWS</button>
-<button class="pill" data-sm="tilt">TILT</button>
+<button class="pill on" data-sm="wheel">عجلة القيادة</button>
+<button class="pill" data-sm="arrows">الأسهم</button>
+<button class="pill" data-sm="tilt">إمالة الجهاز</button>
 </div>
-<div id="spd">0<small>km/h</small></div>
+<div id="spd">0<small>كم/س</small></div>
 </div>
 <div id="prog"><i></i></div><div id="cd"></div>
-<div class="pedal" id="pb">BRAKE</div><div class="pedal" id="pg">GAS</div><button id="ph">HANDBRAKE</button>
+<div class="pedal" id="pb">فرامل</div><div class="pedal" id="pg">بنزين</div><button id="ph">فرامل اليد</button>
 <div id="wheel">
 <svg id="wsvg" viewBox="0 0 100 100">
 <circle cx="50" cy="50" r="42" fill="none" stroke="#1d1d24" stroke-width="12"/>
@@ -161,9 +161,9 @@ const R=Math.random,KS=.3/3.6;
 const hs=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 const PAL=['#e63946','#f4a261','#2a9d8f','#8d99ae','#ffd166','#9b5de5','#06d6a0','#ffffff'];
 const VEH={
-moto:{n:'NINJA BIKE',type:'moto',acc:120,brk:40,top:270,hd:1.25,w:.9,l:2.1,col:'#ff3b30'},
-bmw:{n:'BMW M4',type:'car',acc:100,brk:50,top:250,hd:1,w:1.85,l:4.1,col:'#1c6dff'},
-merc:{n:'MERCEDES AMG',type:'car',acc:85,brk:65,top:265,hd:.95,w:1.85,l:4.1,col:'#c9ced6'}
+moto:{n:'موتوسيكل نينجا',type:'moto',acc:120,brk:40,top:270,hd:1.25,w:.9,l:2.1,col:'#ff3b30'},
+bmw:{n:'بي إم دبليو M4',type:'car',acc:100,brk:50,top:250,hd:1,w:1.85,l:4.1,col:'#1c6dff'},
+merc:{n:'مرسيدس AMG',type:'car',acc:85,brk:65,top:265,hd:.95,w:1.85,l:4.1,col:'#c9ced6'}
 };
 const S={name:'Racer',veh:'bmw',mode:'race',d:0,traffic:'same',sm:'wheel'};
 const cv=$('cv'),c=cv.getContext('2d');
@@ -233,7 +233,7 @@ document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.g
 $('n1').onclick=()=>{
 const v=$('nm').value.trim();
 if(!v){const i=$('nm');i.classList.remove('bad');void i.offsetWidth;i.classList.add('bad');return}
-S.name=v;try{window.SOYA_NAME&&window.SOYA_NAME(v)}catch(e){}$('hi').textContent='HELLO, '+v.toUpperCase()+'!';show('hello');
+S.name=v;try{window.SOYA_NAME&&window.SOYA_NAME(v)}catch(e){}$('hi').textContent='أهلاً يا '+v+'!';show('hello');
 };
 $('nm').onkeydown=e=>{if(e.key==='Enter')$('n1').click()};
 
@@ -243,7 +243,7 @@ for(const id in VEH){
 const V=VEH[id],d=document.createElement('div');
 d.className='card'+(id===S.veh?' sel':'');d.dataset.id=id;
 d.innerHTML=`<canvas width="120" height="140"></canvas><b>${V.n}</b>`+
-stat('Acceleration',V.acc,V.acc/130*100)+stat('Brake',V.brk,V.brk/80*100)+stat('Top speed',V.top+' km/h',V.top/290*100);
+stat('التسارع',V.acc,V.acc/130*100)+stat('الفرامل',V.brk,V.brk/80*100)+stat('السرعة القصوى',V.top+' كم/س',V.top/290*100);
 $('vc').appendChild(d);
 const x=d.querySelector('canvas').getContext('2d');
 drawVeh(x,V.type,V.col,60,70,V.w*26,V.l*26,-.35,false);
@@ -391,7 +391,7 @@ if(label){label.textContent='سلامة العربية: '+left+'/5';label.style.
 for(let i=0;i<10;i++)g.parts.push({x:g.P.x+(R()-.5)*g.P.w,z:g.P.z-g.P.l*.3,vx:(R()-.5)*2,vz:R()*2,life:.35,max:.35,c:i%2?'#b9b8b4':'#ffd24a',s:.08,gr:0});
 if(g.damage<5){toast(g.damage>=3?'⚠️ العربية اتخبطت — خليك حذر':'💥 خبطة! سلامة العربية '+left+'/5');return;}
 g.st='over';g.burning=true;g.P.spin=(R()-.5)*2;g.shake=1.2;
-setTimeout(()=>over(g,'العربية اتحرقت! 🔥','العربية اتخبطت 5 مرات وباظت. اختار RESTART أو MENU.'),1800);
+setTimeout(()=>over(g,'العربية اتحرقت! 🔥','العربية اتخبطت ٥ مرات وباظت. اختار إعادة اللعب أو القائمة.'),1800);
 }
 function over(g,t,s){if(G!==g)return;g.frozen=true;$('ot').textContent=t;$('os').textContent=s;show('over');}
 
@@ -436,8 +436,8 @@ if(m!=='end'&&P.z>=g.len){
 g.st='done';
 if(m==='race'){
 const pl=g.fin+1;
-setTimeout(()=>over(g,['1ST PLACE! 🏆','2ND PLACE','3RD PLACE'][pl-1],pl===1?'You are the champion, '+S.name+'!':'Try harder next time!'),1500);
-}else setTimeout(()=>over(g,'FINISH! 🏆','You conquered the off-road, '+S.name+'!'),1500);
+setTimeout(()=>over(g,['المركز الأول! 🏆','المركز الثاني','المركز الثالث'][pl-1],pl===1?'أنت البطل يا '+S.name+'!':'حاول تاني المرة الجاية!'),1500);
+}else setTimeout(()=>over(g,'وصلت للنهاية! 🏆','أنت تغلبت على الطريق الوعر يا '+S.name+'!'),1500);
 }
 }else if(g.st==='done'){
 for(const e of g.ents)if(e.ai)e.z+=e.sp*KS*dt;
@@ -604,11 +604,11 @@ function hud(){
 const g=G,P=g.P;$('spd').firstChild.nodeValue=Math.round(P.sp);
 if(g.m==='race'){
 let p=1;g.ents.forEach(e=>{if(e.ai&&e.z>P.z)p++});
-$('stat').textContent=`${S.name.toUpperCase()} · POS ${p}/3`;
-}else $('stat').textContent=g.m==='off'?`${Math.round(P.z)} / ${g.len} m`:`${Math.round(P.z)} m`;
+$('stat').textContent=`${S.name} · المركز ${p}/3`;
+}else $('stat').textContent=g.m==='off'?`${Math.round(P.z)} / ${g.len} م`:`${Math.round(P.z)} m`;
 $('prog').style.display=g.m==='end'?'none':'block';
 $('prog').firstChild.style.width=clamp(P.z/g.len*100,0,100)+'%';
-$('cd').textContent=g.st==='count'?Math.ceil(g.cd):(g.st==='run'&&g.rt<.8?'GO!':'');
+$('cd').textContent=g.st==='count'?Math.ceil(g.cd):(g.st==='run'&&g.rt<.8?'انطلق!':'');
 $('pg').style.transform=`perspective(300px) rotateX(${IN.gas*28}deg)`;
 $('pb').style.transform=`perspective(300px) rotateX(${IN.brk*28}deg)`;
 $('wsvg').style.transform=`rotate(${wa}rad)`;
@@ -641,7 +641,7 @@ requestAnimationFrame(loop);
 #c3{position:fixed;inset:0;width:100%;height:100%;z-index:1;display:none;touch-action:none}
 #mm{position:absolute;top:64px;right:10px;width:150px;height:115px;border-radius:12px;border:2px solid #fff4;background:#000a;display:none;pointer-events:none}
 </style>
-<div id="garage" class="screen"><h2>🚗 GARAGE · الجراج</h2><div id="gm"></div><div class="gg" id="gg"></div><button class="btn" id="gn">NEXT ▶</button></div>
+<div id="garage" class="screen"><h2>🚗 الجراج</h2><div id="gm"></div><div class="gg" id="gg"></div><button class="btn" id="gn">التالي ▶</button></div>
 <div id="toast"></div>
 <canvas id="c3"></canvas>
 <script>
@@ -653,18 +653,18 @@ try{const j=JSON.parse(localStorage.getItem(SV));if(j&&Array.isArray(j.own))D=j}
 const cloudSave=()=>{try{window.SOYA_CLOUD_SAVE&&window.SOYA_CLOUD_SAVE({name:D.name||'',money:D.money,own:D.own,sel:D.sel,missions:D.mis||0})}catch(e){}};
 const save=()=>{try{localStorage.setItem(SV,JSON.stringify(D))}catch(e){}cloudSave()};
 Object.assign(VEH,{
-junk:{n:'FIAT 128',type:'car',acc:45,brk:35,top:60,hd:.9,w:1.85,l:4.1,col:'#8a7f6a'},
+junk:{n:'فيات ١٢٨',type:'car',acc:45,brk:35,top:60,hd:.9,w:1.85,l:4.1,col:'#8a7f6a'},
 tuktuk:{n:'توك توك',type:'car',acc:38,brk:30,top:55,hd:1.35,w:1.3,l:2.5,col:'#ffcc00'},
-p504:{n:'PEUGEOT 504',type:'car',acc:60,brk:45,top:110,hd:.95,w:1.85,l:4.1,col:'#f2b705'},
-lada:{n:'LADA',type:'car',acc:70,brk:50,top:140,hd:1,w:1.85,l:4.1,col:'#c0392b'},
-suzuki:{n:'SUZUKI',type:'car',acc:78,brk:52,top:155,hd:1.05,w:1.75,l:3.9,col:'#2a6fdb'},
-scooter:{n:'VESPA',type:'moto',acc:80,brk:45,top:150,hd:1.3,w:.8,l:1.9,col:'#2ec4b6'},
-toyota:{n:'TOYOTA COROLLA',type:'car',acc:82,brk:55,top:175,hd:1,w:1.85,l:4.2,col:'#cfd3d6'},
+p504:{n:'بيجو ٥٠٤',type:'car',acc:60,brk:45,top:110,hd:.95,w:1.85,l:4.1,col:'#f2b705'},
+lada:{n:'لادا',type:'car',acc:70,brk:50,top:140,hd:1,w:1.85,l:4.1,col:'#c0392b'},
+suzuki:{n:'سوزوكي',type:'car',acc:78,brk:52,top:155,hd:1.05,w:1.75,l:3.9,col:'#2a6fdb'},
+scooter:{n:'فيسبا',type:'moto',acc:80,brk:45,top:150,hd:1.3,w:.8,l:1.9,col:'#2ec4b6'},
+toyota:{n:'تويوتا كورولا',type:'car',acc:82,brk:55,top:175,hd:1,w:1.85,l:4.2,col:'#cfd3d6'},
 microbus:{n:'ميكروباص',type:'van',acc:50,brk:42,top:120,hd:.8,w:2,l:5.2,col:'#f5f5f5'},
-jeep:{n:'JEEP WRANGLER',type:'car',acc:75,brk:50,top:185,hd:.9,w:2,l:4.4,col:'#3d7a3a'},
-fiat2:{n:'FIAT TIPO',type:'car',acc:90,brk:58,top:200,hd:1.05,w:1.85,l:4.3,col:'#e63946'},
+jeep:{n:'جيب رانجلر',type:'car',acc:75,brk:50,top:185,hd:.9,w:2,l:4.4,col:'#3d7a3a'},
+fiat2:{n:'فيات تيبو',type:'car',acc:90,brk:58,top:200,hd:1.05,w:1.85,l:4.3,col:'#e63946'},
 mg:{n:'MG',type:'car',acc:95,brk:60,top:230,hd:1,w:1.85,l:4.2,col:'#ff7a00'},
-bugatti:{n:'BUGATTI',type:'car',acc:150,brk:80,top:420,hd:1.15,w:2,l:4.5,col:'#0a3fae'}
+bugatti:{n:'بوجاتي',type:'car',acc:150,brk:80,top:420,hd:1.15,w:2,l:4.5,col:'#0a3fae'}
 });
 const FL=[
 ['junk',0,'sedan','فيات ١٢٨ المعفنة'],
@@ -687,9 +687,9 @@ if(!VEH[D.sel]||!D.own.includes(D.sel))D.sel='junk';S.veh=D.sel;
 /* ---------- cloud (Firebase, by IP) glue ---------- */
 const IB=document.querySelector('#intro .btn');
 let rdy=false;
-function known(){if(D.name){S.name=D.name;$('hi').textContent='WELCOME BACK, '+D.name.toUpperCase()+'!';IB.dataset.go='hello'}}
-function ready(){if(rdy)return;rdy=true;known();IB.disabled=false;IB.textContent='NEXT ▶'}
-IB.disabled=true;IB.textContent='LOADING…';setTimeout(ready,6000);
+function known(){if(D.name){S.name=D.name;$('hi').textContent='أهلاً بعودتك يا '+D.name+'!';IB.dataset.go='hello'}}
+function ready(){if(rdy)return;rdy=true;known();IB.disabled=false;IB.textContent='التالي ▶'}
+IB.disabled=true;IB.textContent='جاري التحميل…';setTimeout(ready,6000);
 window.SOYA_APPLY=d=>{
 if(d&&typeof d==='object'){
 D.money=Math.max(0,+d.money||0);
@@ -717,25 +717,24 @@ function hideInjectedVisualErrors(root=document.body){
   e.style.setProperty('display','none','important');e.style.setProperty('visibility','hidden','important');e.style.setProperty('opacity','0','important');e.setAttribute('aria-hidden','true');
  }
 }
-function toast(t){const msg=String(t||'');if(isForbiddenVisualError(msg)||/التصادم المائي/i.test(msg))return;const e=$('toast');if(!e)return;e.textContent=msg;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2200)}
-(()=>{const start=()=>{hideInjectedVisualErrors();const mo=new MutationObserver(records=>{for(const r of records){if(r.type==='characterData'&&isForbiddenVisualError(r.target.nodeValue)){hideInjectedVisualErrors(r.target.parentElement||document.body);continue}for(const n of r.addedNodes||[]){if(n.nodeType===Node.TEXT_NODE&&isForbiddenVisualError(n.nodeValue)){hideInjectedVisualErrors(n.parentElement||document.body)}else if(n.nodeType===Node.ELEMENT_NODE){const t=(n.textContent||'').replace(/\s+/g,' ').trim();if(isForbiddenVisualError(t))hideInjectedVisualErrors(n);else if(t.length<260)hideInjectedVisualErrors(n.parentElement||document.body)}}}});mo.observe(document.documentElement,{subtree:true,childList:true,characterData:true})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start()})();
-function pay(n){D.money=Math.max(0,D.money+n);save();toast((n>0?'+':'')+n+' EGP 💰')}
+function toast(t){const msg=String(t||'');if(isForbiddenVisualError(msg)||/التصادم المائي/i.test(msg))return;const e=$('toast');if(!e)return;e.textContent=msg;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2200)}(()=>{const start=()=>{hideInjectedVisualErrors();const mo=new MutationObserver(records=>{for(const r of records){if(r.type==='characterData'&&isForbiddenVisualError(r.target.nodeValue)){hideInjectedVisualErrors(r.target.parentElement||document.body);continue}for(const n of r.addedNodes||[]){if(n.nodeType===Node.TEXT_NODE&&isForbiddenVisualError(n.nodeValue)){hideInjectedVisualErrors(n.parentElement||document.body)}else if(n.nodeType===Node.ELEMENT_NODE){const t=(n.textContent||'').replace(/\s+/g,' ').trim();if(isForbiddenVisualError(t))hideInjectedVisualErrors(n);else if(t.length<260)hideInjectedVisualErrors(n.parentElement||document.body)}}}});mo.observe(document.documentElement,{subtree:true,childList:true,characterData:true})};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start()})();
+function pay(n){D.money=Math.max(0,D.money+n);save();toast((n>0?'+':'')+n+' جنيه 💰')}
 function nearMiss(a){
 a.cc=(a.gt-a.lmt<3)?a.cc+1:1;a.lmt=a.gt;
-const amt=a.cc*50;pay(amt);toast('🏎️ غرزة! +'+amt+' EGP x'+a.cc)}
+const amt=a.cc*50;pay(amt);toast('🏎️ غرزة! +'+amt+' جنيه ×'+a.cc)}
 setInterval(()=>{ /* 100 EGP every 300 m, in every map */
 const o=A||(G&&!G.frozen&&G.st==='run'?G:null);if(!o||(A&&A.over))return;
 const z=A?A.dist:G.P.z,n=Math.floor(z/300);o.pd=o.pd||0;if(n>o.pd){pay((n-o.pd)*100);o.pd=n}
 },300);
 /* ---------- garage ---------- */
 function renderG(){
-$('gm').textContent='💰 '+D.money+' EGP'+(D.mis?' · 🕵️ '+D.mis:'');const g=$('gg');g.innerHTML='';
+$('gm').textContent='💰 '+D.money+' جنيه'+(D.mis?' · 🕵️ '+D.mis:'');const g=$('gg');g.innerHTML='';
 for(const f of FL){
 const id=f[0],pr=f[1],V=VEH[id],own=D.own.includes(id),d=document.createElement('div');
 d.className='gc'+(D.sel===id?' sel':'');
-d.innerHTML='<canvas width="90" height="100"></canvas><b>'+f[3]+'</b><span>'+V.top+' km/h · ACC '+V.acc+'</span>';
+d.innerHTML='<canvas width="90" height="100"></canvas><b>'+f[3]+'</b><span>'+V.top+' كم/س · التسارع '+V.acc+'</span>';
 const b=document.createElement('button');
-b.textContent=D.sel===id?'✔ SELECTED':own?'SELECT':pr+' EGP 🔒';
+b.textContent=D.sel===id?'✔ تم الاختيار':own?'اختيار':pr+' جنيه 🔒';
 if(!own&&D.money<pr)b.className='lock';
 b.onclick=()=>{
 if(!own){if(D.money<pr){toast('ناقصك '+(pr-D.money)+' جنيه');return}D.money-=pr;D.own.push(id)}
@@ -748,8 +747,8 @@ drawVeh(d.querySelector('canvas').getContext('2d'),V.type,V.col,45,50,V.w*20,V.l
 function openGarage(){show('garage');renderG()}
 $('gn').onclick=()=>show('mode');
 document.querySelector('#hello [data-go]').onclick=openGarage;
-$('mode').querySelector('.row').insertAdjacentHTML('beforeend','<div class="card" id="mX"><span class="big">🌊</span><b>مابا إسكندرية</b><span>Alexandria Corniche · Qaitbay · Bibliotheca · Stanley · Montaza</span></div><div class="card" id="mA"><span class="big">🌅</span><b>الواقعية 3D</b><span>Realistic 3D city drive</span></div><div class="card" id="mM"><span class="big">🕵️</span><b>المهمات</b><span>Ram · steal · escape · ride</span></div>');
-$('mode').insertAdjacentHTML('beforeend','<button class="btn alt" id="mG">🚗 GARAGE</button>');
+$('mode').querySelector('.row').insertAdjacentHTML('beforeend','<div class="card" id="mX"><span class="big">🌊</span><b>خريطة إسكندرية</b><span>الكورنيش · قايتباي · المكتبة · ستانلي · المنتزه</span></div><div class="card" id="mA"><span class="big">🌅</span><b>الواقعية ثلاثية الأبعاد</b><span>قيادة واقعية في المدينة</span></div><div class="card" id="mM"><span class="big">🕵️</span><b>المهمات</b><span>اخبط · اسرق · اهرب · اركب</span></div>');
+$('mode').insertAdjacentHTML('beforeend','<button class="btn alt" id="mG">🚗 الجراج</button>');
 $('ui').insertAdjacentHTML('beforeend','<canvas id="mm" width="150" height="115"></canvas>');
 $('mG').onclick=openGarage;$('mA').onclick=()=>startA('free');$('mM').onclick=()=>startA('mission');$('mX').onclick=()=>startA('alex');
 /* ---------- 3D helpers ---------- */
@@ -759,7 +758,7 @@ function useW(w){SC=w.SC;DY=w.DY;DL=w.DL;SUN=w.SUN}
 function loadT(cb){
 if(window.THREE)return cb();
 const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-s.onload=cb;s.onerror=()=>toast('محتاج إنترنت لتحميل محرك الـ 3D');document.head.appendChild(s);
+s.onload=cb;s.onerror=()=>toast('محتاج إنترنت لتحميل محرك ثلاثي الأبعاد');document.head.appendChild(s);
 }
 function tex(w,h,fn,rx,ry){const c=document.createElement('canvas');c.width=w;c.height=h;fn(c.getContext('2d'),w,h);const t=new THREE.CanvasTexture(c);t.wrapS=t.wrapT=THREE.RepeatWrapping;if(rx)t.repeat.set(rx,ry);t.anisotropy=4;t.encoding=THREE.sRGBEncoding;return t}
 const mt={};
@@ -1127,8 +1126,7 @@ i+=Math.max(1,Math.round((w+(r?3+R()*8:1.5+R()*4))/C.L))}}}
 strip(CC,CH,[-1],2);strip(GN,7,[1,-1],2);for(const C of CON)strip(C,6,[1,-1],1);
 
 /* ---------- props: palms, trees, lamps, umbrellas, boats ---------- */
-{const B0=MX(0,0,0,0),TRK=LM('#7a5a3a'),LEAF=LM('#3a8a30'),LAMP=LM('#4a4a50'),BUL=LM('#f4f1e6','#cfcab8'),TRG=new THREE.CylinderGeometry(.18,.3,7,5),CRG=new THREE.ConeGeometry(3,1.6,7),LPG=new THREE.CylinderGeometry(.1,.14,8,5),BLG=new THREE.SphereGeometry(.4,6,4),FLO=new THREE.SphereGeometry(2.6,7,5);
-const props=(C,hw,sides,pal)=>{for(let i=5;i<C.N;i+=3)for(const s of sides){
+{const B0=MX(0,0,0,0),TRK=LM('#7a5a3a'),LEAF=LM('#3a8a30'),LAMP=LM('#4a4a50'),BUL=LM('#f4f1e6','#cfcab8'),TRG=new THREE.CylinderGeometry(.18,.3,7,5),CRG=new THREE.ConeGeometry(3,1.6,7),LPG=new THREE.CylinderGeometry(.1,.14,8,5),BLG=new THREE.SphereGeometry(.4,6,4),FLO=new THREE.SphereGeometry(2.6,7,5);const props=(C,hw,sides,pal)=>{for(let i=5;i<C.N;i+=3)for(const s of sides){
 const p=at(C,i,s*(hw+2.5));if(nearRoad(p.x,p.z,-1))continue;
 if(i%2===0){const k=.8+R()*.5;if(pal){add(TRG,TRK,MX(p.x,3.7*k,p.z,0,k,k,k));add(CRG,LEAF,MX(p.x,7.6*k,p.z,R()*6,k,k,k))}else{add(TRG,TRK,MX(p.x,3.2*k,p.z,0,.8*k,.8*k,.8*k));add(FLO,LEAF,MX(p.x,7*k,p.z,0,k,k*1.1,k))}}
 if(i%5===0){const q=at(C,i,s*(hw+1));add(LPG,LAMP,MX(q.x,4,q.z));add(BLG,BUL,MX(q.x,8.2,q.z))}}};
@@ -1374,7 +1372,7 @@ function registerDamage(a,impact){
  if(a.damage<5){toast(a.damage>=3?'⚠️ العربية اتخبطت — خليك حذر':'💥 خبطة! سلامة العربية '+(5-a.damage)+'/5');return;}
  toast('🔥 العربية ولعت!');finishBurn(a);
 }
-function finishBurn(a){if(!a||a.over)return;a.over=true;setTimeout(()=>{if(A!==a)return;$('ot').textContent='العربية اتحرقت! 🔥';$('os').textContent='العربية اتخبطت 5 مرات وباظت. اختار RESTART أو MENU.';show('over');$('c3').style.display='block';},1800)}
+function finishBurn(a){if(!a||a.over)return;a.over=true;setTimeout(()=>{if(A!==a)return;$('ot').textContent='العربية اتحرقت! 🔥';$('os').textContent='العربية اتخبطت ٥ مرات وباظت. اختار إعادة اللعب أو القائمة.';show('over');$('c3').style.display='block';},1800)}
 function fin(t,s){const a=A;a.over=true;$('ot').textContent=t;$('os').textContent=s;show('over');$('c3').style.display='block'}
 function step(dt){
 const a=A,P=a.P,V=a.V,top=V.top/3.6,sp0=Math.hypot(P.vx,P.vz);
@@ -1461,9 +1459,9 @@ if(a.chase>0){a.chase-=dt;if(a.chase<=0){clearCops();pay(200);toast('نجوت م
 const p=OB[a.obj][1];
 if(p&&Math.hypot(P.x-p[0],P.z-p[1])<(a.obj===3?5:9)){
 if(a.obj===1){pay(200);toast('سرقت الشنطة! البوليس وراك 🚨');spawnCops();setObj(2)}
-else if(a.obj===2){clearCops();pay(150);toast('فلتّ منهم ✔ +150 EGP');setObj(3)}
-else if(a.obj===3){DY.remove(a.m);if(a.pk)DY.remove(a.pk);a.id='moto';a.V=VEH.moto;a.m=mkV('moto');DY.add(a.m);P.vx=P.vz=0;pay(100);toast('ركبت الموتوسيكل 🏍️ +100 EGP');setObj(4)}
-else if(a.obj===4){D.mis=(D.mis||0)+1;pay(1000);fin('المهمة تمت! 🏆','عملتها يا '+S.name+' — +1000 EGP')}
+else if(a.obj===2){clearCops();pay(150);toast('فلتّ منهم ✔ +150 جنيه');setObj(3)}
+else if(a.obj===3){DY.remove(a.m);if(a.pk)DY.remove(a.pk);a.id='moto';a.V=VEH.moto;a.m=mkV('moto');DY.add(a.m);P.vx=P.vz=0;pay(100);toast('ركبت الموتوسيكل 🏍️ +100 جنيه');setObj(4)}
+else if(a.obj===4){D.mis=(D.mis||0)+1;pay(1000);fin('المهمة تمت! 🏆','عملتها يا '+S.name+' — +1000 جنيه')}
 }}
 }
 function hud(a,sp){
@@ -1471,7 +1469,7 @@ $('spd').firstChild.nodeValue=Math.round(sp);
 $('pg').style.transform='perspective(300px) rotateX('+IN.gas*28+'deg)';$('pb').style.transform='perspective(300px) rotateX('+IN.brk*28+'deg)';
 $('ph').classList.toggle('on',IN.hb>.4);
 $('wsvg').style.transform='rotate('+wa+'rad)';
-$('cd').textContent=a.cd>0?Math.ceil(a.cd):(a.gt<.8?'GO!':'');
+$('cd').textContent=a.cd>0?Math.ceil(a.cd):(a.gt<.8?'انطلق!':'');
 if(a.mode==='mission'){
 const p=OB[a.obj][1],tg=a.traf.find(t=>t.tgt),q=p||(tg?[tg.x,tg.z]:null);
 $('stat').textContent=OB[a.obj][0]+(q?' · '+Math.round(Math.hypot(a.P.x-q[0],a.P.z-q[1]))+' م':'')+(a.cops.length?' · 🚨 '+Math.round(a.bust/5*100)+'%':'');
@@ -1539,14 +1537,14 @@ window.SOYA_INGAME=()=>!!(A||G);
 #sl .none{font-size:12px;color:#aaa;font-family:Tahoma,Arial,sans-serif}
 </style>
 <div id="setp" class="screen" style="z-index:8;background:#000b"><div class="panel">
-<h2>⚙ SETTINGS</h2>
+<h2>⚙ الإعدادات</h2>
 <div id="np">🎵 —</div>
 <div class="mc"><button class="pill" id="mp">⏮</button><button class="pill" id="mpl">▶</button><button class="pill" id="mn">⏭</button><input type="range" id="vol" min="0" max="1" step=".05" value=".7"></div>
 <div id="sl"></div>
-<div class="row"><button class="btn alt" id="sadd">➕ ADD SONG</button><button class="btn alt" id="sref">🔄</button></div>
+<div class="row"><button class="btn alt" id="sadd">➕ إضافة أغنية</button><button class="btn alt" id="sref">🔄</button></div>
 <input type="file" id="sfile" accept="audio/*" multiple style="display:none">
-<button class="btn" id="sres">▶ RESUME</button>
-<button class="btn r" id="sq">✕ QUIT TO MENU</button>
+<button class="btn" id="sres">▶ متابعة</button>
+<button class="btn r" id="sq">✕ خروج للقائمة</button>
 </div></div>
 <script>
 (()=>{
@@ -1597,7 +1595,7 @@ try{u=(await idbAll()).map(x=>({name:x.name,url:URL.createObjectURL(x.blob)}))}c
 list=g.concat(u,sess);cur=cn?list.findIndex(x=>x.name===cn):-1;draw()}
 function draw(){
 const box=q('sl');box.innerHTML='';
-if(!list.length){box.innerHTML='<div class="none">مفيش أغاني لسه — ارفع أغاني على GitHub أو دوس ADD SONG</div>'}
+if(!list.length){box.innerHTML='<div class="none">مفيش أغاني لسه — ارفع أغاني على GitHub أو دوس إضافة أغنية</div>'}
 list.forEach((s,i)=>{const b=document.createElement('button');b.className='pill'+(i===cur?' on':'');b.textContent='🎵 '+s.name;b.onclick=()=>play(i);box.appendChild(b)});
 q('np').textContent='🎵 '+(cur>=0&&list[cur]?list[cur].name:'—');
 q('mpl').textContent=AU.paused?'▶':'⏸'}
@@ -1613,12 +1611,12 @@ q('mn').onclick=()=>play(cur+1);
 q('mp').onclick=()=>play(cur-1);
 q('mpl').onclick=()=>{if(cur<0)return play(0);AU.paused?AU.play().catch(()=>{}):AU.pause()};
 q('sadd').onclick=()=>q('sfile').click();
-q('sref').onclick=async()=>{await load(true);tt('اتحدثت القايمة ✔')};
+q('sref').onclick=async()=>{await load(true);tt('تم تحديث القائمة ✔')};
 q('sfile').onchange=async e=>{
 for(const f of e.target.files){
 const nm=f.name.replace(EXT,'');
 try{await idbPut(nm,f)}catch(er){sess.push({name:nm,url:URL.createObjectURL(f)})}}
-e.target.value='';await load();tt('اتضافت الأغنية ✔')};
+e.target.value='';await load();tt('تمت إضافة الأغنية ✔')};
 function openS(){
 const g=window.SOYA_INGAME&&window.SOYA_INGAME();
 ['gas','brk','gd','bd','al','ar','hb','hbd'].forEach(k=>IN[k]=0);
@@ -1630,7 +1628,7 @@ function closeS(){q('setp').classList.remove('on');window.SOYA_PAUSE&&window.SOY
 window.SOYA_SET=v=>v?openS():closeS();
 q('sres').onclick=closeS;
 q('sq').onclick=()=>{closeS();window.SOYA_QUIT&&window.SOYA_QUIT()};
-q('mode').insertAdjacentHTML('beforeend','<button class="btn alt" id="mS">⚙ SETTINGS</button>');
+q('mode').insertAdjacentHTML('beforeend','<button class="btn alt" id="mS">⚙ الإعدادات</button>');
 q('mS').onclick=openS;
 /* resume the last song on the first tap anywhere */
 addEventListener('pointerdown',()=>{
