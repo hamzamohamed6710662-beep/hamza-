@@ -588,8 +588,7 @@ if(g.damage>0){c.save();c.translate(cx+P.x*k,py);c.rotate(P.st*.1+P.rot);for(let
 if(g.burning){c.save();c.translate(cx+P.x*k,py);for(let i=0;i<7;i++){const wob=Math.sin(g.t*13+i*1.7),fx=(i%3-1)*P.w*k*.23,fy=-P.l*k*.22-(Math.abs(wob)*.22+.12)*k; c.fillStyle=i%3===0?'#ffcf36':i%3===1?'#ff6a00':'#e92816';c.beginPath();c.moveTo(fx-k*.12,fy+k*.45);c.quadraticCurveTo(fx-k*(.2+Math.abs(wob)*.12),fy,fx,fy-k*(.5+Math.abs(wob)*.22));c.quadraticCurveTo(fx+k*(.23+Math.abs(wob)*.1),fy,fx+k*.12,fy+k*.45);c.fill()}c.restore();}
 for(const p of g.parts){
 const a=Math.max(0,p.life/p.max);c.globalAlpha=a*(p.gr?.7:1);c.fillStyle=p.c;
-c.beginPath();c.arc(cx+p.x*k,Y(p.z),p.s*k*(1+(1-a)*p.gr),0,7);c.fill();
-}
+c.beginPath();c.arc(cx+p.x*k,Y(p.z),p.s*k*(1+(1-a)*p.gr),0,7);c.fill();}
 c.globalAlpha=1;
 if(P.sp>(g.V.top*.5)){
 c.strokeStyle='rgba(255,255,255,.09)';c.lineWidth=1.5;c.beginPath();
@@ -656,7 +655,7 @@ const cloudSave=()=>{try{window.SOYA_CLOUD_SAVE&&window.SOYA_CLOUD_SAVE({name:D.
 const save=()=>{try{localStorage.setItem(SV,JSON.stringify(D))}catch(e){}cloudSave()};
 Object.assign(VEH,{
 junk:{n:'فيات ١٢٨',type:'car',acc:45,brk:35,top:60,hd:.9,w:1.85,l:4.1,col:'#8a7f6a'},
-tuktuk:{n:'توك توك',type:'car',acc:105,brk:42,top:155,hd:1.45,w:1.3,l:2.5,col:'#ffcc00'},
+tuktuk:{n:'توك توك',type:'car',acc:145,brk:42,top:220,hd:1.45,w:1.3,l:2.5,col:'#ffcc00'},
 p504:{n:'بيجو ٥٠٤',type:'car',acc:60,brk:45,top:110,hd:.95,w:1.85,l:4.1,col:'#f2b705'},
 lada:{n:'لادا',type:'car',acc:70,brk:50,top:140,hd:1,w:1.85,l:4.1,col:'#c0392b'},
 suzuki:{n:'سوزوكي',type:'car',acc:78,brk:52,top:155,hd:1.05,w:1.75,l:3.9,col:'#2a6fdb'},
@@ -670,20 +669,20 @@ bugatti:{n:'بوجاتي',type:'car',acc:150,brk:80,top:420,hd:1.15,w:2,l:4.5,co
 });
 const FL=[
 ['junk',0,'sedan','فيات ١٢٨ المعفنة'],
-['tuktuk',400,'sedan','توك توك'],
-['p504',800,'taxi','بيجو ٥٠٤'],
-['lada',1500,'sedan','لادا'],
-['suzuki',1900,'sedan','سوزوكي'],
-['scooter',2300,'scooter','فيسبا'],
-['toyota',2800,'sedan','تويوتا كورولا'],
-['microbus',3400,'van','ميكروباص أبيض'],
-['jeep',4200,'jeep','جيب رانجلر'],
-['bmw',5000,'sedan','BMW M4'],
-['fiat2',5800,'sedan','فيات تيبو'],
-['moto',6800,'moto','نينجا'],
-['merc',8000,'sedan','مرسيدس AMG'],
-['mg',11000,'sedan','MG'],
-['bugatti',45000,'sedan','بوجاتي']
+['tuktuk',3000,'sedan','توك توك'],
+['p504',4000,'taxi','بيجو ٥٠٤'],
+['lada',5000,'sedan','لادا'],
+['suzuki',6000,'sedan','سوزوكي'],
+['scooter',6500,'scooter','فيسبا'],
+['toyota',8000,'sedan','تويوتا كورولا'],
+['microbus',10000,'van','ميكروباص أبيض'],
+['jeep',12000,'jeep','جيب رانجلر'],
+['bmw',18000,'sedan','BMW M4'],
+['fiat2',14000,'sedan','فيات تيبو'],
+['moto',20000,'moto','نينجا'],
+['merc',25000,'sedan','مرسيدس AMG'],
+['mg',30000,'sedan','MG'],
+['bugatti',50000,'sedan','بوجاتي']
 ];
 if(!VEH[D.sel]||!D.own.includes(D.sel))D.sel='junk';S.veh=D.sel;
 /* ---------- cloud (Firebase, by IP) glue ---------- */
@@ -1180,8 +1179,7 @@ if(b>=CC.N-6){const sp=Math.hypot(P.vx,P.vz),i=30;P.x=CC.X[i]-CC.TZ[i]*5.6;P.z=C
 /* traffic */
 const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw),ps=a.pi*CC.L;
 for(const t of a.traf){
-const C=t.C;let tv=t.bv;const sg=Math.sign(t.bv);
-t.laneTimer=(t.laneTimer??(60+R()*30))-dt;
+const C=t.C;let tv=t.bv;const sg=Math.sign(t.bv);t.laneTimer=(t.laneTimer??(60+R()*30))-dt;
 if(t.laneTimer<=0){
  const lanes=C===CC?CLN:GLN;
  const sameDir=lanes.filter(x=>Math.sign(x)===Math.sign(t.bv));
@@ -1707,15 +1705,16 @@ flush();
 <script>
 (()=>{
 'use strict';
-const engineStart=new Audio('./تشغيل%20المحرك.mp3');
+const engineStart=new Audio('./تشغيل%20المحرك%281%29.mp3');
 engineStart.preload='auto';
+engineStart.volume=.30;
 const carSounds=[
-  './عربيه%20عاديه.mp3',
-  './بردو%20عريبه%20عاديه.mp3',
-  './اصوات%20عربيع%20بردو.mp3'
-].map(src=>{const a=new Audio(src);a.loop=true;a.preload='auto';a.volume=.55;return a});
-const busSound=new Audio('./مكرباص%20ابيض.mp3');
-busSound.loop=true;busSound.preload='auto';busSound.volume=.62;
+  './بردو%20عريبه%20عاديه%281%29.mp3',
+  './اصوات%20عربيع%20بردو%281%29.mp3'
+].map(src=>{const a=new Audio(src);a.loop=true;a.preload='auto';a.volume=.28;return a});
+// لا يوجد ملف صوت ميكروباص ضمن الملفات المرفوعة حالياً، لذلك نستخدم صوت سيارة مؤقتاً.
+const busSound=new Audio('./بردو%20عريبه%20عاديه%281%29.mp3');
+busSound.loop=true;busSound.preload='auto';busSound.volume=.30;
 let active=null,token=0;
 function stopAll(){
   token++;
