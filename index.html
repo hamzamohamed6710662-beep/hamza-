@@ -192,7 +192,7 @@ function drawVeh(c,t,col,x,y,w,h,rot,brk){
 c.save();c.translate(x,y);c.rotate(rot||0);
 c.fillStyle='rgba(0,0,0,.4)';c.beginPath();c.ellipse(w*.1,h*.04,w*.62,h*.56,0,0,7);c.fill();
 const g=c.createLinearGradient(-w/2,0,w/2,0);g.addColorStop(0,shade(col,-55));g.addColorStop(.5,col);g.addColorStop(1,shade(col,-55));
-if(t==='moto'){
+if(t==='tuktuk'){c.fillStyle='#101010';rr(c,-w*.42,-h*.22,w*.84,h*.58,w*.1);c.fillStyle='#ffdf00';rr(c,-w*.43,-h*.48,w*.86,h*.25,w*.1);c.fillStyle='#151515';rr(c,-w*.36,-h*.20,w*.72,h*.28,w*.07);c.fillStyle='#17232b';rr(c,-w*.30,-h*.17,w*.60,h*.20,w*.04);c.fillStyle='#ffdf00';rr(c,-w*.42,h*.03,w*.84,h*.055,2);c.fillStyle='#ff9b00';rr(c,-w*.38,h*.12,w*.17,h*.055,2);rr(c,w*.21,h*.12,w*.17,h*.055,2);c.fillStyle='#ddd';c.beginPath();c.arc(0,h*.39,w*.10,0,7);c.fill();c.strokeStyle='#aaa';c.lineWidth=Math.max(1,w*.025);c.beginPath();c.moveTo(-w*.38,-h*.34);c.lineTo(-w*.58,-h*.48);c.lineTo(-w*.66,-h*.42);c.moveTo(w*.38,-h*.34);c.lineTo(w*.58,-h*.48);c.lineTo(w*.66,-h*.42);c.stroke();}else if(t==='moto'){
 c.fillStyle='#0c0c0c';rr(c,-w*.17,-h*.5,w*.34,h*.24,w*.1);rr(c,-w*.17,h*.26,w*.34,h*.24,w*.1);
 c.fillStyle=g;rr(c,-w*.3,-h*.32,w*.6,h*.66,w*.3);
 c.fillStyle='#222';rr(c,-w*.5,-h*.2,w,h*.05,3);
@@ -668,7 +668,7 @@ const cloudSave=()=>{try{window.SOYA_CLOUD_SAVE&&window.SOYA_CLOUD_SAVE({name:D.
 const save=()=>{D.roadsterPaidV1=true;try{localStorage.setItem(SV,JSON.stringify(D))}catch(e){}cloudSave()};
 Object.assign(VEH,{
 junk:{n:'فيات ١٢٨',type:'car',acc:45,brk:35,top:60,hd:.9,w:1.85,l:4.1,col:'#8a7f6a'},
-tuktuk:{n:'توك توك',type:'car',acc:145,brk:42,top:220,hd:1.45,w:1.3,l:2.5,col:'#ffcc00'},
+tuktuk:{n:'توك توك هندي أسود وأصفر',type:'tuktuk',acc:145,brk:42,top:220,hd:1.45,w:1.3,l:2.5,col:'#ffcc00'},
 p504:{n:'بيجو ٥٠٤',type:'car',acc:60,brk:45,top:110,hd:.95,w:1.85,l:4.1,col:'#f2b705'},
 lada:{n:'لادا',type:'car',acc:70,brk:50,top:140,hd:1,w:1.85,l:4.1,col:'#c0392b'},
 suzuki:{n:'سوزوكي',type:'car',acc:78,brk:52,top:155,hd:1.05,w:1.75,l:3.9,col:'#2a6fdb'},
@@ -889,15 +889,32 @@ b.a(CYZ(.42,.25,14),tire,0,y0+hb*.8,l/2+.14);b.a(CYZ(.22,.27,10),chr,0,y0+hb*.8,
 if(s.bu){b.a(BX(w*.99,hb*.4,l*.96),MS('#0a0a0e',.3,.6),0,y0+hb*.2,0);b.a(BX(w*.8,.05,.55),MS('#0a0a0e',.3,.6),0,top+.28,l/2-.2);for(const sx of[-1,1])b.a(BX(.06,.3,.1),dk,sx*w*.25,top+.12,l/2-.2);b.a(BX(.14,.012,l*.5),chr,0,top+.012,-l*.12);b.a(BX(.02,.02,l*.5),chr,w/2+.01,y0+hb*.55,0);b.a(BX(.02,.02,l*.5),chr,-w/2-.01,y0+hb*.55,0)}
 return b.done()}
 function mkTuk(col,w,l){
-const b=new CB(),body=MS(col,.3,.4),dk=MT('#16161a'),gl=MS('#0a1826',.05,.7),tire=MT('#0d0d0f'),chr=MS('#d5d8de',.2,.9),hl=MT('#fff4c0','#fff4c0'),blk=MS('#1a1a1a',.5,.2);
-b.a(frus(1.25,1.2,.55,1.7,1.6,0),body,0,.65,.45);b.a(frus(.9,.55,.55,.9,.7,0),body,0,.65,-.75);
-b.a(BX(1.35,.07,1.85),blk,0,1.75,.35);
-for(const sx of[-1,1]){b.a(BX(.06,1.05,.06),dk,sx*.62,1.22,.88);b.a(BX(.06,1.05,.06),dk,sx*.58,1.22,-.35)}
-b.a(BX(1.12,.7,.03),gl,0,1.3,-.42,-.25,0,0);b.a(BX(1.1,.3,.5),dk,0,.95,.72);b.a(BX(.04,.55,.04),dk,0,1.1,-.72);b.a(BX(.6,.04,.04),dk,0,1.35,-.72);
-for(const sx of[-1,1]){b.a(CYX(.3,.2),tire,sx*.62,.3,.95);b.a(CYX(.17,.22,8),chr,sx*.62,.3,.95)}
-b.a(CYX(.3,.18),tire,0,.3,-1.15);b.a(CYX(.16,.2,8),chr,0,.3,-1.15);b.a(BX(.42,.05,.7),body,0,.7,-1.15);b.a(SPH(.12),hl,0,.85,-1.12);
-b.a(BX(.5,.14,.05),MT('#ff2a2a','#b00000'),0,.9,1.31);
+// Black-and-yellow three-wheeled tuk-tuk based on the user's reference images.
+const b=new CB(),body=MS('#111111',.34,.38),black=MS('#08090b',.45,.2),yellow=MS('#ffe500',.24,.25),yellow2=MS('#ffb900',.3,.25),glass=MS('#17232b',.12,.72),rubber=MT('#101010'),chrome=MS('#c4c8c9',.22,.85),lamp=MT('#fff7d6','#fff7d6'),tail=MT('#ff9b18','#7b2600');
+const seat=tex(128,128,(c,w,h)=>{c.fillStyle='#17130d';c.fillRect(0,0,w,h);for(let y=0;y<h;y+=32)for(let x=0;x<w;x+=32){c.fillStyle=(x+y)%64?'#d5c36b':'#f2df8b';c.fillRect(x+3,y+3,26,26);c.fillStyle='#88733c';c.beginPath();c.arc(x+16,y+16,9,0,Math.PI*2);c.fill();c.fillStyle='#eee0a0';c.beginPath();c.arc(x+16,y+16,5,0,Math.PI*2);c.fill()}});
+const seatmat=new THREE.MeshStandardMaterial({map:seat,roughness:.75,metalness:0});
+// Passenger cabin and lower black body.
+b.a(frus(1.18,1.13,.62,1.55,1.48,0),body,0,.62,.36);b.a(BX(1.12,.12,1.42),black,0,.94,.42);
+// Black canopy with yellow front roof band.
+b.a(frus(1.22,1.16,.16,1.64,1.56,0),black,0,1.58,.34);b.a(frus(1.24,1.18,.14,.40,.38,0),yellow,0,1.48,-.54);b.a(BX(1.17,.11,1.54),black,0,1.46,.34);
+// Front cabin, broad windshield and yellow trim.
+b.a(frus(1.02,.91,.70,.50,.40,0),black,0,1.02,-.62);b.a(BX(1.00,.49,.045),glass,0,1.22,-.835,-.08,0,0);b.a(BX(1.10,.075,.09),yellow,0,1.50,-.82);b.a(BX(1.10,.12,.09),yellow2,0,.91,-.82);b.a(BX(1.06,.25,.15),black,0,.72,-.78);
+for(const sx of[-1,1]){b.a(BX(.055,.56,.07),black,sx*.49,1.20,-.79,-.12,0,sx*-.08);b.a(BX(.07,.23,.09),yellow2,sx*.47,.80,-.81);b.a(BX(.12,.055,.045),lamp,sx*.42,.78,-.87);b.a(BX(.035,.65,.035),chrome,sx*.62,1.23,-.42)}
+b.a(BX(.36,.025,.025),black,0,1.07,-.88);
+// Open passenger side with gold floral patterned seats.
+b.a(BX(.88,.30,.06),seatmat,0,.90,.60);b.a(BX(.88,.27,.07),seatmat,0,1.12,.98);b.a(BX(.90,.10,.07),black,0,.72,.90);
+// Rear black cover and small rear window.
+b.a(BX(1.12,.48,.035),black,0,1.26,1.13);b.a(BX(.35,.18,.04),glass,0,1.28,1.155);b.a(BX(1.12,.07,.06),yellow2,0,.36,1.12);
+// Three wheels: one front and two rear.
+b.a(CYX(.31,.19,18),rubber,0,.31,-1.03);b.a(CYX(.17,.205,12),chrome,0,.31,-1.045);b.a(CYX(.075,.215,10),black,0,.31,-1.06);
+for(const sx of[-1,1]){b.a(CYX(.29,.18,16),rubber,sx*.62,.29,.72);b.a(CYX(.16,.195,12),chrome,sx*.62,.29,.73);b.a(CYX(.07,.205,10),black,sx*.62,.29,.745)}
+// Mudguard and round central headlight.
+b.a(BX(.55,.07,.36),black,0,.48,-1.04,.15,0,0);b.a(CYZ(.14,.07,16),chrome,0,.66,-.91);b.a(CYZ(.105,.075,16),lamp,0,.66,-.955);
+// Twin stalk mirrors.
+for(const sx of[-1,1]){b.a(BX(.035,.38,.035),chrome,sx*.64,1.44,-.67,0,0,sx*.42);b.a(SPH(.105,12),chrome,sx*.78,1.60,-.76);b.a(SPH(.072,12),black,sx*.79,1.605,-.78)}
+for(const sx of[-1,1])b.a(BX(.12,.18,.05),tail,sx*.48,.63,1.14);b.a(BX(1.12,.06,.12),yellow2,0,.31,1.10);
 const g=b.done();shadow(g,w,l);return g}
+
 function mkNinja(col){
 const b=new CB(),body=MS(col,.3,.5),dk=MT('#16161a'),blk=MS('#1a1a20',.4,.5),gl=MS('#7fb6d6',.05,.4),tire=MT('#0d0d0f'),chr=MS('#d5d8de',.2,.9),hl=MT('#fff4c0','#fff4c0'),suit=MS('#15151a',.6,.1),hm=MS('#f2f2f2',.2,.2);
 for(const z of[-.72,.72]){b.a(CYX(.33,.17,16),tire,0,.33,z);b.a(CYX(.2,.18,10),chr,0,.33,z)}
