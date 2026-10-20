@@ -105,8 +105,8 @@ input.bad{animation:sh .3s;border-color:#ff0}
 </div></div>
 
 <div id="hello" class="screen"><div class="panel">
-<h2 id="hi"></h2><p>جاهز تسيطر على الطريق؟</p>
-<button class="btn" data-go="veh">التالي ▶</button>
+<h2 id="hi"></h2><canvas id="hiav" width="120" height="180" style="display:none"></canvas><p>جاهز تسيطر على الطريق؟</p>
+<button class="btn" data-go="veh">التالي ▶</button><button class="btn alt" id="charedit">🎨 تعديل الشخصية</button>
 </div></div>
 
 <div id="veh" class="screen">
@@ -247,7 +247,7 @@ document.querySelectorAll('[data-go]').forEach(b=>b.onclick=()=>show(b.dataset.g
 $('n1').onclick=()=>{
 const v=$('nm').value.trim();
 if(!v){const i=$('nm');i.classList.remove('bad');void i.offsetWidth;i.classList.add('bad');return}
-S.name=v;try{window.SOYA_NAME&&window.SOYA_NAME(v)}catch(e){}$('hi').textContent='أهلاً يا '+v+'!';show('hello');
+S.name=v;try{window.SOYA_NAME&&window.SOYA_NAME(v)}catch(e){}$('hi').textContent='أهلاً يا '+v+'!';show(window.SOYA_CHAR_GET&&window.SOYA_CHAR_GET()?'hello':'char');
 };
 $('nm').onkeydown=e=>{if(e.key==='Enter')$('n1').click()};
 
@@ -740,7 +740,7 @@ const SV='soya_save2';let D={money:0,own:['junk'],sel:'junk'};
 try{const j=JSON.parse(localStorage.getItem(SV));if(j&&Array.isArray(j.own))D=j}catch(e){}
 /* One-time migration: old Roadster was granted free; it now costs 100000. */
 if(!D.roadsterPaidV1){D.own=D.own.filter(id=>id!=='roadster');if(D.sel==='roadster')D.sel='junk';D.roadsterPaidV1=true;try{localStorage.setItem(SV,JSON.stringify(D))}catch(e){}}
-const cloudSave=()=>{try{window.SOYA_CLOUD_SAVE&&window.SOYA_CLOUD_SAVE({name:D.name||'',money:D.money,own:D.own,sel:D.sel,missions:D.mis||0})}catch(e){}};
+const cloudSave=()=>{try{window.SOYA_CLOUD_SAVE&&window.SOYA_CLOUD_SAVE({name:D.name||'',money:D.money,own:D.own,sel:D.sel,missions:D.mis||0,char:D.char||null})}catch(e){}};
 const save=()=>{D.roadsterPaidV1=true;try{localStorage.setItem(SV,JSON.stringify(D))}catch(e){}cloudSave()};
 Object.assign(VEH,{
 junk:{n:'فيات ١٢٨',type:'car',acc:45,brk:35,top:60,hd:.9,w:1.85,l:4.1,col:'#8a7f6a'},
@@ -787,12 +787,14 @@ if(d&&typeof d==='object'){
 D.money=Math.max(0,+d.money||0);
 D.own=(Array.isArray(d.own)?d.own:[]).filter(x=>VEH[x]);if(!D.own.includes('junk'))D.own.unshift('junk');
 D.sel=(VEH[d.sel]&&D.own.includes(d.sel))?d.sel:'junk';
-D.mis=+d.missions||0;if(d.name)D.name=d.name;
+D.mis=+d.missions||0;if(d.name)D.name=d.name;if(d.char&&typeof d.char==='object')D.char=d.char;
 S.veh=D.sel;try{localStorage.setItem(SV,JSON.stringify(D))}catch(e){}
 }else if(D.name||D.money>0)cloudSave();
 known();ready();
 };
 window.SOYA_NAME=v=>{D.name=v;save()};
+window.SOYA_CHAR_GET=()=>D.char||null;
+window.SOYA_CHAR_SET=c=>{D.char=c;save()};
 let A=null,PZ=false;
 function isForbiddenVisualError(v){return /حدث\s+خطأ[\s\S]{0,100}(?:داخل[\s\S]{0,35})?(?:التصوير|المرئي|المرآئي|المائي|المرئى)|(?:التصوير|المرئي|المرآئي|المائي|المرئى)[\s\S]{0,100}حدث\s+خطأ/i.test(String(v||''))}
 function hideInjectedVisualErrors(root=document.body){
@@ -2422,5 +2424,135 @@ document.addEventListener('keyup',e=>{if(e.code==='KeyB')off()});
 window.addEventListener('blur',off);
 setInterval(()=>{let visible=document.getElementById('ui').style.display==='block'&&typeof S!=='undefined'&&S.veh==='roadster';b.style.display=visible?'flex':'none';if(!visible)off()},160);
 })();
-</script></body>
+</script>
+<!-- ===== SOYA ADD-ON 4 : CHARACTER CUSTOMIZATION (saved by IP) ===== -->
+<style>
+#char .panel{width:min(94vw,560px);max-height:94vh;overflow-y:auto;gap:12px}
+#chcv{background:linear-gradient(180deg,#181832,#0a0a16);border:2px solid #ff2d5566;border-radius:16px;max-height:36vh}
+.chsec{width:100%;display:flex;flex-direction:column;gap:6px;align-items:center}
+.chsec>b{font-size:12px;color:#ffd9a0;letter-spacing:1px}
+.chsw{width:30px;height:30px;border-radius:50%;border:2px solid #fff3;cursor:pointer;padding:0}
+.chsw.on{border-color:#ff2d55;box-shadow:0 0 12px #ff2d55aa;transform:scale(1.15)}
+#hiav{border-radius:14px;background:linear-gradient(180deg,#181832,#0a0a16);border:1px solid #ffffff22}
+#charedit{font-size:12px;padding:10px 20px;letter-spacing:1px}
+</style>
+<div id="char" class="screen"><div class="panel">
+<h2>🎨 صمّم شخصيتك</h2>
+<canvas id="chcv" width="170" height="250"></canvas>
+<div class="chsec"><b>لون البشرة</b><div class="row" id="chskin"></div></div>
+<div class="chsec"><b>نوع الجسم</b><div class="row" id="chbt"></div></div>
+<div class="chsec"><b>شكل الجسم</b><div class="row" id="chbs"></div></div>
+<div class="chsec"><b>البلوزة</b><div class="row" id="chtop"></div><div class="row" id="chtopc"></div></div>
+<div class="chsec"><b>البنطلون</b><div class="row" id="chpn"></div><div class="row" id="chpnc"></div></div>
+<div class="chsec"><b>الحذاء</b><div class="row" id="chsh"></div><div class="row" id="chshc"></div></div>
+<button class="btn g" id="chsave">حفظ الشخصية ✔</button>
+</div></div>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+/* ---------- options ---------- */
+const OPT={
+skin:[['#ffe0d1','فاتح جداً'],['#f7d3ae','فاتح'],['#eab98a','قمحي'],['#d69e6b','برونزي'],['#bd8048','أسمر'],['#9c6539','غامق'],['#6e4426','داكن'],['#472b16','داكن جداً']],
+bt:[['slim','نحيف'],['norm','عادي'],['ath','رياضي'],['heavy','ضخم']],
+bs:[['bal','متوازن'],['legs','أرجل طويلة'],['torso','جذع طويل']],
+top:[['tshirt','تيشيرت'],['polo','بولو'],['shirt','قميص'],['hoodie','هودي'],['jacket','جاكيت'],['sweater','بلوفر']],
+pn:[['jeans','جينز'],['cargo','كارجو'],['sport','رياضي'],['formal','قماش'],['shorts','شورت']],
+sh:[['sneak','سنيكرز'],['run','كوتشي رياضي'],['boot','بوت'],['formal','حذاء رسمي'],['sandal','صندل']],
+topc:['#e63946','#1c6dff','#12b34a','#ffc400','#17171f','#f2f2f2','#ff7a00','#9b5de5','#06d6a0','#8d99ae'],
+pnc:['#2f4d7a','#17171f','#6b6f7a','#0e2a4a','#b9a06a','#3d5a3a','#5b3a29'],
+shc:['#f2f2f2','#17171f','#7a4a21','#e63946','#6b6f7a','#c98d4a','#1c6dff']
+};
+const DEF={skin:'#eab98a',bt:'norm',bs:'bal',top:'tshirt',topc:'#1c6dff',pn:'jeans',pnc:'#2f4d7a',sh:'sneak',shc:'#f2f2f2'};
+function norm(c){
+const d=Object.assign({},DEF);if(!c||typeof c!=='object')return d;
+const inL=(v,l)=>l.some(x=>Array.isArray(x)?x[0]===v:x===v),hex=v=>typeof v==='string'&&/^#[0-9a-f]{6}$/i.test(v);
+if(inL(c.skin,OPT.skin))d.skin=c.skin;if(inL(c.bt,OPT.bt))d.bt=c.bt;if(inL(c.bs,OPT.bs))d.bs=c.bs;
+if(inL(c.top,OPT.top))d.top=c.top;if(inL(c.pn,OPT.pn))d.pn=c.pn;if(inL(c.sh,OPT.sh))d.sh=c.sh;
+if(hex(c.topc))d.topc=c.topc;if(hex(c.pnc))d.pnc=c.pnc;if(hex(c.shc))d.shc=c.shc;
+return d;
+}
+let cur=norm(typeof window.SOYA_CHAR_GET==='function'?window.SOYA_CHAR_GET():null);
+/* ---------- character renderer ---------- */
+function shx(h,a){const n=parseInt(h.slice(1),16),f=v=>Math.max(0,Math.min(255,v+a));return'rgb('+f(n>>16)+','+f(n>>8&255)+','+f(n&255)+')'}
+function rrc(g,x,y,w,h,r){g.beginPath();g.roundRect(x,y,w,h,Math.max(0,r));g.fill()}
+function drawChar(g,W,H,ch){
+g.save();g.scale(W/170,H/250);
+const cx=85,footY=236,neckY=54,shoY=58;
+const skin=ch.skin,topc=ch.topc,pnc=ch.pnc,shc=ch.shc;
+const legFrac=ch.bs==='legs'?.63:ch.bs==='torso'?.48:.56;
+const hipY=footY-(footY-neckY)*legFrac,legLen=footY-hipY;
+const sw={slim:19,norm:24,ath:29,heavy:26}[ch.bt]||24;
+const ww={slim:15,norm:18,ath:18,heavy:26}[ch.bt]||18;
+const aw={slim:6.5,norm:7.5,ath:8.5,heavy:9}[ch.bt]||7.5;
+const legW=Math.max(9,ww-4),lxc=cx-(legW/2+1),rxc=cx+(legW/2+1);
+/* shadow */
+g.fillStyle='rgba(0,0,0,.35)';g.beginPath();g.ellipse(cx,241,36,5.5,0,0,7);g.fill();
+/* hood behind head */
+if(ch.top==='hoodie'){g.fillStyle=shx(topc,-35);g.beginPath();g.arc(cx,neckY+1,13,0,7);g.fill()}
+/* neck */
+g.fillStyle=skin;g.fillRect(cx-5,46,10,12);
+/* legs + pants */
+const pantTop=hipY-2;
+if(ch.pn==='shorts'){
+const ph=legLen*.34;
+g.fillStyle=pnc;rrc(g,lxc-legW/2,pantTop,legW,ph+2,4);rrc(g,rxc-legW/2,pantTop,legW,ph+2,4);
+g.fillStyle=shx(pnc,-30);g.fillRect(lxc-legW/2,pantTop+ph-2,legW,3);g.fillRect(rxc-legW/2,pantTop+ph-2,legW,3);
+g.fillStyle=skin;rrc(g,lxc-legW/2+1,pantTop+ph+1,legW-2,footY-10-pantTop-ph-1,3);rrc(g,rxc-legW/2+1,pantTop+ph+1,legW-2,footY-10-pantTop-ph-1,3);
+}else{
+g.fillStyle=pnc;rrc(g,lxc-legW/2,pantTop,legW,footY-10-pantTop,4);rrc(g,rxc-legW/2,pantTop,legW,footY-10-pantTop,4);
+if(ch.pn==='jeans'){g.fillStyle=shx(pnc,40);g.fillRect(lxc-legW/2,pantTop+6,2,footY-16-pantTop);g.fillRect(rxc+legW/2-2,pantTop+6,2,footY-16-pantTop);g.fillStyle=shx(pnc,-25);rrc(g,cx-ww+2,pantTop+3,7,6,2);rrc(g,cx+ww-9,pantTop+3,7,6,2)}
+else if(ch.pn==='cargo'){g.fillStyle=shx(pnc,-25);rrc(g,lxc-legW/2-1,hipY+12,7,10,2);rrc(g,rxc+legW/2-6,hipY+12,7,10,2)}
+else if(ch.pn==='sport'){g.fillStyle='#f2f2f2';g.fillRect(lxc-legW/2,pantTop+4,3,footY-14-pantTop);g.fillRect(rxc+legW/2-3,pantTop+4,3,footY-14-pantTop)}
+else if(ch.pn==='formal'){g.fillStyle=shx(pnc,25);g.fillRect(lxc-1,pantTop+6,2,footY-16-pantTop);g.fillRect(rxc-1,pantTop+6,2,footY-16-pantTop)}
+}
+/* shoes */
+const shoeW=legW+7;
+for(const fx of[lxc,rxc]){
+if(ch.sh==='boot'){g.fillStyle=shc;rrc(g,fx-shoeW/2+1,footY-18,shoeW-2,17,4);g.fillStyle=shx(shc,-40);g.fillRect(fx-shoeW/2+1,footY-5,shoeW-2,4)}
+else if(ch.sh==='formal'){g.fillStyle=shc;rrc(g,fx-shoeW/2-1,footY-8,shoeW+2,7.5,3.5);g.fillStyle=shx(shc,-45);g.fillRect(fx-shoeW/2-1,footY-2.5,shoeW+2,2.5)}
+else if(ch.sh==='sandal'){g.fillStyle=shx(shc,-30);rrc(g,fx-shoeW/2,footY-4,shoeW,4,2);g.strokeStyle=shc;g.lineWidth=2.4;g.beginPath();g.moveTo(fx-shoeW/2+2,footY-9);g.lineTo(fx+shoeW/2-2,footY-5);g.moveTo(fx+shoeW/2-2,footY-9);g.lineTo(fx-shoeW/2+2,footY-5);g.stroke()}
+else{g.fillStyle=shc;rrc(g,fx-shoeW/2,footY-(ch.sh==='run'?9:10),shoeW,ch.sh==='run'?8:9,4);
+g.fillStyle='#f8f8f8';g.fillRect(fx-shoeW/2,footY-3,shoeW,3);
+if(ch.sh==='run'){g.fillStyle='#ffffff88';g.fillRect(fx-shoeW/2,footY-6,shoeW,2)}}
+}
+/* torso (top) */
+g.fillStyle=topc;g.beginPath();g.moveTo(cx-sw,shoY);g.lineTo(cx+sw,shoY);g.lineTo(cx+ww,hipY+2);g.lineTo(cx-ww,hipY+2);g.closePath();g.fill();
+if(ch.top==='tshirt'){g.fillStyle=skin;g.beginPath();g.arc(cx,shoY,5.5,0,Math.PI);g.fill();g.fillStyle=shx(topc,-30);g.fillRect(cx-ww+1,hipY-1,ww*2-2,2.5)}
+else if(ch.top==='polo'){g.fillStyle=shx(topc,-25);g.beginPath();g.moveTo(cx-8,shoY);g.lineTo(cx-1,shoY+9);g.lineTo(cx-9,shoY+6);g.closePath();g.fill();g.beginPath();g.moveTo(cx+8,shoY);g.lineTo(cx+1,shoY+9);g.lineTo(cx+9,shoY+6);g.closePath();g.fill();g.fillStyle='#ffffffcc';g.beginPath();g.arc(cx,shoY+12,1.6,0,7);g.fill();g.beginPath();g.arc(cx,shoY+18,1.6,0,7);g.fill()}
+else if(ch.top==='shirt'){g.fillStyle=shx(topc,-25);g.beginPath();g.moveTo(cx-8,shoY);g.lineTo(cx-1,shoY+10);g.lineTo(cx-10,shoY+5);g.closePath();g.fill();g.beginPath();g.moveTo(cx+8,shoY);g.lineTo(cx+1,shoY+10);g.lineTo(cx+10,shoY+5);g.closePath();g.fill();g.fillStyle=shx(topc,-40);g.fillRect(cx-1,shoY+10,2,hipY-shoY-10);g.fillStyle='#ffffff55';for(let by=shoY+16;by<hipY-4;by+=11){g.beginPath();g.arc(cx,by,1.5,0,7);g.fill()}}
+else if(ch.top==='hoodie'){g.strokeStyle='#ffffffaa';g.lineWidth=1.8;g.beginPath();g.moveTo(cx-4,shoY+4);g.lineTo(cx-4,shoY+13);g.moveTo(cx+4,shoY+4);g.lineTo(cx+4,shoY+13);g.stroke();g.fillStyle=shx(topc,-20);rrc(g,cx-ww*.7,hipY-14,ww*1.4,13,3)}
+else if(ch.top==='jacket'){g.fillStyle='#dfe3e8';rrc(g,cx-6,shoY+4,12,hipY-shoY-2,2);g.fillStyle='#3339';g.fillRect(cx-1,shoY+4,2,hipY-shoY-2);g.fillStyle=shx(topc,-30);g.beginPath();g.moveTo(cx-9,shoY);g.lineTo(cx-1,shoY+14);g.lineTo(cx-11,shoY+7);g.closePath();g.fill();g.beginPath();g.moveTo(cx+9,shoY);g.lineTo(cx+1,shoY+14);g.lineTo(cx+11,shoY+7);g.closePath();g.fill()}
+else if(ch.top==='sweater'){g.fillStyle=shx(topc,-25);rrc(g,cx-8,shoY-2,16,6,3);for(let ry=hipY-11;ry<hipY+1;ry+=4){g.fillStyle=shx(topc,-30);g.fillRect(cx-ww+1,ry,ww*2-2,2)}}
+/* arms */
+const armEnd=hipY+16,armLen=armEnd-shoY-2,axL=cx-(sw+aw/2-3),axR=cx+(sw+aw/2-3);
+for(const ax of[axL,axR]){
+if(ch.top==='tshirt'||ch.top==='polo'){
+g.fillStyle=shx(topc,-15);rrc(g,ax-aw/2,shoY+1,aw,armLen*.42,3);
+g.fillStyle=skin;rrc(g,ax-aw/2+1,shoY+1+armLen*.42,aw-2,armLen*.58,3);
+}else{g.fillStyle=shx(topc,-15);rrc(g,ax-aw/2,shoY+1,aw,armLen,3)}
+g.fillStyle=skin;g.beginPath();g.arc(ax,armEnd+1,aw*.72,0,7);g.fill();
+}
+/* head */
+g.fillStyle=skin;g.beginPath();g.arc(cx,32,17,0,7);g.fill();
+g.fillStyle='#241609';g.beginPath();g.arc(cx,30,17.5,Math.PI,Math.PI*2);g.fill();g.fillRect(cx-17.5,24,4,9);g.fillRect(cx+13.5,24,4,9);
+g.fillStyle='#1a1a1a';g.beginPath();g.arc(cx-6,31,1.9,0,7);g.fill();g.beginPath();g.arc(cx+6,31,1.9,0,7);g.fill();
+g.strokeStyle='#00000055';g.lineWidth=1.6;g.beginPath();g.arc(cx,37,5.5,Math.PI*.15,Math.PI*.85);g.stroke();
+g.restore();
+}
+window.SOYA_CHAR_DRAW=drawChar;
+/* ---------- UI ---------- */
+function pills(id,key){const el=$(id);if(!el)return;el.innerHTML='';for(const[v,n]of OPT[key]){const b=document.createElement('button');b.type='button';b.className='pill'+(cur[key]===v?' on':'');b.textContent=n;b.onclick=()=>{cur[key]=v;refresh()};el.appendChild(b)}}
+function sws(id,key){const el=$(id);if(!el)return;el.innerHTML='';for(const col of OPT[key]){const b=document.createElement('button');b.type='button';b.className='chsw'+(cur[key]===col?' on':'');b.style.background=col;const nm=OPT[key]===OPT.skin?(OPT.skin.find(x=>x[0]===col)||[])[1]:col;b.title=nm||col;b.onclick=()=>{cur[key]=col;refresh()};el.appendChild(b)}}
+function refresh(){pills('chbt','bt');pills('chbs','bs');pills('chtop','top');pills('chpn','pn');pills('chsh','sh');sws('chskin','skin');sws('chtopc','topc');sws('chpnc','pnc');sws('chshc','shc');paint()}
+function paint(){const cv=$('chcv');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);drawChar(g,cv.width,cv.height,cur)}
+function paintAv(){const av=$('hiav');if(!av)return;const c=typeof window.SOYA_CHAR_GET==='function'?window.SOYA_CHAR_GET():null;if(!c){av.style.display='none';return}av.style.display='block';const g=av.getContext('2d');g.clearRect(0,0,av.width,av.height);drawChar(g,av.width,av.height,norm(c))}
+const sv=$('chsave');if(sv)sv.onclick=()=>{try{window.SOYA_CHAR_SET&&window.SOYA_CHAR_SET(Object.assign({},cur))}catch(e){}window.show('hello')};
+const ed=$('charedit');if(ed)ed.onclick=()=>window.show('char');
+/* hook screen switching: refresh editor on open, paint avatar on hello */
+const _show=window.show;
+if(typeof _show==='function'){window.show=function(id){const r=_show.apply(this,arguments);if(id==='hello')paintAv();else if(id==='char'){cur=norm(typeof window.SOYA_CHAR_GET==='function'?window.SOYA_CHAR_GET():null);refresh()}return r}}
+})();
+</script>
+</body>
 </html>
