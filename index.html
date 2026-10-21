@@ -85,6 +85,17 @@ input.bad{animation:sh .3s;border-color:#ff0}
 #hornBtn.on{background:linear-gradient(145deg,#ffd166,#ff7a00);color:#21160a;transform:scale(.94);box-shadow:0 0 24px #ffc400aa}
 #hornBtn.on .hornIcon{color:#21160a}
 @media(max-width:600px){#hornBtn{left:max(18px,env(safe-area-inset-left));bottom:clamp(180px,29vh,235px);width:64px;height:64px}}
+/* زر النايتروس — متاح في كل المركبات وعلى اللمس والكمبيوتر */
+#nitroBtn{position:absolute;right:12px;bottom:clamp(210px,38vh,260px);width:82px;height:78px;border-radius:18px;border:2px solid #35d0ff;background:linear-gradient(145deg,#112d48,#07111e);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;box-shadow:0 5px 20px #000b,0 0 16px #18bfff55;touch-action:none;z-index:6;font:900 10px Tahoma,Arial,sans-serif;overflow:hidden}
+#nitroBtn .nitro-icon{font:900 italic 20px Arial,sans-serif;letter-spacing:1px;color:#66e2ff;text-shadow:0 0 10px #00bfff}
+#nitroBtn .nitro-label{font-size:9px;line-height:1.1;white-space:nowrap}
+#nitroBtn .nitro-track{display:block;width:64px;height:5px;background:#ffffff30;border-radius:9px;overflow:hidden;margin-top:3px}
+#nitroBtn #nitroFill{display:block;width:100%;height:100%;background:linear-gradient(90deg,#00aaff,#8affff);border-radius:9px;transition:width .15s linear}
+#nitroBtn .nitro-key{position:absolute;top:4px;right:5px;font-size:8px;color:#b8edff;background:#ffffff17;border-radius:4px;padding:2px 4px}
+#nitroBtn.on{border-color:#ffe36e;background:linear-gradient(145deg,#624016,#1c1720);box-shadow:0 0 28px #ff7b00bb,inset 0 0 14px #ffbd3d55;transform:scale(.97)}
+#nitroBtn.on .nitro-icon{color:#fff2a1;text-shadow:0 0 12px #ff6a00}
+#nitroBtn.on #nitroFill{background:linear-gradient(90deg,#ff5c00,#ffe45c)}
+@media(max-width:600px){#nitroBtn{right:max(12px,env(safe-area-inset-right));bottom:clamp(210px,38vh,260px);width:76px;height:74px}#nitroBtn .nitro-track{width:59px}}
 </style>
 </head>
 <body>
@@ -168,11 +179,26 @@ input.bad{animation:sh .3s;border-color:#ff0}
 </div>
 <div id="arr"><button id="aL">◀</button><button id="aR">▶</button></div>
 <button id="hornBtn" aria-label="زمارة العربية"><span class="hornIcon">📣</span><span>زمارة</span></button>
+<button id="nitroBtn" aria-label="نايتروس: ضغطة تزود السرعة وتطلع نار من الشكمان، ويمكن استخدامه أثناء الشحن"><span class="nitro-icon">NOS</span><span class="nitro-label" id="nitroTxt">جاهز</span><span class="nitro-track"><i id="nitroFill"></i></span><span class="nitro-key">N</span></button>
 </div>
 
 <script>
 const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function nitroUI(state){
+ const b=$('nitroBtn'),fill=$('nitroFill'),label=$('nitroTxt');if(!b||!fill||!label)return;
+ const active=!!(state&&state.nitroT>0),left=clamp(Number(state&&state.nitroRecharge)||0,0,180),done=100*(1-left/180);
+ fill.style.width=done+'%';b.classList.toggle('on',active);
+ if(active)label.textContent='🔥 شغّال';
+ else if(left>0){const sec=Math.ceil(left);label.textContent='شحن '+Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')}
+ else label.textContent='جاهز';
+}
+function useNitro2D(){
+ if(!G||scene!=='game'||G.frozen||G.st==='over'||G.st==='done')return;
+ G.nitroT=4;G.nitroRecharge=180;nitroUI(G);
+}
+$('nitroBtn').addEventListener('click',useNitro2D);
+addEventListener('keydown',e=>{if(e.code==='KeyN'&&!e.repeat)useNitro2D()});
 const R=Math.random,KS=.3/3.6;
 const hs=n=>{const x=Math.sin(n*127.1+311.7)*43758.5453;return x-Math.floor(x)};
 const PAL=['#e63946','#f4a261','#2a9d8f','#8d99ae','#ffd166','#9b5de5','#06d6a0','#ffffff'];
@@ -254,7 +280,8 @@ S.name=v;try{window.SOYA_NAME&&window.SOYA_NAME(v)}catch(e){}
 try{localStorage.setItem('drift_player_name',v);localStorage.removeItem('drift_name_logged_out')}catch(e){}
 $('hi').textContent='أهلاً يا '+v+'!';
 const editing=window.__DRIFT_EDITING_NAME===true;window.__DRIFT_EDITING_NAME=false;
-show(editing?'hello':(window.SOYA_CHAR_GET&&window.SOYA_CHAR_GET()?'hello':'char'));
+const forceNew=window.__DRIFT_FORCE_NEW_PROFILE===true;window.__DRIFT_FORCE_NEW_PROFILE=false;
+show(editing?'hello':(forceNew?'char':(window.SOYA_CHAR_GET&&window.SOYA_CHAR_GET()?'hello':'char')));
 };
 $('nm').onkeydown=e=>{if(e.key==='Enter')$('n1').click()};
 $('nameedit').onclick=()=>{
@@ -264,13 +291,18 @@ show('name');
 setTimeout(()=>$('nm').focus(),50);
 };
 $('logoutName').onclick=()=>{
-S.name='Racer';D.name='';
+// تسجيل الخروج يرجّع البداية: الاسم ثم اختيار الشخصية من جديد.
+S.name='Racer';D.name='';D.char=null;
 try{localStorage.removeItem('drift_player_name');localStorage.setItem('drift_name_logged_out','1')}catch(e){}
+try{if(typeof window.SOYA_CHAR_SET==='function')window.SOYA_CHAR_SET(null)}catch(e){}
 try{save()}catch(e){}
 $('nm').value='';$('hi').textContent='';
+// بعد تسجيل الخروج ابدأ مباشرة بطلب الاسم، وبعده شاشة تصميم الشخصية.
 const introBtn=document.querySelector('#intro [data-go]');
 if(introBtn){introBtn.dataset.go='name';introBtn.textContent='التالي ▶';}
-show('intro');
+window.__DRIFT_FORCE_NEW_PROFILE=true;
+show('name');
+setTimeout(()=>$('nm').focus(),80);
 };
 
 const stat=(l,v,p)=>`<div class="st"><span>${l}</span><i>${v}</i><u><s style="width:${p}%"></s></u></div>`;
@@ -390,7 +422,7 @@ function startGame(){
 const V=VEH[S.veh],m=S.mode,lanes=m==='race'?3:m==='end'?4:0,rw=m==='off'?16:lanes*3.6;
 G={
 m,d:S.d,V,rw,lanes,len:m==='off'?1200:1500,t:0,rt:0,st:'count',cd:3.4,
-ents:[],parts:[],shake:0,nz:45,fin:0,frozen:false,damage:0,damageCooldown:0,burning:false,
+ents:[],parts:[],shake:0,nz:45,fin:0,frozen:false,damage:0,damageCooldown:0,burning:false,nitroT:0,nitroRecharge:0,
 P:{x:m==='end'?1.8:0,z:0,sp:0,st:0,w:V.w,l:V.l,rot:0,spin:0}
 };
 if(m==='race')[-3.6,3.6].forEach((x,i)=>G.ents.push({
@@ -475,18 +507,21 @@ function over(g,t,s){if(G!==g)return;g.frozen=true;$('ot').textContent=t;$('os')
 
 function upd(dt){
 const g=G,P=g.P,V=g.V,m=g.m;g.t+=dt;g.damageCooldown=Math.max(0,(g.damageCooldown||0)-dt);
+ g.nitroT=Math.max(0,(g.nitroT||0)-dt);g.nitroRecharge=Math.max(0,(g.nitroRecharge||0)-dt);
 const gT=(IN.gd||K.ArrowUp||K.KeyW)?1:0,bT=(IN.bd||K.ArrowDown||K.KeyS||K.Space)?1:0;
 IN.gas+=(gT-IN.gas)*Math.min(1,dt*(gT?4:8));IN.brk+=(bT-IN.brk)*Math.min(1,dt*10);
 if(!wd)wa*=1-Math.min(1,dt*7);IN.wheel=clamp(wa/1.1,-1,1);
 P.st+=(steerT()-P.st)*Math.min(1,dt*9);
 if(g.st==='count'){g.cd-=dt;if(g.cd<=0)g.st='run';}
-const run=g.st==='run',top=V.top*(m==='off'?.75:1);
+const run=g.st==='run',top=V.top*(m==='off'?.75:1),nitroOn=(g.nitroT||0)>0,speedLimit=top*(nitroOn?1.45:1);
 if(run){
 g.rt+=dt;
-P.sp+=IN.gas*V.acc*.8*(V===VEH.roadster&&window.DRIFT_BOOST_ACTIVE?2.0:1)*Math.max(0,1-P.sp/top)*dt;
+P.sp+=IN.gas*V.acc*.8*(V===VEH.roadster&&window.DRIFT_BOOST_ACTIVE?2.0:1)*Math.max(0,1-P.sp/speedLimit)*dt;
+if(nitroOn)P.sp+=V.acc*1.15*Math.max(.15,1-P.sp/speedLimit)*dt;
+else if(P.sp>top)P.sp-=Math.min(P.sp-top,45*dt);
 P.sp-=IN.brk*V.brk*2.4*dt;
 P.sp-=(5+P.sp*.025)*dt*(IN.gas>.1?.3:1);
-P.sp=clamp(P.sp,0,top);
+P.sp=clamp(P.sp,0,nitroOn?speedLimit:Math.max(top,P.sp));
 P.x+=P.st*(5.5+P.sp*.012)*V.hd*clamp(P.sp/30+.15,0,1)*dt;
 const lim=g.rw/2-P.w/2-.1;
 if(Math.abs(P.x)>lim){
@@ -660,6 +695,15 @@ drawVeh(c,e.t,e.col,x,y,e.w*k,e.l*k,e.rot||0,false);
 }
 }
 drawVeh(c,g.V.type,g.V.col,cx+P.x*k,py,P.w*k,P.l*k,P.st*.1+P.rot,IN.brk>.15&&g.st==='run');
+if((g.nitroT||0)>0){
+ c.save();c.translate(cx+P.x*k,py);c.rotate(P.st*.1+P.rot);
+ for(const side of[-1,1]){
+  const ex=side*P.w*k*.22,ey=P.l*k*.43,len=k*(.48+R()*.42),wid=Math.max(2,k*.09);
+  c.globalAlpha=.95;c.fillStyle='#ff4a00';c.beginPath();c.moveTo(ex-wid,ey);c.quadraticCurveTo(ex-wid*1.4,ey+len*.38,ex,ey+len);c.quadraticCurveTo(ex+wid*1.4,ey+len*.38,ex+wid,ey);c.closePath();c.fill();
+  c.fillStyle=R()>.5?'#ffe66a':'#fff7cf';c.beginPath();c.moveTo(ex-wid*.42,ey);c.quadraticCurveTo(ex-wid*.7,ey+len*.32,ex,ey+len*.72);c.quadraticCurveTo(ex+wid*.7,ey+len*.32,ex+wid*.42,ey);c.closePath();c.fill();
+ }
+ c.restore();
+}
 if(g.damage>0){c.save();c.translate(cx+P.x*k,py);c.rotate(P.st*.1+P.rot);for(let i=0;i<Math.min(4,g.damage);i++){c.strokeStyle=i%2?'rgba(225,225,220,.65)':'rgba(30,30,35,.65)';c.lineWidth=Math.max(1,k*.035);c.beginPath();c.moveTo((i%2?1:-1)*P.w*k*.16,-P.l*k*.2+i*k*.12);c.lineTo((i%2?1:-1)*(P.w*k*.25),-P.l*k*.12+i*k*.12);c.stroke()}c.restore();}
 if(g.burning){c.save();c.translate(cx+P.x*k,py);for(let i=0;i<7;i++){const wob=Math.sin(g.t*13+i*1.7),fx=(i%3-1)*P.w*k*.23,fy=-P.l*k*.22-(Math.abs(wob)*.22+.12)*k; c.fillStyle=i%3===0?'#ffcf36':i%3===1?'#ff6a00':'#e92816';c.beginPath();c.moveTo(fx-k*.12,fy+k*.45);c.quadraticCurveTo(fx-k*(.2+Math.abs(wob)*.12),fy,fx,fy-k*(.5+Math.abs(wob)*.22));c.quadraticCurveTo(fx+k*(.23+Math.abs(wob)*.1),fy,fx+k*.12,fy+k*.45);c.fill()}c.restore();}
 for(const p of g.parts){
@@ -688,7 +732,7 @@ $('prog').firstChild.style.width=clamp(P.z/g.len*100,0,100)+'%';
 $('cd').textContent=g.st==='count'?Math.ceil(g.cd):(g.st==='run'&&g.rt<.8?'انطلق!':'');
 $('pg').style.transform=`perspective(300px) rotateX(${IN.gas*28}deg)`;
 $('pb').style.transform=`perspective(300px) rotateX(${IN.brk*28}deg)`;
-$('wsvg').style.transform=`rotate(${wa}rad)`;
+$('wsvg').style.transform=`rotate(${wa}rad)`;nitroUI(g);
 }
 
 function rs(){
@@ -706,7 +750,7 @@ requestAnimationFrame(loop);
 </script>
 <!-- ===== SOYA ADD-ON : GARAGE + ALEXANDRIA 3D + MISSIONS ===== -->
 <style>
-#garage{justify-content:flex-start;padding-top:18px}
+#garage{justify-content:flex-start;padding-top:18px}#garageHome{min-width:190px}
 #gm{font-size:18px;color:#ffd166;letter-spacing:2px}
 .gg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;width:min(96vw,780px)}
 .gc{background:#12121fdd;border:2px solid #ffffff22;border-radius:16px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px}
@@ -725,7 +769,7 @@ requestAnimationFrame(loop);
 #gpsi{font:900 14px Tahoma,Arial,sans-serif;color:#ffd166;min-height:20px}
 #gpsov .btn{font-size:12px;padding:10px 16px;letter-spacing:1px}
 </style>
-<div id="garage" class="screen"><h2>🚗 الجراج</h2><div id="gm"></div><div class="gg" id="gg"></div><button class="btn" id="gn">التالي ▶</button></div>
+<div id="garage" class="screen"><h2>🚗 الجراج</h2><div id="gm"></div><div class="gg" id="gg"></div><div class="row" style="margin:8px 0 18px"><button class="btn alt" id="garageHome">⌂ القائمة الرئيسية</button><button class="btn" id="gn">اختيار الماب ▶</button></div></div>
 <div id="toast"></div>
 <canvas id="c3"></canvas>
 <script>
@@ -777,6 +821,7 @@ jeep:{n:'جيب رانجلر',type:'car',acc:75,brk:50,top:185,hd:.9,w:2,l:4.4,c
 fiat2:{n:'فيات تيبو',type:'car',acc:90,brk:58,top:200,hd:1.05,w:1.85,l:4.3,col:'#e63946'},
 mg:{n:'MG',type:'car',acc:95,brk:60,top:230,hd:1,w:1.85,l:4.2,col:'#ff7a00'},
 bugatti:{n:'بوجاتي',type:'car',acc:150,brk:80,top:420,hd:1.15,w:2,l:4.5,col:'#0a3fae'},
+ferrari:{n:'فيراري SF90',type:'car',acc:165,brk:88,top:390,hd:1.2,w:2,l:4.55,col:'#d71920'},
 roadster:{n:'تسلا رودستر 2026 — WHITE ROCKET',type:'car',acc:600,brk:125,top:1000,hd:1.65,w:2.05,l:4.65,col:'#f5f7fb'}
 });
 const FL=[
@@ -795,6 +840,7 @@ const FL=[
 ['merc',25000,'sedan','مرسيدس AMG'],
 ['mg',30000,'sedan','MG'],
 ['bugatti',50000,'sedan','بوجاتي'],
+['ferrari',65000,'sedan','فيراري SF90'],
 ['roadster',100000,'hyper','⚡ تسلا رودستر الجديدة — رقم 16 · أبيض لؤلؤي']
 ];
 /* Roadster is now premium; new players must buy it. */if(!VEH[D.sel]||!D.own.includes(D.sel))D.sel='junk';S.veh=D.sel;
@@ -829,6 +875,12 @@ window.SOYA_NAME=v=>{D.name=v;try{localStorage.setItem('drift_player_name',v);lo
 window.SOYA_CHAR_GET=()=>D.char||null;
 window.SOYA_CHAR_SET=c=>{D.char=c;save()};
 let A=null,PZ=false;
+function useNitro3D(){
+ if(!A||A.over)return;
+ A.nitroT=4;A.nitroRecharge=180;nitroUI(A);
+}
+$('nitroBtn').addEventListener('click',useNitro3D);
+addEventListener('keydown',e=>{if(e.code==='KeyN'&&!e.repeat)useNitro3D()});
 function isForbiddenVisualError(v){return /حدث\s+خطأ[\s\S]{0,100}(?:داخل[\s\S]{0,35})?(?:التصوير|المرئي|المرآئي|المائي|المرئى)|(?:التصوير|المرئي|المرآئي|المائي|المرئى)[\s\S]{0,100}حدث\s+خطأ/i.test(String(v||''))}
 function hideInjectedVisualErrors(root=document.body){
  if(!root)return;
@@ -871,6 +923,7 @@ drawVeh(d.querySelector('canvas').getContext('2d'),V.type,V.col,45,50,V.w*20,V.l
 }
 function openGarage(){show('garage');renderG()}
 $('gn').onclick=()=>show('mode');
+$('garageHome').onclick=()=>show('hello');
 document.querySelector('#hello [data-go]').onclick=openGarage;
 $('mode').querySelector('.row').insertAdjacentHTML('beforeend','<div class="card" id="mX"><span class="big">🌊</span><b>خريطة إسكندرية</b><span>الكورنيش · قايتباي · المكتبة · ستانلي · المنتزه</span></div><div class="card" id="mA"><span class="big">🌅</span><b>مابة أونلاين 🌐</b><span>إسكندرية · إنشاء سيرفر أو دخول بكود</span></div><div class="card" id="mM"><span class="big">🕵️</span><b>المهمات</b><span>اخبط · اسرق · اهرب · اركب</span></div>');
 $('mode').insertAdjacentHTML('beforeend','<button class="btn alt" id="mG">🚗 الجراج</button>');
@@ -1920,6 +1973,19 @@ const vn=P.vx*nx+P.vz*nz;
 if(vn<0){P.vx-=1.3*vn*nx;P.vz-=1.3*vn*nz;imp=Math.max(imp,-vn)}
 }}
 return imp}
+function setupNitroFlames(a){
+ if(a.nitroFlames&&a.nitroFlames.parent)a.nitroFlames.parent.remove(a.nitroFlames);
+ const V=a.V||{},w=V.w||1.8,l=V.l||4,root=new THREE.Group(),parts=[];
+ const r=Math.max(.09,Math.min(.23,w*.105));
+ for(const side of[-1,1]){
+  const outer=new THREE.Mesh(new THREE.ConeGeometry(r,Math.max(.58,Math.min(1.05,l*.23)),9),new THREE.MeshBasicMaterial({color:'#ff4b00',transparent:true,opacity:.96,depthWrite:false,blending:THREE.AdditiveBlending}));
+  outer.rotation.x=Math.PI/2;outer.position.set(side*w*.22,0,0);root.add(outer);parts.push(outer);
+  const core=new THREE.Mesh(new THREE.ConeGeometry(r*.52,Math.max(.42,Math.min(.72,l*.16)),8),new THREE.MeshBasicMaterial({color:'#fff0a0',transparent:true,opacity:.98,depthWrite:false,blending:THREE.AdditiveBlending}));
+  core.rotation.x=Math.PI/2;core.position.set(side*w*.22,0,-.015);root.add(core);parts.push(core);
+ }
+ root.position.set(0,V.type==='moto'?.46:.40,l*.5+.035);root.visible=false;root.userData.parts=parts;
+ a.m.add(root);a.nitroFlames=root;
+}
 function setupDamageVisual(a){
  const root=a.m,V=a.V,w=V.w||1.8,l=V.l||4;
  const dark=new THREE.MeshBasicMaterial({color:0x242326,transparent:true,opacity:0,depthWrite:false});
@@ -1981,15 +2047,19 @@ const gas=(IN.gd||K.ArrowUp||K.KeyW)?1:0,brk=(IN.bd||K.ArrowDown||K.KeyS||K.Spac
 IN.gas+=(gas-IN.gas)*Math.min(1,dt*4);IN.brk+=(brk-IN.brk)*Math.min(1,dt*10);IN.hb+=(hbIn-IN.hb)*Math.min(1,dt*14);
 if(!wd)wa*=1-Math.min(1,dt*7);IN.wheel=clamp(wa/1.1,-1,1);
 P.st+=(steerT()-P.st)*Math.min(1,dt*9);
+ a.nitroT=Math.max(0,(a.nitroT||0)-dt);a.nitroRecharge=Math.max(0,(a.nitroRecharge||0)-dt);
 if(a.cd>0){a.cd-=dt;return}
 a.gt+=dt;a.damageCooldown=Math.max(0,(a.damageCooldown||0)-dt);
+const nitroOn=(a.nitroT||0)>0,topLimit=top*(nitroOn?1.48:1);
 const fx=-Math.sin(P.yaw),fz=-Math.cos(P.yaw),rx=Math.cos(P.yaw),rz=-Math.sin(P.yaw);
 let vf=P.vx*fx+P.vz*fz,vl=P.vx*rx+P.vz*rz;
-if(gas)vf+=V.acc*.1*(a.id==='roadster'&&window.DRIFT_BOOST_ACTIVE?2.1:1)*Math.max(0,1-Math.max(0,vf)/top)*dt;
+if(gas)vf+=V.acc*.1*(a.id==='roadster'&&window.DRIFT_BOOST_ACTIVE?2.1:1)*Math.max(0,1-Math.max(0,vf)/topLimit)*dt;
+if(nitroOn)vf+=(gas?28:18)*Math.max(.15,1-Math.max(0,vf)/topLimit)*dt;
 if(brk){if(vf>.5)vf-=V.brk*.18*dt;else vf=Math.max(-8,vf-5*dt)}
 // الهاند بريك للتفحيط فقط: لا يضغط على الفرامل ولا يوقف العربية
-if(a.id==='roadster'&&window.DRIFT_BOOST_ACTIVE&&gas){vf=Math.min(top,vf+80*dt)}
+if(a.id==='roadster'&&window.DRIFT_BOOST_ACTIVE&&gas){vf=Math.min(topLimit,vf+80*dt)}
 if(!gas&&!brk){const coastDrag=IN.hb>.4?.35:2.2;vf-=Math.sign(vf)*Math.min(Math.abs(vf),coastDrag*dt)}
+if(nitroOn)vf=Math.min(vf,topLimit);else if(vf>top)vf=Math.max(top,vf-12*dt);
 const dr=(IN.hb>.4&&Math.abs(vf)>4)||(brk&&Math.abs(vf)>9&&Math.abs(P.st)>.25);
 if(dr)vl+=P.st*vf*1.15*dt;
  vl*=Math.exp(-(dr?.32:7)*dt);
@@ -2064,7 +2134,7 @@ const p=OB[a.obj][1];
 if(p&&Math.hypot(P.x-p[0],P.z-p[1])<(a.obj===3?5:9)){
 if(a.obj===1){pay(200);toast('سرقت الشنطة! البوليس وراك 🚨');spawnCops();setObj(2)}
 else if(a.obj===2){clearCops();pay(150);toast('فلتّ منهم ✔ +150 جنيه');setObj(3)}
-else if(a.obj===3){DY.remove(a.m);if(a.pk)DY.remove(a.pk);a.id='moto';a.V=VEH.moto;a.m=mkV('moto');DY.add(a.m);P.vx=P.vz=0;pay(100);toast('ركبت الموتوسيكل 🏍️ +100 جنيه');setObj(4)}
+else if(a.obj===3){DY.remove(a.m);if(a.pk)DY.remove(a.pk);a.id='moto';a.V=VEH.moto;a.m=mkV('moto');DY.add(a.m);setupNitroFlames(a);P.vx=P.vz=0;pay(100);toast('ركبت الموتوسيكل 🏍️ +100 جنيه');setObj(4)}
 else if(a.obj===4){D.mis=(D.mis||0)+1;pay(1000);fin('المهمة تمت! 🏆','عملتها يا '+S.name+' — +1000 جنيه')}
 }}
 }
@@ -2076,7 +2146,7 @@ if(dd<30){if(gwp.bc&&gwp.bc.parent)gwp.bc.parent.remove(gwp.bc);toast('✔ وص�
 else{const yw=a.P.yaw,fx=-Math.sin(yw),fz=-Math.cos(yw),rx=Math.cos(yw),rz=-Math.sin(yw);$('wpa').style.transform='rotate('+Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz)+'rad)';$('wpt').textContent=gwp.ar+' · '+(dd>=1000?(dd/1000).toFixed(1)+' كم':Math.round(dd)+' م');wb.style.display='flex'}
 }else if(wb)wb.style.display='none'}
 $('pg').style.transform='perspective(300px) rotateX('+IN.gas*28+'deg)';$('pb').style.transform='perspective(300px) rotateX('+IN.brk*28+'deg)';
-$('ph').classList.toggle('on',IN.hb>.4);
+$('ph').classList.toggle('on',IN.hb>.4);nitroUI(a);
 $('wsvg').style.transform='rotate('+wa+'rad)';
 $('cd').textContent=a.cd>0?Math.ceil(a.cd):(a.gt<.8?'انطلق!':'');
 if(a.mode==='mission'){
@@ -2100,6 +2170,8 @@ CM.lookAt(P.x+fx*12,1.3+yy+camPitchOffset*.55,P.z+fz*12);
 CM.fov+=(58+Math.min(sp*3.6,280)*.12-CM.fov)*Math.min(1,dt*3);CM.updateProjectionMatrix();
 a.sh=Math.max(0,a.sh-dt*1.5);updateDamageVisual(a,dt);
 a.m.position.set(P.x,yy,P.z);a.m.rotation.y=P.yaw;
+ const nitroOn=(a.nitroT||0)>0;
+ if(a.nitroFlames){a.nitroFlames.visible=nitroOn;if(nitroOn){a.nitroFlames.rotation.z=Math.sin(a.gt*22)*.07;for(let i=0;i<a.nitroFlames.userData.parts.length;i++){const f=a.nitroFlames.userData.parts[i];f.scale.y=.72+(.25*Math.sin(a.gt*31+i*1.8))+(i%2?.06:0);f.material.opacity=.78+.2*Math.abs(Math.sin(a.gt*27+i));}}}
  const drifting=IN.hb>.4&&Math.hypot(P.vx,P.vz)>4; a.m.rotation.z+=( (drifting?-Math.sign(P.st)*.18:0)-a.m.rotation.z)*Math.min(1,dt*5);
 SUN.position.set(CM.position.x-260,210,CM.position.z-650);
 DL.position.set(P.x-70,95,P.z-40);DL.target.position.set(P.x,0,P.z);
@@ -2121,8 +2193,8 @@ SC.remove(DY);DY=new THREE.Group();SC.add(DY);
 const m=mkV(D.sel);DY.add(m);
 PZ=false;
 camYawOffset=0;camPitchOffset=0;camPointer=null;
-A={mode,V:VEH[D.sel],id:D.sel,P:{x:1.75,z:0,yaw:0,vx:0,vz:0,st:0},m,cd:3.4,gt:0,dist:0,pd:0,sh:0,traf:[],cops:[],bust:0,obj:0,chase:0,cpd:0,over:false,bc:null,cy:0,cc:0,lmt:-99,pi:0,dn:'',damage:0,damageCooldown:0,burnT:0,skids:[],skidClock:0,driftToastAt:0};
-setupDamageVisual(A);window.SOYA_ENGINE_START&&window.SOYA_ENGINE_START(D.sel);$('dmg').textContent='سلامة العربية: 5/5';$('dmg').style.color='#fff';
+A={mode,V:VEH[D.sel],id:D.sel,P:{x:1.75,z:0,yaw:0,vx:0,vz:0,st:0},m,cd:3.4,gt:0,dist:0,pd:0,sh:0,traf:[],cops:[],bust:0,obj:0,chase:0,cpd:0,over:false,bc:null,cy:0,cc:0,lmt:-99,pi:0,dn:'',damage:0,damageCooldown:0,burnT:0,skids:[],skidClock:0,driftToastAt:0,nitroT:0,nitroRecharge:0};
+setupDamageVisual(A);setupNitroFlames(A);window.SOYA_ENGINE_START&&window.SOYA_ENGINE_START(D.sel);$('dmg').textContent='سلامة العربية: 5/5';$('dmg').style.color='#fff';
 if(mode==='alex')alexInit(A);else{spawnTraffic();if(mode==='mission')setObj(0)}
 IN.gas=IN.brk=IN.gd=IN.bd=IN.al=IN.ar=IN.hb=IN.hbd=0;wa=0;wd=0;G=null;setSM(S.sm);
 show('game');$('ui').style.display='block';$('c3').style.display='block';$('prog').style.display='none';
@@ -2131,7 +2203,7 @@ $('retry').onclick=()=>startA(mode);$('menu').onclick=()=>{stopA();G=null;show('
 cancelAnimationFrame(raf);lt=performance.now();raf=requestAnimationFrame(loop);
 });
 }
-function stopA(){if(onlineActive)closeOnline();window.SOYA_ENGINE_STOP&&window.SOYA_ENGINE_STOP();A=null;cancelAnimationFrame(raf);$('c3').style.display='none';$('mm').style.display='none';$('gpsb').style.display='none';$('wpb').style.display='none';gwp=null;gpsClose();$('retry').onclick=startGame;$('menu').onclick=()=>{G=null;show('mode')}}
+function stopA(){if(onlineActive)closeOnline();window.SOYA_ENGINE_STOP&&window.SOYA_ENGINE_STOP();A=null;nitroUI(null);cancelAnimationFrame(raf);$('c3').style.display='none';$('mm').style.display='none';$('gpsb').style.display='none';$('wpb').style.display='none';gwp=null;gpsClose();$('retry').onclick=startGame;$('menu').onclick=()=>{G=null;show('mode')}}
 /* ---------- GPS map: button 📍 (or key G) -> pick a place -> arrow or instant teleport ---------- */
 let gsel=-1,gwp=null;
 const gov=()=>$('gpsov');
@@ -2649,5 +2721,175 @@ const _show=window.show;
 if(typeof _show==='function'){window.show=function(id){const r=_show.apply(this,arguments);if(id==='hello')paintAv();else if(id==='char'){cur=norm(typeof window.SOYA_CHAR_GET==='function'?window.SOYA_CHAR_GET():null);refresh()}return r}}
 })();
 </script>
+
+<!-- DRIFT MAIN LOBBY: PUBG-inspired garage, player and navigation -->
+<style>
+#lobby{position:fixed;inset:0;z-index:8;display:none;overflow:hidden;color:#fff;font-family:Tahoma,Arial,sans-serif;background:linear-gradient(110deg,rgba(4,10,21,.90),rgba(7,17,30,.38) 55%,rgba(4,8,16,.78)),radial-gradient(ellipse at 52% 45%,#42566b 0%,#172b3e 42%,#070b14 82%)}
+#lobby:before{content:"";position:absolute;inset:0;background:linear-gradient(0deg,#060910 0%,transparent 44%),repeating-linear-gradient(105deg,transparent 0 90px,#ffffff06 91px 93px);pointer-events:none}
+.lb-top{position:absolute;top:18px;left:22px;right:22px;display:flex;align-items:center;justify-content:space-between;gap:12px;z-index:2}
+.lb-brand{font-size:clamp(24px,4vw,42px);font-weight:1000;letter-spacing:3px;color:#ffc21c;text-shadow:0 3px 22px #ff9d0055;font-style:italic}.lb-brand small{display:block;font-size:10px;letter-spacing:4px;color:#dce8f6;font-style:normal}
+.lb-logout{background:#101b2bd9;border:1px solid #ffffff38;border-radius:12px;color:#fff;padding:12px 16px;font-weight:bold;cursor:pointer}
+.lb-left{position:absolute;left:20px;top:100px;bottom:22px;width:clamp(68px,8vw,104px);display:flex;flex-direction:column;gap:12px;z-index:2}
+.lb-tab{height:76px;border:1px solid #ffffff2b;border-radius:15px;background:linear-gradient(140deg,#1c2b3ddd,#0a111ddd);color:#dce8f6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:11px;cursor:pointer;box-shadow:0 8px 24px #0005}.lb-tab span{font-size:25px}.lb-tab.active{border-color:#ffc21c;background:linear-gradient(140deg,#6e4b0b,#172235);color:#ffe39a}
+.lb-search{position:absolute;right:22px;top:95px;width:min(310px,40vw);display:flex;gap:7px;padding:9px;background:#0a1422d9;border:1px solid #ffffff2b;border-radius:13px;z-index:2}.lb-search input{min-width:0;width:100%;padding:10px;border:1px solid #ffffff20;background:#07101b;color:#fff;font:14px Tahoma,Arial,sans-serif;text-align:right;border-radius:8px}.lb-search button{border:0;border-radius:8px;background:#ffc21c;color:#171717;font-weight:bold;padding:0 12px;cursor:pointer;white-space:nowrap}
+.lb-friends-box{position:absolute;right:22px;top:157px;width:145px;min-height:44px;display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border:1px solid #ffffff30;border-radius:10px;background:linear-gradient(140deg,#1b2b40ee,#0a1422ee);color:#fff;font: bold 13px Tahoma,Arial,sans-serif;cursor:pointer;z-index:3}.lb-friends-panel{position:absolute;right:22px;top:207px;width:210px;min-height:90px;padding:14px;border:1px solid #ffc21c88;border-radius:12px;background:#08111ff5;box-shadow:0 10px 28px #0009;text-align:right;z-index:4;font-family:Tahoma,Arial,sans-serif}.lb-friends-panel b{display:block;color:#ffd56a;margin-bottom:12px}.lb-friends-panel p{font-size:13px;color:#c7d4e3}.lb-friends-panel[hidden]{display:none}
+.lb-stage{position:absolute;inset:100px 13% 85px 13%;display:flex;align-items:center;justify-content:center;perspective:900px;z-index:1}
+.lb-hangar{position:absolute;inset:2% 0 0;background:linear-gradient(180deg,#172a3a55,#07101ccc),repeating-linear-gradient(90deg,transparent 0 12%,#cbd7e412 12.1% 12.4%),linear-gradient(180deg,#29394a 0%,#172333 62%,#101722 63%,#080c13 100%);clip-path:polygon(10% 0,90% 0,100% 100%,0 100%);border-top:2px solid #a7c4d433}
+.lb-lights{position:absolute;top:3%;left:12%;right:12%;height:4px;background:#fff;box-shadow:0 0 28px 8px #d9efff55}
+.lb-car{position:absolute;width:min(68vw,760px);height:245px;bottom:20%;left:55%;transform:translateX(-50%) scale(.94);filter:drop-shadow(0 24px 20px #000c);z-index:1;opacity:.98}
+.lb-car svg{width:100%;height:100%;overflow:visible}.lb-car .body{fill:url(#lbpaint);stroke:#e7f1ff;stroke-width:2}.lb-car .glass{fill:#142b3d;stroke:#8ba8bd;stroke-width:2}.lb-car .wheel{fill:#080a0e;stroke:#68717b;stroke-width:7}.lb-car .lamp{fill:#fff2ac;filter:drop-shadow(0 0 8px #ffefaa)}
+.lb-player{position:absolute;bottom:3%;left:50%;transform:translateX(-50%);width:clamp(110px,16vw,180px);height:clamp(190px,38vh,310px);display:flex;align-items:flex-end;justify-content:center;filter:drop-shadow(0 12px 12px #000b);z-index:2}#lbAvatar{width:100%;height:100%;object-fit:contain}
+.lb-info{position:absolute;left:22px;bottom:22px;z-index:3;background:#07111fdf;border:1px solid #ffffff2b;border-left:4px solid #ffc21c;padding:12px 16px;border-radius:10px;min-width:170px}.lb-info b{display:block;color:#ffd15c;font-size:16px;margin-bottom:4px}.lb-info small{color:#b6c7d8}
+.lb-actions{position:absolute;right:22px;bottom:22px;z-index:3;display:flex;flex-direction:column;gap:10px;width:clamp(180px,23vw,270px)}.lb-action{padding:17px 18px;border:1px solid #ffffff55;border-radius:12px;text-align:right;font-size:clamp(15px,2vw,20px);font-weight:1000;cursor:pointer;box-shadow:0 8px 20px #0007;transition:.15s}.lb-action:hover{transform:translateY(-2px);filter:brightness(1.1)}.lb-action small{display:block;font-size:10px;font-weight:normal;margin-top:4px;opacity:.8}.lb-start{background:linear-gradient(100deg,#ffd02e,#ff9b00);color:#17120a;border:1px solid #fff0a0}.lb-garage{background:linear-gradient(100deg,#1c3b58,#0c1b2d);color:#fff;border-color:#6aa8d9}.lb-custom{background:#101b2be8;color:#dce8f6}
+#lbNotice{position:absolute;top:160px;right:22px;z-index:4;color:#ffd56a;font-size:12px;max-width:280px;text-align:right}
+@media(max-width:650px){.lb-top{top:10px;left:10px;right:10px}.lb-left{left:8px;top:84px;bottom:10px;width:58px;gap:8px}.lb-tab{height:62px;font-size:9px;border-radius:11px}.lb-tab span{font-size:21px}.lb-search{top:84px;right:8px;width:min(240px,64vw);padding:6px}.lb-search input{font-size:12px;padding:8px}.lb-friends-box{top:136px;right:8px;width:130px;min-height:40px}.lb-friends-panel{top:182px;right:8px;width:min(210px,64vw)}.lb-stage{inset:150px 4% 110px 12%}.lb-car{width:96vw;height:165px;bottom:24%;left:55%;transform:translateX(-50%) scale(.94)}.lb-player{left:50%;bottom:2%;height:200px;width:96px;transform:translateX(-50%)}.lb-info{left:74px;bottom:10px;padding:8px 10px;min-width:120px}.lb-info b{font-size:13px}.lb-info small{font-size:9px}.lb-actions{right:8px;bottom:10px;width:145px;gap:7px}.lb-action{padding:12px 10px;font-size:14px}.lb-action small{font-size:9px}.lb-logout{padding:9px;font-size:11px}.lb-brand{font-size:24px}.lb-brand small{font-size:8px}}
+</style>
+<div id="lobby" dir="rtl" aria-label="اللوبي الرئيسي لدرفت">
+ <div class="lb-top"><div class="lb-brand">درفت <small>DRIFT · GARAGE LOBBY</small></div><button class="lb-logout" id="lbLogout">◉ تسجيل خروج</button></div>
+ <nav class="lb-left"><button class="lb-tab active" id="lbHome"><span>⌂</span>الرئيسية</button><button class="lb-tab" id="lbGarage"><span>🚘</span>الجراج</button><button class="lb-tab" id="lbCharacter"><span>♟</span>الشخصية</button><button class="lb-tab" id="lbMaps"><span>🌍</span>المابات</button></nav>
+ <div class="lb-search"><input id="lbFriendSearch" maxlength="30" placeholder="البحث عن الأصدقاء" aria-label="البحث عن الأصدقاء"><button id="lbSearchBtn">بحث</button></div>
+ <button id="lbFriendsBox" type="button" aria-expanded="false">👥 الأصدقاء <span>⌄</span></button>
+ <div id="lbFriendsPanel" hidden><b>الأصدقاء</b><p>لا يوجد أصدقاء</p></div>
+ <div id="lbNotice" aria-live="polite"></div>
+ <div class="lb-stage"><div class="lb-hangar"></div><div class="lb-lights"></div>
+  <div class="lb-player"><canvas id="lbAvatar" width="170" height="250"></canvas></div>
+  <div class="lb-car"><svg viewBox="0 0 700 240" role="img" aria-label="سيارة داخل الجراج"><defs><linearGradient id="lbpaint" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset=".35" stop-color="#8ba8bf"/><stop offset=".7" stop-color="#30475b"/><stop offset="1" stop-color="#101a26"/></linearGradient><linearGradient id="lbwindow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8cb3ca"/><stop offset="1" stop-color="#0b1723"/></linearGradient></defs><ellipse cx="350" cy="205" rx="300" ry="24" fill="#0009"/><path class="body" d="M65 157 L88 124 Q105 112 168 105 L231 57 Q253 39 294 38 L424 42 Q456 44 484 76 L531 111 L603 123 Q633 129 646 151 L638 180 Q625 192 591 193 L109 193 Q73 188 65 157Z"/><path class="glass" d="M191 103 L244 61 Q260 50 292 50 L335 51 L335 103Z"/><path class="glass" d="M348 51 L420 54 Q445 56 466 81 L488 104 L348 103Z"/><path d="M342 48 L342 178" stroke="#d6e5f0" stroke-width="3" opacity=".7"/><path d="M205 113 L485 113" stroke="#fff" stroke-width="2" opacity=".28"/><path d="M86 151 L142 144 L136 165 L80 169Z" class="lamp"/><path d="M590 150 L634 155 L624 170 L588 168Z" fill="#ff334d"/><circle class="wheel" cx="185" cy="184" r="37"/><circle class="wheel" cx="530" cy="184" r="37"/><circle cx="185" cy="184" r="17" fill="#c6d3df"/><circle cx="530" cy="184" r="17" fill="#c6d3df"/><path d="M112 177 L603 177" stroke="#e7f1ff" stroke-width="2" opacity=".45"/></svg></div>
+ </div>
+ <div class="lb-info"><b id="lbPlayerName">المتسابق</b><small>جاهز للدرفت؟ · اختار عربيتك وانطلق</small></div>
+ <div class="lb-actions"><button class="lb-action lb-start" id="lbStart">ابدأ درفت ⟵<small>اختار الماب وابدأ القيادة</small></button><button class="lb-action lb-garage" id="lbOpenGarage">🚘 الجراج<small>عربياتك والتطويرات</small></button><button class="lb-action lb-custom" id="lbEditChar">🎨 تعديل الشخصية<small>الشكل والملابس</small></button></div>
+</div>
+<script>
+(()=>{
+ const $=id=>document.getElementById(id),lobby=$('lobby');if(!lobby)return;
+ const originalShow=window.show;
+ function drawLobbyAvatar(){const cv=$('lbAvatar');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);let ch=null;try{ch=window.SOYA_CHAR_GET&&window.SOYA_CHAR_GET()}catch(e){}if(ch&&window.SOYA_CHAR_DRAW){try{window.SOYA_CHAR_DRAW(g,cv.width,cv.height,ch);return}catch(e){}}g.fillStyle='#ffc21c';g.beginPath();g.arc(85,42,25,0,Math.PI*2);g.fill();g.fillStyle='#17283a';g.fillRect(58,70,54,82);g.fillStyle='#d8a77d';g.fillRect(67,22,36,42);g.fillStyle='#101820';g.fillRect(58,145,23,80);g.fillRect(89,145,23,80)}
+ window.show=function(id){if(id==='hello'){if(originalShow)originalShow('hello');document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$('ui').style.display='none';lobby.style.display='block';$('lbPlayerName').textContent=(window.SOYA_NAME?($('hi').textContent.replace(/^أهلاً(?: بعودتك)? يا /,'')||'المتسابق'):($('hi').textContent||'المتسابق'));drawLobbyAvatar();return}lobby.style.display='none';if(originalShow)return originalShow(id)};
+ $('lbStart').onclick=()=>{lobby.style.display='none';window.show('mode')};
+ $('lbOpenGarage').onclick=()=>{lobby.style.display='none';if(typeof openGarage==='function')openGarage();else window.show('garage')};
+ $('lbGarage').onclick=$('lbOpenGarage').onclick;
+ $('lbEditChar').onclick=()=>{lobby.style.display='none';window.show('char')};$('lbCharacter').onclick=$('lbEditChar').onclick;
+ $('lbMaps').onclick=$('lbStart').onclick;
+ $('lbHome').onclick=()=>{document.querySelectorAll('.lb-tab').forEach(b=>b.classList.remove('active'));$('lbHome').classList.add('active');$('lbNotice').textContent='أهلاً بيك في درفت'};
+ $('lbLogout').onclick=()=>{lobby.style.display='none';$('logoutName').click()};
+ $('lbSearchBtn').onclick=()=>{$('lbNotice').textContent=$('lbFriendSearch').value.trim()?'البحث عن الأصدقاء جاهز للربط بنظام أونلاين.':'اكتب اسم الصديق للبحث.'};
+ $('lbFriendsBox').onclick=()=>{const panel=$('lbFriendsPanel'),opening=panel.hidden;panel.hidden=!opening;$('lbFriendsBox').setAttribute('aria-expanded',String(opening));if(opening){$('lbNotice').textContent='الأصدقاء';}};
+ $('lbFriendSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('lbSearchBtn').click()});
+ const oldCharSet=window.SOYA_CHAR_SET;window.SOYA_CHAR_SET=function(ch){if(oldCharSet)oldCharSet(ch);drawLobbyAvatar()};
+})();
+</script>
+
+
+<!-- FIX: force logout -> name -> character creation, without reusing the previous profile -->
+<script>
+(()=>{
+  const $=id=>document.getElementById(id);
+  let mustCreateCharacter=false;
+  function clearProfileAndAskName(e){
+    if(e){e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();}
+    mustCreateCharacter=true;
+    window.__DRIFT_FORCE_NEW_PROFILE=true;
+    window.__DRIFT_EDITING_NAME=false;
+    try{
+      localStorage.removeItem('drift_player_name');
+      localStorage.setItem('drift_name_logged_out','1');
+      localStorage.setItem('drift_force_character_setup','1');
+    }catch(_){}
+    try{if(typeof window.SOYA_CHAR_SET==='function')window.SOYA_CHAR_SET(null);}catch(_){}
+    try{
+      const raw=localStorage.getItem('soya_save2');
+      if(raw){const d=JSON.parse(raw);d.name='';d.char=null;localStorage.setItem('soya_save2',JSON.stringify(d));}
+    }catch(_){}
+    const nm=$('nm'),hi=$('hi');
+    if(nm)nm.value='';
+    if(hi)hi.textContent='';
+    if(typeof window.show==='function')window.show('name');
+    setTimeout(()=>{if(nm)nm.focus();},80);
+  }
+  // Capture phase ensures the original handlers cannot skip the required flow.
+  ['lbLogout','logoutName'].forEach(id=>{
+    const el=$(id);
+    if(el)el.addEventListener('click',clearProfileAndAskName,true);
+  });
+  const next=$('n1');
+  if(next)next.addEventListener('click',e=>{
+    if(!mustCreateCharacter && !(()=>{try{return localStorage.getItem('drift_force_character_setup')==='1'}catch(_){return false}})())return;
+    e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+    const nm=$('nm'),v=(nm?.value||'').trim();
+    if(!v){if(nm){nm.classList.add('bad');nm.focus();}return;}
+    mustCreateCharacter=true;
+    try{
+      localStorage.setItem('drift_player_name',v);
+      localStorage.removeItem('drift_name_logged_out');
+    }catch(_){}
+    try{if(typeof window.SOYA_NAME==='function')window.SOYA_NAME(v);}catch(_){}
+    const hi=$('hi');if(hi)hi.textContent='أهلاً يا '+v+'!';
+    window.__DRIFT_FORCE_NEW_PROFILE=true;
+    window.__DRIFT_EDITING_NAME=false;
+    if(typeof window.show==='function')window.show('char');
+  },true);
+  const saveChar=$('chsave');
+  if(saveChar)saveChar.addEventListener('click',()=>{
+    if(!mustCreateCharacter && !(()=>{try{return localStorage.getItem('drift_force_character_setup')==='1'}catch(_){return false}})())return;
+    mustCreateCharacter=false;
+    window.__DRIFT_FORCE_NEW_PROFILE=false;
+    try{localStorage.removeItem('drift_force_character_setup');}catch(_){}
+  },true);
+})();
+</script>
+
+
+<!-- تدوير تلقائي مع اتجاه الموبايل: يدعم الطولي والعرضي بدون فرض اتجاه ثابت -->
+<style id="auto-orientation-style">
+html,body{width:100%;height:100%;min-height:100%;}
+@media (orientation:landscape) and (max-height:600px){
+  .screen{gap:8px;padding:8px;}
+  .panel{padding:12px 16px;gap:8px;max-height:96dvh;overflow-y:auto;}
+  .brand-logo{width:min(35vw,250px);max-height:24dvh;}
+  .logo{font-size:clamp(34px,9vh,72px);}
+  h2{font-size:clamp(14px,3.5vh,22px);}
+  .tag{font-size:10px;letter-spacing:3px;}
+  .btn{padding:8px 18px;font-size:12px;}
+  .card{width:clamp(90px,18vw,145px);padding:6px;font-size:10px;}
+  .card canvas{max-height:17vh;}
+  #top{padding:4px 8px;}
+  #prog{top:43px;}
+  #wheel{width:clamp(78px,18vh,118px);height:clamp(78px,18vh,118px);bottom:6px;left:8px;}
+  .pedal{height:clamp(68px,23vh,100px);bottom:7px;padding-bottom:5px;}
+  #pb{right:clamp(66px,15vw,96px);}
+  #pg{right:8px;}
+  #ph{width:70px;height:48px;right:8px;bottom:clamp(84px,27vh,125px);}
+  #ph .hb-icon{font-size:18px;}
+  #hornBtn{width:52px;height:52px;left:8px;bottom:clamp(90px,28vh,130px);}
+  #hornBtn .hornIcon{font-size:20px;}
+  #nitroBtn{width:66px;height:62px;right:8px;bottom:clamp(145px,43vh,190px);}
+  #nitroBtn .nitro-track{width:50px;}
+  #arr{bottom:8px;left:8px;}
+  #arr button{width:58px;height:58px;}
+}
+</style>
+<script id="auto-orientation-handler">
+(()=>{
+  let pending=false;
+  function refreshForRotation(){
+    if(pending)return;
+    pending=true;
+    requestAnimationFrame(()=>{
+      pending=false;
+      // أعد قياس مساحة العرض والكانفاس بعد تدوير الجهاز، من غير إعادة بدء اللعبة.
+      try{if(typeof rs==='function')rs();}catch(_){}
+      try{if(typeof rs3==='function')rs3();}catch(_){}
+      try{if(typeof resizeGarage3D==='function')resizeGarage3D();}catch(_){}
+      try{window.dispatchEvent(new Event('drift:viewportchange'));}catch(_){}
+    });
+  }
+  window.addEventListener('orientationchange',refreshForRotation,{passive:true});
+  window.addEventListener('resize',refreshForRotation,{passive:true});
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',refreshForRotation,{passive:true});
+  // لو المتصفح كان قد فرض قفل اتجاه سابقًا، اسمح له باتباع وضع الجهاز الطبيعي.
+  try{if(screen.orientation&&typeof screen.orientation.unlock==='function')screen.orientation.unlock();}catch(_){}
+  refreshForRotation();
+})();
+</script>
+
 </body>
 </html>
