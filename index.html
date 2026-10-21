@@ -2897,5 +2897,77 @@ html,body{width:100%;height:100%;min-height:100%;}
 })();
 </script>
 
+
+<style id="responsive-device-fit-v2">
+/* واجهة مرنة: نفس مساحة اللعب على الكمبيوتر والموبايل، ومقاسات تحكم متناسبة مع مساحة الشاشة */
+:root{--safe-b:env(safe-area-inset-bottom,0px);--safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px)}
+html,body{width:100%;height:100%;height:100dvh;min-height:0;overflow:hidden}
+#cv,#c3{width:100vw;height:100dvh;max-width:100vw;max-height:100dvh}
+.screen{width:100vw;height:100dvh;min-height:0;overflow:auto;overscroll-behavior:contain;padding:clamp(8px,2.5vmin,18px);gap:clamp(8px,2.2vmin,16px)}
+.panel{max-height:calc(100dvh - 16px);overflow-y:auto;padding:clamp(12px,2.8vmin,26px) clamp(12px,3vw,22px);gap:clamp(8px,2vmin,16px)}
+@media(max-width:700px){
+  .logo{font-size:clamp(38px,12vw,76px);letter-spacing:2px}
+  .brand-logo{width:min(48vw,230px);max-height:24dvh}
+  .tag{font-size:clamp(9px,2.4vw,13px);letter-spacing:2px}
+  h2{font-size:clamp(15px,4vw,22px);letter-spacing:1px}
+  .btn{font-size:clamp(12px,3.2vw,15px);padding:clamp(9px,2.3vw,13px) clamp(16px,4vw,24px);letter-spacing:1px}
+  .card{width:clamp(90px,27vw,145px);padding:7px 5px}
+  input{font-size:16px;padding:10px 12px}
+  #top{padding:calc(5px + env(safe-area-inset-top,0px)) calc(6px + var(--safe-r)) 5px calc(6px + var(--safe-l));gap:4px}
+  #sel .pill{padding:4px 6px;font-size:9px}
+  #quit{width:29px;height:29px;font-size:13px}
+  #stat{font-size:10px;letter-spacing:0}
+  #spd{font-size:clamp(22px,6vw,30px)}
+  #spd small{font-size:8px}
+  #prog{top:44px;left:7px;right:7px}
+  /* أزرار صغيرة بصريًا، مع بقاء مساحة اللمس على نفس الزر */
+  #wheel{width:clamp(76px,20vw,96px);height:clamp(76px,20vw,96px);left:calc(6px + var(--safe-l));bottom:calc(6px + var(--safe-b))}
+  .pedal{width:clamp(43px,11vw,54px);height:clamp(72px,18vh,94px);bottom:calc(7px + var(--safe-b));padding-bottom:4px;border-radius:10px;font-size:9px;letter-spacing:0;border-width:1px}
+  #pb{right:calc(53px + var(--safe-r))}
+  #pg{right:calc(6px + var(--safe-r))}
+  #ph{right:calc(6px + var(--safe-r));bottom:calc(clamp(82px,21vh,108px) + var(--safe-b));width:52px;height:40px;border-radius:10px;font-size:9px;gap:0}
+  #ph .hb-icon{font-size:15px}#ph .hb-label{font-size:8px}#ph .hb-hint{display:none}
+  #hornBtn{left:calc(7px + var(--safe-l));bottom:calc(clamp(88px,23vh,116px) + var(--safe-b));width:44px;height:44px;border-width:2px;font-size:8px;border-radius:50%}
+  #hornBtn .hornIcon{font-size:17px}
+  #nitroBtn{right:calc(6px + var(--safe-r));bottom:calc(clamp(128px,33vh,158px) + var(--safe-b));width:52px;height:50px;border-radius:11px;font-size:8px;gap:1px}
+  #nitroBtn .nitro-icon{font-size:15px}#nitroBtn .nitro-label{font-size:7px}#nitroBtn .nitro-track{width:37px;height:3px;margin-top:1px}#nitroBtn .nitro-key{display:none}
+  #arr{left:calc(6px + var(--safe-l));bottom:calc(6px + var(--safe-b));gap:5px}
+  #arr button{width:38px;height:38px;font-size:17px;border-width:2px}
+}
+@media(max-width:700px) and (orientation:portrait){
+  /* في الوضع الطولي نسيب منتصف الشاشة فاضي للرؤية، ونحط التحكم عند الحواف السفلية */
+  #wheel{width:clamp(72px,19vw,88px);height:clamp(72px,19vw,88px)}
+  .pedal{height:clamp(68px,13vh,82px);width:clamp(40px,10vw,48px)}
+  #pb{right:calc(48px + var(--safe-r))}
+  #ph{bottom:calc(clamp(75px,15vh,92px) + var(--safe-b))}
+  #hornBtn{bottom:calc(clamp(78px,16vh,96px) + var(--safe-b))}
+  #nitroBtn{bottom:calc(clamp(118px,24vh,142px) + var(--safe-b))}
+}
+@media(orientation:landscape) and (max-height:700px){
+  .screen{padding:5px;gap:5px}
+  .panel{padding:7px 12px;gap:6px;max-height:calc(100dvh - 10px)}
+  .brand-logo{width:min(25vw,180px);max-height:18dvh}
+  .logo{font-size:clamp(30px,7vh,54px)}
+  h2{font-size:clamp(12px,3vh,18px)}
+  .tag{font-size:9px;letter-spacing:2px}
+  .btn{padding:6px 14px;font-size:11px;letter-spacing:1px}
+  .card{width:clamp(76px,14vw,110px);padding:4px;font-size:9px;gap:3px}
+  .card .big{font-size:25px}
+  #wheel{width:clamp(58px,13vh,76px);height:clamp(58px,13vh,76px);left:calc(5px + var(--safe-l));bottom:calc(4px + var(--safe-b))}
+  .pedal{width:clamp(34px,7vw,45px);height:clamp(52px,15vh,65px);bottom:calc(4px + var(--safe-b));padding-bottom:3px;font-size:8px;border-radius:8px}
+  #pb{right:calc(clamp(39px,8vw,51px) + var(--safe-r))}
+  #pg{right:calc(4px + var(--safe-r))}
+  #ph{right:calc(4px + var(--safe-r));bottom:calc(clamp(58px,19vh,75px) + var(--safe-b));width:43px;height:31px;border-radius:8px;font-size:8px}
+  #ph .hb-icon{font-size:12px}#ph .hb-label{font-size:7px}#ph .hb-hint{display:none}
+  #hornBtn{left:calc(5px + var(--safe-l));bottom:calc(clamp(56px,19vh,76px) + var(--safe-b));width:34px;height:34px;border-width:1px;font-size:7px}
+  #hornBtn .hornIcon{font-size:13px}
+  #nitroBtn{right:calc(4px + var(--safe-r));bottom:calc(clamp(92px,30vh,112px) + var(--safe-b));width:42px;height:40px;border-radius:8px;font-size:7px}
+  #nitroBtn .nitro-icon{font-size:12px}#nitroBtn .nitro-label{font-size:6px}#nitroBtn .nitro-track{width:29px;height:3px}#nitroBtn .nitro-key{display:none}
+  #arr{left:calc(5px + var(--safe-l));bottom:calc(4px + var(--safe-b));gap:4px}
+  #arr button{width:32px;height:32px;font-size:15px;border-width:1px}
+  #stat{font-size:9px}#spd{font-size:24px}#spd small{font-size:8px}#prog{top:39px}
+}
+</style>
+
 </body>
 </html>
