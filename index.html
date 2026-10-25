@@ -48,7 +48,7 @@ input.bad{animation:sh .3s;border-color:#ff0}
 #ui>*{pointer-events:auto}
 #top{position:absolute;top:0;left:0;right:0;padding:8px 10px;display:flex;justify-content:space-between;align-items:flex-start;gap:6px;pointer-events:none}
 #top>*{pointer-events:auto}
-#sel{display:flex;gap:4px}#sel .pill{padding:6px 9px;font-size:10px}
+#sel{display:flex;gap:4px;align-items:center}#sel .pill{padding:8px 10px;font-size:11px}
 #quit{width:34px;height:34px;border-radius:50%;border:2px solid #fff4;background:#0009;color:#fff;font-size:16px}
 #stat{font-size:12px;letter-spacing:1px;text-shadow:0 0 6px #000;margin-top:4px}
 #dmg{font:900 11px Tahoma,Arial,sans-serif;color:#fff;background:#0009;border:1px solid #ffffff33;border-radius:12px;padding:4px 8px;margin-top:5px;display:inline-block;text-shadow:0 1px 3px #000}
@@ -64,7 +64,7 @@ input.bad{animation:sh .3s;border-color:#ff0}
 #toast.drift{background:linear-gradient(90deg,#101018ee,#5b2500ee);border:1px solid #ffc400;color:#ffe27a;font-weight:900;box-shadow:0 0 20px #ff8a0088}
 #wheel{position:absolute;bottom:14px;left:12px;width:clamp(110px,32vw,160px);height:clamp(110px,32vw,160px);touch-action:none}
 #wsvg{width:100%;height:100%;filter:drop-shadow(0 6px 10px #000a)}
-#arr{position:absolute;bottom:26px;left:14px;gap:12px;display:none}
+#arr{position:absolute;bottom:26px;left:14px;gap:12px;display:none;direction:ltr}
 #arr button{width:clamp(60px,18vw,84px);height:clamp(60px,18vw,84px);border-radius:50%;border:3px solid #fff5;background:#000a;color:#fff;font-size:28px;touch-action:none}
 @media(max-width:600px){
 .panel{padding:20px 14px;gap:13px}
@@ -158,11 +158,7 @@ input.bad{animation:sh .3s;border-color:#ff0}
 <div style="display:flex;gap:8px;align-items:flex-start">
 <button id="quit">⚙</button><div><div id="stat"></div><div id="dmg">سلامة العربية: 5/5</div></div>
 </div>
-<div id="sel">
-<button class="pill on" data-sm="wheel">عجلة القيادة</button>
-<button class="pill" data-sm="arrows">الأسهم</button>
-<button class="pill" data-sm="tilt">إمالة الجهاز</button>
-</div>
+
 <div id="spd">0<small>كم/س</small></div>
 </div>
 <div id="prog"><i></i></div><div id="cd"></div>
@@ -410,6 +406,8 @@ $('wheel').style.display=m==='wheel'?'block':'none';
 $('arr').style.display=m==='arrows'?'flex':'none';
 if(m==='tilt'&&window.DeviceOrientationEvent&&DeviceOrientationEvent.requestPermission)DeviceOrientationEvent.requestPermission().catch(()=>{});
 }
+// Settings markup is added later in the HTML, so expose the handler for late binding.
+window.SOYA_SET_SM=setSM;
 document.querySelectorAll('#sel button').forEach(b=>b.onclick=()=>setSM(b.dataset.sm));
 
 const steerT=()=>{
@@ -750,7 +748,7 @@ requestAnimationFrame(loop);
 </script>
 <!-- ===== SOYA ADD-ON : GARAGE + ALEXANDRIA 3D + MISSIONS ===== -->
 <style>
-#garage{justify-content:flex-start;padding-top:18px}#garageHome{min-width:190px}
+#garage,#purchase{justify-content:flex-start;padding-top:18px;overflow-y:auto}#garageHome,#purchaseHome{min-width:190px}
 #gm{font-size:18px;color:#ffd166;letter-spacing:2px}
 .gg{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;width:min(96vw,780px)}
 .gc{background:#12121fdd;border:2px solid #ffffff22;border-radius:16px;padding:8px;display:flex;flex-direction:column;align-items:center;gap:5px;font-size:10px}
@@ -768,8 +766,11 @@ requestAnimationFrame(loop);
 #gpsc{max-width:96vw;border:2px solid #35d0ff55;border-radius:14px;background:#0b1620;touch-action:none}
 #gpsi{font:900 14px Tahoma,Arial,sans-serif;color:#ffd166;min-height:20px}
 #gpsov .btn{font-size:12px;padding:10px 16px;letter-spacing:1px}
+#plateShop{justify-content:flex-start;padding:18px 12px;overflow-y:auto;gap:14px}#plateShop .plate-panel{width:min(94vw,500px);padding:18px;background:#10101ddd;border:1px solid #ffffff2a;border-radius:20px;display:flex;flex-direction:column;align-items:center;gap:12px}#plateShop .plate-preview{width:min(86vw,380px);border:3px solid #aeb6c0;border-radius:10px;overflow:hidden;background:#f5f5f5;color:#111;box-shadow:0 8px 24px #0009}#plateShop .plate-top{padding:7px;color:#fff;font:bold 18px Tahoma,Arial,sans-serif;text-align:center}#plateShop .plate-bottom{display:flex;align-items:center;justify-content:space-around;padding:12px 8px;color:#111;font:bold clamp(20px,5vw,30px) Tahoma,Arial,sans-serif;direction:rtl}#plateShop label{font: bold 14px Tahoma,Arial,sans-serif}#plateShop input{font:bold 19px Tahoma,Arial,sans-serif;letter-spacing:1px}#plateShop .colors{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}#plateShop .color-choice{width:38px;height:38px;border:3px solid #ffffff55;border-radius:50%;cursor:pointer}#plateShop .color-choice.active{outline:3px solid #ffd166;outline-offset:2px}#plateShop .shop-note{font:13px Tahoma,Arial,sans-serif;color:#d9e3ef;text-align:center}
 </style>
-<div id="garage" class="screen"><h2>🚗 الجراج</h2><div id="gm"></div><div class="gg" id="gg"></div><div class="row" style="margin:8px 0 18px"><button class="btn alt" id="garageHome">⌂ القائمة الرئيسية</button><button class="btn" id="gn">اختيار الماب ▶</button></div></div>
+<div id="garage" class="screen"><h2>🚗 الجراج — عربياتك</h2><div id="gm"></div><div class="gg" id="gg"></div><div class="row" style="margin:8px 0 18px"><button class="btn alt" id="garageHome">⌂ القائمة الرئيسية</button><button class="btn o" id="garagePlate">🇪🇬 تخصيص النمرة</button><button class="btn" id="gn">اختيار الماب ▶</button></div></div>
+<div id="purchase" class="screen"><h2>💲 شراء العربيات</h2><div id="pm" style="font-size:18px;color:#ffd166"></div><p>اختار عربية جديدة تضيفها لجراجك</p><div class="gg" id="pgoods"></div><button class="btn o" id="purchasePlate">🇪🇬 شراء وتخصيص النمرة — ٥٠ جنيه</button><div class="row" style="margin:8px 0 18px"><button class="btn alt" id="purchaseHome">⌂ القائمة الرئيسية</button><button class="btn alt" id="purchaseGarage">🚗 الجراج</button></div></div>
+<div id="plateShop" class="screen" dir="rtl"><h2>🇪🇬 تخصيص نمرة العربية</h2><div id="plateBalance" style="font-size:17px;color:#ffd166"></div><div class="plate-panel"><div class="plate-preview"><div class="plate-top" id="platePreviewTop" style="background:#0755a7">EGYPT　 مصر</div><div class="plate-bottom"><span id="platePreviewNumbers">٣٩٥١</span><span style="height:38px;border-left:4px solid #777"></span><span id="platePreviewLetters">د ر ف</span></div></div><div class="shop-note">اكتب لحد ٣ حروف و٤ أرقام، واشتري النمرة بـ ٥٠ جنيه.</div><label for="plateLetters">حروف النمرة (حد أقصى ٣)</label><input id="plateLetters" maxlength="3" placeholder="مثال: د ر ف" autocomplete="off"><label for="plateNumbers">أرقام النمرة (حد أقصى ٤)</label><input id="plateNumbers" maxlength="4" inputmode="numeric" placeholder="مثال: ٣٩٥١" autocomplete="off"><button class="btn" id="buyPlateText">شراء النمرة وحفظها — ٥٠ جنيه</button><div class="shop-note">اختار لون الجزء العلوي من النمرة.</div><div class="colors" id="plateColors"><button class="color-choice active" data-color="#0755a7" style="background:#0755a7" aria-label="أزرق"></button><button class="color-choice" data-color="#188447" style="background:#188447" aria-label="أخضر"></button><button class="color-choice" data-color="#b91c31" style="background:#b91c31" aria-label="أحمر"></button><button class="color-choice" data-color="#222222" style="background:#222222" aria-label="أسود"></button><button class="color-choice" data-color="#f2a100" style="background:#f2a100" aria-label="أصفر"></button></div><button class="btn o" id="buyPlateColor">شراء اللون المختار — ٥٠ جنيه</button><div id="plateMessage" class="shop-note" aria-live="polite"></div></div><div class="row"><button class="btn alt" id="plateBack">رجوع</button></div></div>
 <div id="toast"></div>
 <canvas id="c3"></canvas>
 <script>
@@ -904,26 +905,52 @@ const o=A||(G&&!G.frozen&&G.st==='run'?G:null);if(!o||(A&&A.over))return;
 const z=A?A.dist:G.P.z,n=Math.floor(z/300);o.pd=o.pd||0;if(n>o.pd){pay((n-o.pd)*100);o.pd=n}
 },300);
 /* ---------- garage ---------- */
+function vehicleCard(f,mode){
+ const id=f[0],pr=f[1],V=VEH[id],own=D.own.includes(id),d=document.createElement('div');
+ d.className='gc'+(D.sel===id?' sel':'')+(id==='roadster'?' roadster-card':'');
+ d.innerHTML='<canvas width="90" height="100"></canvas><b>'+f[3]+'</b><span>'+V.top+' كم/س · التسارع '+V.acc+'</span>'+(id==='roadster'?'<small>💰 100,000 جنيه · ⚡ BOOST · LED · جناح خلفي · محرك كهربائي · وضع ROCKET</small>':'');
+ const b=document.createElement('button');
+ if(mode==='buy'){
+  b.textContent=pr===0?'مجاني — شراء':pr+' جنيه 💲';if(D.money<pr)b.className='lock';
+  b.onclick=()=>{if(D.money<pr){toast('ناقصك '+(pr-D.money)+' جنيه');return}D.money-=pr;if(!D.own.includes(id))D.own.push(id);D.sel=id;S.veh=id;save();renderPurchase();renderG();toast('تم شراء '+V.n+' وإضافتها للجراج ✔')};
+ }else{
+  b.textContent=D.sel===id?'✔ العربية المختارة':'اختيار العربية';
+  b.onclick=()=>{D.sel=id;S.veh=id;save();renderG()};
+ }
+ d.appendChild(b);drawVeh(d.querySelector('canvas').getContext('2d'),V.type,V.col,45,50,V.w*20,V.l*20,-.3,false);return d;
+}
 function renderG(){
-$('gm').textContent='💰 '+D.money+' جنيه'+(D.mis?' · 🕵️ '+D.mis:'');const g=$('gg');g.innerHTML='';
-for(const f of FL){
-const id=f[0],pr=f[1],V=VEH[id],own=D.own.includes(id),d=document.createElement('div');
-d.className='gc'+(D.sel===id?' sel':'')+(id==='roadster'?' roadster-card':'');
-d.innerHTML='<canvas width="90" height="100"></canvas><b>'+f[3]+'</b><span>'+V.top+' كم/س · التسارع '+V.acc+'</span>'+(id==='roadster'?'<small>💰 100,000 جنيه · ⚡ BOOST · LED · جناح خلفي · محرك كهربائي · وضع ROCKET</small>':'');
-const b=document.createElement('button');
-b.textContent=D.sel===id?'✔ تم الاختيار':own?'اختيار':pr===0?'مجاني — اختيار':pr+' جنيه 🔒';
-if(!own&&D.money<pr)b.className='lock';
-b.onclick=()=>{
-if(!own){if(D.money<pr){toast('ناقصك '+(pr-D.money)+' جنيه');return}D.money-=pr;D.own.push(id)}
-D.sel=id;S.veh=id;save();renderG();
-};
-d.appendChild(b);g.appendChild(d);
-drawVeh(d.querySelector('canvas').getContext('2d'),V.type,V.col,45,50,V.w*20,V.l*20,-.3,false);
+ $('gm').textContent='💰 '+D.money+' جنيه'+(D.mis?' · 🕵️ '+D.mis:'');const g=$('gg');g.innerHTML='';
+ const owned=FL.filter(f=>D.own.includes(f[0]));
+ if(!owned.length)g.innerHTML='<p>لسه ماعندكش عربيات.</p>';
+ owned.forEach(f=>g.appendChild(vehicleCard(f,'garage')));
 }
+function renderPurchase(){
+ $('pm').textContent='💰 رصيدك: '+D.money+' جنيه';const g=$('pgoods');g.innerHTML='';
+ const available=FL.filter(f=>!D.own.includes(f[0]));
+ if(!available.length){g.innerHTML='<p>🎉 مبروك! اشتريت كل العربيات المتاحة.</p>';return}
+ available.forEach(f=>g.appendChild(vehicleCard(f,'buy')));
 }
+/* ---------- تخصيص النمرة المصرية: شراء وحفظ داخل نفس ملف اللعبة ---------- */
+let plateColorDraft='#0755a7',plateShopReturn='purchase';
+const arDigits=v=>String(v).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[Number(d)]);
+function plateData(){return {letters:String(D.plateLetters||'درف').slice(0,3),numbers:String(D.plateNumbers||'٣٩٥١').slice(0,4),color:/^#[0-9a-f]{6}$/i.test(D.plateColor||'')?D.plateColor:'#0755a7',owned:!!D.customPlateOwned}}
+function updatePlatePreview(){const l=$('plateLetters'),n=$('plateNumbers');$('platePreviewLetters').textContent=(l.value||D.plateLetters||'درف').split('').join(' ');$('platePreviewNumbers').textContent=arDigits(n.value||D.plateNumbers||'٣٩٥١');$('platePreviewTop').style.background=plateColorDraft;document.querySelectorAll('#plateColors [data-color]').forEach(b=>b.classList.toggle('active',b.dataset.color===plateColorDraft));$('plateBalance').textContent='💰 رصيدك: '+D.money+' جنيه'}
+function openPlateShop(from){plateShopReturn=from||(document.getElementById('garage')?.classList.contains('on')?'garage':'purchase');$('plateLetters').value=D.plateLetters||'درف';$('plateNumbers').value=D.plateNumbers||'٣٩٥١';plateColorDraft=D.plateColor||'#0755a7';$('plateMessage').textContent='';updatePlatePreview();show('plateShop')}
+window.openPlateShop=openPlateShop;
+$('garagePlate').onclick=()=>openPlateShop('garage');$('purchasePlate').onclick=()=>openPlateShop('purchase');
+$('plateLetters').addEventListener('input',()=>{ $('plateLetters').value=[...$('plateLetters').value].filter(ch=>/[\u0600-\u06FFa-zA-Z]/.test(ch)).slice(0,3).join('');updatePlatePreview()});
+$('plateNumbers').addEventListener('input',()=>{$('plateNumbers').value=[...$('plateNumbers').value].filter(ch=>/[0-9٠-٩]/.test(ch)).slice(0,4).join('');updatePlatePreview()});
+document.querySelectorAll('#plateColors [data-color]').forEach(b=>b.onclick=()=>{plateColorDraft=b.dataset.color;updatePlatePreview()});
+$('buyPlateText').onclick=()=>{const letters=[...$('plateLetters').value.trim()].filter(ch=>/[\u0600-\u06FFa-zA-Z]/.test(ch)).slice(0,3).join(''),numbers=[...$('plateNumbers').value.trim()].filter(ch=>/[0-9٠-٩]/.test(ch)).slice(0,4).join('');if(!letters||!numbers){$('plateMessage').textContent='اكتب حرف واحد على الأقل ورقم واحد على الأقل.';return}if(D.money<50){$('plateMessage').textContent='رصيدك مش كفاية؛ محتاج ٥٠ جنيه.';return}D.money-=50;D.plateLetters=letters;D.plateNumbers=numbers;D.customPlateOwned=true;save();try{PLP.p.length=0;PLP.t.length=0;for(const k in VC)delete VC[k]}catch(_){}updatePlatePreview();$('plateMessage').textContent='تم شراء النمرة وحفظها! اتخصم ٥٠ جنيه.';renderG();renderPurchase()};
+$('buyPlateColor').onclick=()=>{if(!D.customPlateOwned){$('plateMessage').textContent='اشتري النمرة الأول بـ ٥٠ جنيه.';return}if(plateColorDraft===(D.plateColor||'#0755a7')){$('plateMessage').textContent='ده لون النمرة الحالي بالفعل.';return}if(D.money<50){$('plateMessage').textContent='رصيدك مش كفاية؛ محتاج ٥٠ جنيه.';return}D.money-=50;D.plateColor=plateColorDraft;save();try{PLP.p.length=0;PLP.t.length=0;for(const k in VC)delete VC[k]}catch(_){}updatePlatePreview();$('plateMessage').textContent='تم شراء اللون وحفظه! اتخصم ٥٠ جنيه.';renderG();renderPurchase()};
+$('plateBack').onclick=()=>{if(plateShopReturn==='garage'){show('garage');renderG()}else{show('purchase');renderPurchase()}};
 function openGarage(){show('garage');renderG()}
+function openPurchase(){show('purchase');renderPurchase()}
+window.openGarage=openGarage;window.openPurchase=openPurchase;
 $('gn').onclick=()=>show('mode');
 $('garageHome').onclick=()=>show('hello');
+$('purchaseHome').onclick=()=>show('hello');$('purchaseGarage').onclick=openGarage;
 document.querySelector('#hello [data-go]').onclick=openGarage;
 $('mode').querySelector('.row').insertAdjacentHTML('beforeend','<div class="card" id="mX"><span class="big">🌊</span><b>خريطة إسكندرية</b><span>الكورنيش · قايتباي · المكتبة · ستانلي · المنتزه</span></div><div class="card" id="mA"><span class="big">🌅</span><b>مابة أونلاين 🌐</b><span>إسكندرية · إنشاء سيرفر أو دخول بكود</span></div><div class="card" id="mM"><span class="big">🕵️</span><b>المهمات</b><span>اخبط · اسرق · اهرب · اركب</span></div>');
 $('mode').insertAdjacentHTML('beforeend','<button class="btn alt" id="mG">🚗 الجراج</button>');
@@ -1199,14 +1226,11 @@ function plateMat(taxi){
 const pool=PLP[taxi?'t':'p'];
 if(pool.length<24){
 const t=tex(256,128,(c,w,h)=>{
-const bg=taxi?'#f2a100':'#1c4fa3',fg=taxi?'#111111':'#ffffff';
-c.fillStyle=bg;c.fillRect(0,0,w,h);
-c.strokeStyle=fg;c.lineWidth=6;c.strokeRect(5,5,w-10,h-10);c.fillStyle=fg;c.textAlign='center';c.textBaseline='middle';
-c.font='bold 20px Tahoma,Arial';c.fillText('مصر  EGYPT',w/2,25);
-c.font='bold 50px Tahoma,Arial';c.fillText(toAr(100+((R()*9899)|0)),68,74);
-c.fillRect(133,46,3,56);
-c.font='bold 44px Tahoma,Arial';
-const used=[];for(let k=0;k<3;k++){let a;do{a=AL[(R()*AL.length)|0]}while(used.includes(a));used.push(a);c.fillText(a,228-k*38,74)}
+let custom=null;try{const saved=JSON.parse(localStorage.getItem('soya_save2')||'{}');if(saved.customPlateOwned)custom=saved}catch(_){}
+const bg=custom&&/^#[0-9a-f]{6}$/i.test(custom.plateColor||'')?custom.plateColor:(taxi?'#f2a100':'#1c4fa3'),fg=taxi?'#111111':'#ffffff';
+c.fillStyle=bg;c.fillRect(0,0,w,h);c.strokeStyle=fg;c.lineWidth=6;c.strokeRect(5,5,w-10,h-10);c.fillStyle=fg;c.textAlign='center';c.textBaseline='middle';c.font='bold 20px Tahoma,Arial';c.fillText('مصر  EGYPT',w/2,25);
+c.font='bold 50px Tahoma,Arial';c.fillText(custom?String(custom.plateNumbers||'٣٩٥١'):toAr(100+((R()*9899)|0)),68,74);c.fillRect(133,46,3,56);c.font='bold 44px Tahoma,Arial';
+if(custom){String(custom.plateLetters||'درف').slice(0,3).split('').forEach((a,i)=>c.fillText(a,228-i*38,74))}else{const used=[];for(let k=0;k<3;k++){let a;do{a=AL[(R()*AL.length)|0]}while(used.includes(a));used.push(a);c.fillText(a,228-k*38,74)}}
 c.font='bold 22px Tahoma,Arial';c.fillText(GOV[R()<.5?0:((R()*GOV.length)|0)]+'  '+(taxi?'أجرة':'ملاكي'),w/2,110);
 });
 t.wrapS=t.wrapT=THREE.ClampToEdgeWrapping;
@@ -2242,6 +2266,17 @@ window.SOYA_INGAME=()=>!!(A||G);
 <div id="setp" class="screen" style="z-index:8;background:#000b"><div class="panel">
 <h2>⚙ الإعدادات</h2>
 <div id="np">🎵 —</div>
+<h3 id="controlTitle" style="font:bold 15px Tahoma,Arial,sans-serif;color:#ffd166;margin-top:4px">🎮 طريقة التحكم</h3>
+ <div id="sel" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:center">
+ <button class="pill on" data-sm="wheel">عجلة القيادة</button>
+ <button class="pill" data-sm="arrows">الأسهم يمين وشمال</button>
+ <button class="pill" data-sm="tilt">إمالة الجهاز</button>
+ </div>
+ <label id="langLabel" for="gameLanguage" style="font: bold 13px Tahoma,Arial,sans-serif;color:#ffd166">🌐 لغة اللعبة</label>
+<select id="gameLanguage" style="font: bold 14px Tahoma,Arial,sans-serif;color:#fff;background:#171726;border:1px solid #ff2d55;border-radius:12px;padding:10px;width:min(80vw,300px)">
+<option value="ar">العربية</option><option value="en">English</option><option value="pt">Português (Brasil)</option><option value="es">Español</option><option value="fr">Français</option><option value="tr">Türkçe</option><option value="de">Deutsch</option><option value="it">Italiano</option><option value="ru">Русский</option><option value="zh">中文</option><option value="ja">日本語</option>
+</select>
+<div id="langNotice" style="font:11px Tahoma,Arial,sans-serif;color:#aaa">اختار اللغة لتغيير نصوص واجهة اللعبة فورًا</div>
 <div class="mc"><button class="pill" id="mp">⏮</button><button class="pill" id="mpl">▶</button><button class="pill" id="mn">⏭</button><input type="range" id="vol" min="0" max="1" step=".05" value=".7"></div>
 <div id="sl"></div>
 <div class="row"><button class="btn alt" id="sadd">➕ إضافة أغنية</button><button class="btn alt" id="sref">🔄</button></div>
@@ -2252,7 +2287,61 @@ window.SOYA_INGAME=()=>!!(A||G);
 <script>
 (()=>{
 'use strict';
+
 const q=id=>document.getElementById(id);
+/* واجهة متعددة اللغات: تحفظ الاختيار وتترجم النصوص الظاهرة دون تغيير منطق اللعب */
+const LANG={
+ar:{'⚙ الإعدادات':'⚙ الإعدادات','🎮 طريقة التحكم':'🎮 طريقة التحكم','الأسهم يمين وشمال':'الأسهم يمين وشمال','🌐 لغة اللعبة':'🌐 لغة اللعبة','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'اختار اللغة لتغيير نصوص واجهة اللعبة فورًا','➕ إضافة أغنية':'➕ إضافة أغنية','▶ متابعة':'▶ متابعة','✕ خروج للقائمة':'✕ خروج للقائمة','🎵 —':'🎵 —','التالي ▶':'التالي ▶','اكتب اسم المتسابق':'اكتب اسم المتسابق','اسمك':'اسمك','تعديل الاسم':'تعديل الاسم','🚪 تسجيل الخروج':'🚪 تسجيل الخروج','🎨 تعديل الشخصية':'🎨 تعديل الشخصية','اختار مركبتك':'اختار مركبتك','اختار الطريق':'اختار الطريق','طرق وعرة':'طرق وعرة','طريق لا نهائي':'طريق لا نهائي','سباق':'سباق','نفس الاتجاه':'نفس الاتجاه','اتجاهين (سيارات مقابلة)':'اتجاهين (سيارات مقابلة)','سهل':'سهل','صعب':'صعب','مستحيل':'مستحيل','عجلة القيادة':'عجلة القيادة','الأسهم':'الأسهم','إمالة الجهاز':'إمالة الجهاز','فرامل':'فرامل','بنزين':'بنزين','فرامل اليد':'فرامل اليد','زمارة':'زمارة','جاهز':'جاهز','إعادة اللعب':'إعادة اللعب','القائمة':'القائمة','سلامة العربية: 5/5':'سلامة العربية: 5/5','كم/س':'كم/س'},
+en:{'⚙ الإعدادات':'⚙ Settings','🎮 طريقة التحكم':'🎮 Controls','الأسهم يمين وشمال':'Left/right arrows','🌐 لغة اللعبة':'🌐 Game language','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Choose a language to update the game interface','➕ إضافة أغنية':'➕ Add song','▶ متابعة':'▶ Resume','✕ خروج للقائمة':'✕ Exit to menu','🎵 —':'🎵 —','التالي ▶':'Next ▶','اكتب اسم المتسابق':'Enter racer name','اسمك':'Your name','تعديل الاسم':'Edit name','🚪 تسجيل الخروج':'🚪 Log out','🎨 تعديل الشخصية':'🎨 Edit character','اختار مركبتك':'Choose your vehicle','اختار الطريق':'Choose a route','طرق وعرة':'Off-road','طريق لا نهائي':'Endless road','سباق':'Race','نفس الاتجاه':'Same direction','اتجاهين (سيارات مقابلة)':'Two-way traffic','سهل':'Easy','صعب':'Hard','مستحيل':'Impossible','عجلة القيادة':'Steering wheel','الأسهم':'Arrows','إمالة الجهاز':'Tilt device','فرامل':'Brake','بنزين':'Gas','فرامل اليد':'Handbrake','زمارة':'Horn','جاهز':'Ready','إعادة اللعب':'Retry','القائمة':'Menu','سلامة العربية: 5/5':'Car health: 5/5','كم/س':'km/h'},
+pt:{'⚙ الإعدادات':'⚙ Configurações','🌐 لغة اللعبة':'🌐 Idioma do jogo','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Escolha um idioma para atualizar a interface','➕ إضافة أغنية':'➕ Adicionar música','▶ متابعة':'▶ Continuar','✕ خروج للقائمة':'✕ Sair para o menu','🎵 —':'🎵 —','التالي ▶':'Próximo ▶','اكتب اسم المتسابق':'Digite o nome do piloto','اسمك':'Seu nome','تعديل الاسم':'Editar nome','🚪 تسجيل الخروج':'🚪 Sair da conta','🎨 تعديل الشخصية':'🎨 Editar personagem','اختار مركبتك':'Escolha seu veículo','اختار الطريق':'Escolha a pista','طرق وعرة':'Off-road','طريق لا نهائي':'Estrada infinita','سباق':'Corrida','نفس الاتجاه':'Mesmo sentido','اتجاهين (سيارات مقابلة)':'Mão dupla','سهل':'Fácil','صعب':'Difícil','مستحيل':'Impossível','عجلة القيادة':'Volante','الأسهم':'Setas','إمالة الجهاز':'Inclinar dispositivo','فرامل':'Freio','بنزين':'Acelerador','فرامل اليد':'Freio de mão','زمارة':'Buzina','جاهز':'Pronto','إعادة اللعب':'Tentar novamente','القائمة':'Menu','سلامة العربية: 5/5':'Integridade do carro: 5/5','كم/س':'km/h'},
+es:{'⚙ الإعدادات':'⚙ Ajustes','🌐 لغة اللعبة':'🌐 Idioma del juego','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Elige un idioma para actualizar la interfaz','➕ إضافة أغنية':'➕ Añadir canción','▶ متابعة':'▶ Continuar','✕ خروج للقائمة':'✕ Salir al menú','التالي ▶':'Siguiente ▶','اكتب اسم المتسابق':'Nombre del piloto','اسمك':'Tu nombre','اختار مركبتك':'Elige tu vehículo','اختار الطريق':'Elige la ruta','طرق وعرة':'Todoterreno','طريق لا نهائي':'Carretera infinita','سباق':'Carrera','نفس الاتجاه':'Mismo sentido','سهل':'Fácil','صعب':'Difícil','مستحيل':'Imposible','عجلة القيادة':'Volante','الأسهم':'Flechas','فرامل':'Freno','بنزين':'Acelerador','فرامل اليد':'Freno de mano','زمارة':'Claxon','جاهز':'Listo','إعادة اللعب':'Reintentar','القائمة':'Menú','كم/س':'km/h'},
+fr:{'⚙ الإعدادات':'⚙ Paramètres','🌐 لغة اللعبة':'🌐 Langue du jeu','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Choisissez une langue pour modifier l’interface','➕ إضافة أغنية':'➕ Ajouter une chanson','▶ متابعة':'▶ Reprendre','✕ خروج للقائمة':'✕ Retour au menu','التالي ▶':'Suivant ▶','اكتب اسم المتسابق':'Nom du pilote','اسمك':'Votre nom','اختار مركبتك':'Choisir le véhicule','اختار الطريق':'Choisir la route','طرق وعرة':'Tout-terrain','طريق لا نهائي':'Route infinie','سباق':'Course','نفس الاتجاه':'Même sens','سهل':'Facile','صعب':'Difficile','مستحيل':'Impossible','عجلة القيادة':'Volant','الأسهم':'Flèches','فرامل':'Frein','بنزين':'Accélérateur','فرامل اليد':'Frein à main','زمارة':'Klaxon','جاهز':'Prêt','إعادة اللعب':'Réessayer','القائمة':'Menu','كم/س':'km/h'},
+tr:{'⚙ الإعدادات':'⚙ Ayarlar','🌐 لغة اللعبة':'🌐 Oyun dili','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Arayüz dilini seçin','➕ إضافة أغنية':'➕ Şarkı ekle','▶ متابعة':'▶ Devam et','✕ خروج للقائمة':'✕ Menüye çık','التالي ▶':'İleri ▶','اكتب اسم المتسابق':'Yarışçı adını gir','اسمك':'Adınız','اختار مركبتك':'Aracını seç','اختار الطريق':'Rotayı seç','طرق وعرة':'Arazi','طريق لا نهائي':'Sonsuz yol','سباق':'Yarış','نفس الاتجاه':'Aynı yön','سهل':'Kolay','صعب':'Zor','مستحيل':'İmkânsız','عجلة القيادة':'Direksiyon','الأسهم':'Oklar','فرامل':'Fren','بنزين':'Gaz','فرامل اليد':'El freni','زمارة':'Korna','جاهز':'Hazır','إعادة اللعب':'Yeniden dene','القائمة':'Menü','كم/س':'km/sa'},
+de:{'⚙ الإعدادات':'⚙ Einstellungen','🌐 لغة اللعبة':'🌐 Spielsprache','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Sprache für die Spieloberfläche wählen','➕ إضافة أغنية':'➕ Lied hinzufügen','▶ متابعة':'▶ Weiter','✕ خروج للقائمة':'✕ Zum Menü','التالي ▶':'Weiter ▶','اكتب اسم المتسابق':'Fahrernamen eingeben','اسمك':'Dein Name','اختار مركبتك':'Fahrzeug wählen','اختار الطريق':'Strecke wählen','طرق وعرة':'Gelände','طريق لا نهائي':'Endlosstraße','سباق':'Rennen','نفس الاتجاه':'Gleiche Richtung','سهل':'Einfach','صعب':'Schwer','مستحيل':'Unmöglich','عجلة القيادة':'Lenkrad','الأسهم':'Pfeile','فرامل':'Bremse','بنزين':'Gas','فرامل اليد':'Handbremse','زمارة':'Hupe','جاهز':'Bereit','إعادة اللعب':'Erneut spielen','القائمة':'Menü','كم/س':'km/h'},
+it:{'⚙ الإعدادات':'⚙ Impostazioni','🌐 لغة اللعبة':'🌐 Lingua del gioco','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Scegli la lingua dell’interfaccia','➕ إضافة أغنية':'➕ Aggiungi brano','▶ متابعة':'▶ Continua','✕ خروج للقائمة':'✕ Torna al menu','التالي ▶':'Avanti ▶','اكتب اسم المتسابق':'Nome del pilota','اسمك':'Il tuo nome','اختار مركبتك':'Scegli il veicolo','اختار الطريق':'Scegli il percorso','طرق وعرة':'Fuoristrada','طريق لا نهائي':'Strada infinita','سباق':'Gara','نفس الاتجاه':'Stessa direzione','سهل':'Facile','صعب':'Difficile','مستحيل':'Impossibile','عجلة القيادة':'Volante','الأسهم':'Frecce','فرامل':'Freno','بنزين':'Acceleratore','فرامل اليد':'Freno a mano','زمارة':'Clacson','جاهز':'Pronto','إعادة اللعب':'Riprova','القائمة':'Menu','كم/س':'km/h'},
+ru:{'⚙ الإعدادات':'⚙ Настройки','🌐 لغة اللعبة':'🌐 Язык игры','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'Выберите язык интерфейса','➕ إضافة أغنية':'➕ Добавить песню','▶ متابعة':'▶ Продолжить','✕ خروج للقائمة':'✕ В меню','التالي ▶':'Далее ▶','اكتب اسم المتسابق':'Имя гонщика','اسمك':'Ваше имя','اختار مركبتك':'Выберите машину','اختار الطريق':'Выберите трассу','طرق وعرة':'Бездорожье','طريق لا نهائي':'Бесконечная дорога','سباق':'Гонка','نفس الاتجاه':'В одном направлении','سهل':'Легко','صعب':'Сложно','مستحيل':'Невозможно','عجلة القيادة':'Руль','الأسهم':'Стрелки','فرامل':'Тормоз','بنزين':'Газ','فرامل اليد':'Ручной тормоз','زمارة':'Гудок','جاهز':'Готово','إعادة اللعب':'Повторить','القائمة':'Меню','كم/س':'км/ч'},
+zh:{'⚙ الإعدادات':'⚙ 设置','🌐 لغة اللعبة':'🌐 游戏语言','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'选择界面语言','➕ إضافة أغنية':'➕ 添加歌曲','▶ متابعة':'▶ 继续','✕ خروج للقائمة':'✕ 返回菜单','التالي ▶':'下一步 ▶','اكتب اسم المتسابق':'输入车手名称','اسمك':'你的名字','اختار مركبتك':'选择车辆','اختار الطريق':'选择赛道','طرق وعرة':'越野','طريق لا نهائي':'无尽公路','سباق':'比赛','نفس الاتجاه':'同向行驶','سهل':'简单','صعب':'困难','مستحيل':'不可能','عجلة القيادة':'方向盘','الأسهم':'方向键','فرامل':'刹车','بنزين':'油门','فرامل اليد':'手刹','زمارة':'喇叭','جاهز':'就绪','إعادة اللعب':'重试','القائمة':'菜单','كم/س':'公里/小时'},
+ja:{'⚙ الإعدادات':'⚙ 設定','🌐 لغة اللعبة':'🌐 ゲーム言語','اختار اللغة لتغيير نصوص واجهة اللعبة فورًا':'表示言語を選択','➕ إضافة أغنية':'➕ 曲を追加','▶ متابعة':'▶ 続ける','✕ خروج للقائمة':'✕ メニューへ','التالي ▶':'次へ ▶','اكتب اسم المتسابق':'ドライバー名を入力','اسمك':'名前','اختار مركبتك':'車を選択','اختار الطريق':'コースを選択','طرق وعرة':'オフロード','طريق لا نهائي':'エンドレス道路','سباق':'レース','نفس الاتجاه':'同じ方向','سهل':'簡単','صعب':'難しい','مستحيل':'不可能','عجلة القيادة':'ハンドル','الأسهم':'矢印キー','فرامل':'ブレーキ','بنزين':'アクセル','فرامل اليد':'ハンドブレーキ','زمارة':'クラクション','جاهز':'準備完了','إعادة اللعب':'リトライ','القائمة':'メニュー','كم/س':'km/h'}
+};
+const langOriginals=new WeakMap();
+function applyLanguage(code){
+ const dict=LANG[code]||LANG.ar;
+ document.documentElement.lang=code==='pt'?'pt-BR':code;
+ document.documentElement.dir=code==='ar'?'rtl':'ltr';
+ document.querySelectorAll('body *').forEach(el=>{
+   if(el.id==='gameLanguage'||el.closest('#gameLanguage'))return;
+   for(const node of el.childNodes){
+     if(node.nodeType===3&&node.nodeValue.trim()){
+       if(!langOriginals.has(node))langOriginals.set(node,node.nodeValue);
+       const original=langOriginals.get(node),trim=original.trim();
+       let out=dict[trim];
+       if(!out){
+         const key=Object.keys(LANG.ar).find(k=>trim===k || trim.startsWith(k+' '));
+         if(key&&dict[key])out=dict[key]+trim.slice(key.length);
+       }
+       if(out)node.nodeValue=original.replace(trim,out);
+     }
+   }
+   for(const attr of ['placeholder','aria-label','title']){
+     if(el.hasAttribute(attr)){
+       const old=el.getAttribute('data-lang-original-'+attr)||el.getAttribute(attr);
+       if(!el.hasAttribute('data-lang-original-'+attr))el.setAttribute('data-lang-original-'+attr,old);
+       if(dict[old])el.setAttribute(attr,dict[old]);
+     }
+   }
+ });
+ const label=q('langLabel'),notice=q('langNotice');
+ if(label)label.textContent=dict['🌐 لغة اللعبة']||'🌐 Game language';
+ if(notice)notice.textContent=dict['اختار اللغة لتغيير نصوص واجهة اللعبة فورًا']||'Choose a language';
+ try{localStorage.setItem('drift_language',code)}catch(e){}
+}
+const langSelect=q('gameLanguage');
+if(langSelect){
+ try{langSelect.value=localStorage.getItem('drift_language')||'ar'}catch(e){}
+ langSelect.addEventListener('change',()=>applyLanguage(langSelect.value));
+ applyLanguage(langSelect.value);
+}
+
 const AU=new Audio();AU.preload='none';
 let list=[],cur=-1,sess=[],first=false;
 const lg=(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:v}catch(e){return d}},ls=(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}};
@@ -2290,15 +2379,23 @@ if(Array.isArray(j))for(const it of j)if(it.type==='file'&&EXT.test(it.name))out
 }catch(e){}}
 if(!okAny)return old?old.l:[];
 ls(ck,JSON.stringify({t:Date.now(),l:out}));return out}
+const TEST_SONGS=[
+{name:'تجربة 1',url:'./songs/WhatsApp%20Audio%202026-10-17%20at%2012.49.49%20AM.mpeg'},
+{name:'تجربة 2',url:'./songs/WhatsApp%20Audio%202026-10-17%20at%2012.49.14%20AM%20(1).mpeg'},
+{name:'تجربة 3',url:'./songs/WhatsApp%20Audio%202026-10-17%20at%2012.49.14%20AM%20(2).mpeg'},
+{name:'تجربة 4',url:'./songs/WhatsApp%20Audio%202026-10-17%20at%2012.49.14%20AM%20(3).mpeg'},
+{name:'تجربة 5',url:'./songs/WhatsApp%20Audio%202026-10-17%20at%2012.49.14%20AM%20(4).mpeg'},
+{name:'تجربة 6',url:'./songs/WhatsApp%20Audio%202026-10-17%20at%2012.49.14%20AM%20(5).mpeg'}
+];
 async function load(force){
 const cn=cur>=0&&list[cur]?list[cur].name:null;
-let g=[],u=[];
-try{g=await ghSongs(force)}catch(e){}
+let g=TEST_SONGS.slice(),u=[];
+try{g=g.concat(await ghSongs(force))}catch(e){}
 try{u=(await idbAll()).map(x=>({name:x.name,url:URL.createObjectURL(x.blob)}))}catch(e){}
 list=g.concat(u,sess);cur=cn?list.findIndex(x=>x.name===cn):-1;draw()}
 function draw(){
 const box=q('sl');box.innerHTML='';
-if(!list.length){box.innerHTML='<div class="none">مفيش أغاني لسه — ارفع أغاني على GitHub أو دوس إضافة أغنية</div>'}
+if(!list.length){box.innerHTML='<div class="none">اختار أغنية من القائمة أو دوس إضافة أغنية</div>'}
 list.forEach((s,i)=>{const b=document.createElement('button');b.className='pill'+(i===cur?' on':'');b.textContent='🎵 '+s.name;b.onclick=()=>play(i);box.appendChild(b)});
 q('np').textContent='🎵 '+(cur>=0&&list[cur]?list[cur].name:'—');
 q('mpl').textContent=AU.paused?'▶':'⏸'}
@@ -2331,6 +2428,10 @@ function closeS(){q('setp').classList.remove('on');window.SOYA_PAUSE&&window.SOY
 window.SOYA_SET=v=>v?openS():closeS();
 q('sres').onclick=closeS;
 q('sq').onclick=()=>{closeS();window.SOYA_QUIT&&window.SOYA_QUIT()};
+// Bind the control-choice buttons only after the settings panel exists in the DOM.
+q('sel').querySelectorAll('button[data-sm]').forEach(b=>{
+ b.addEventListener('click',()=>window.SOYA_SET_SM&&window.SOYA_SET_SM(b.dataset.sm));
+});
 q('mode').insertAdjacentHTML('beforeend','<button class="btn alt" id="mS">⚙ الإعدادات</button>');
 q('mS').onclick=openS;
 /* resume the last song on the first tap anywhere */
@@ -2746,7 +2847,7 @@ if(typeof _show==='function'){window.show=function(id){const r=_show.apply(this,
 </style>
 <div id="lobby" dir="rtl" aria-label="اللوبي الرئيسي لدرفت">
  <div class="lb-top"><div class="lb-brand">درفت <small>DRIFT · GARAGE LOBBY</small></div><button class="lb-logout" id="lbLogout">◉ تسجيل خروج</button></div>
- <nav class="lb-left"><button class="lb-tab active" id="lbHome"><span>⌂</span>الرئيسية</button><button class="lb-tab" id="lbGarage"><span>🚘</span>الجراج</button><button class="lb-tab" id="lbCharacter"><span>♟</span>الشخصية</button><button class="lb-tab" id="lbMaps"><span>🌍</span>المابات</button></nav>
+ <nav class="lb-left"><button class="lb-tab active" id="lbHome"><span>⌂</span>الرئيسية</button><button class="lb-tab" id="lbGarage"><span>🚘</span>الجراج</button><button class="lb-tab" id="lbPurchase"><span>💲</span>شراء</button><button class="lb-tab" id="lbCharacter"><span>♟</span>الشخصية</button><button class="lb-tab" id="lbMaps"><span>🌍</span>المابات</button></nav>
  <div class="lb-search"><input id="lbFriendSearch" maxlength="30" placeholder="البحث عن الأصدقاء" aria-label="البحث عن الأصدقاء"><button id="lbSearchBtn">بحث</button></div>
  <button id="lbFriendsBox" type="button" aria-expanded="false">👥 الأصدقاء <span>⌄</span></button>
  <div id="lbFriendsPanel" hidden><b>الأصدقاء</b><p>لا يوجد أصدقاء</p></div>
@@ -2756,7 +2857,7 @@ if(typeof _show==='function'){window.show=function(id){const r=_show.apply(this,
   <div class="lb-car"><svg viewBox="0 0 700 240" role="img" aria-label="سيارة داخل الجراج"><defs><linearGradient id="lbpaint" x1="0" y1="0" x2="0.2" y2="1"><stop offset="0" stop-color="#f8fbff"/><stop offset=".35" stop-color="#8ba8bf"/><stop offset=".7" stop-color="#30475b"/><stop offset="1" stop-color="#101a26"/></linearGradient><linearGradient id="lbwindow" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8cb3ca"/><stop offset="1" stop-color="#0b1723"/></linearGradient></defs><ellipse cx="350" cy="205" rx="300" ry="24" fill="#0009"/><path class="body" d="M65 157 L88 124 Q105 112 168 105 L231 57 Q253 39 294 38 L424 42 Q456 44 484 76 L531 111 L603 123 Q633 129 646 151 L638 180 Q625 192 591 193 L109 193 Q73 188 65 157Z"/><path class="glass" d="M191 103 L244 61 Q260 50 292 50 L335 51 L335 103Z"/><path class="glass" d="M348 51 L420 54 Q445 56 466 81 L488 104 L348 103Z"/><path d="M342 48 L342 178" stroke="#d6e5f0" stroke-width="3" opacity=".7"/><path d="M205 113 L485 113" stroke="#fff" stroke-width="2" opacity=".28"/><path d="M86 151 L142 144 L136 165 L80 169Z" class="lamp"/><path d="M590 150 L634 155 L624 170 L588 168Z" fill="#ff334d"/><circle class="wheel" cx="185" cy="184" r="37"/><circle class="wheel" cx="530" cy="184" r="37"/><circle cx="185" cy="184" r="17" fill="#c6d3df"/><circle cx="530" cy="184" r="17" fill="#c6d3df"/><path d="M112 177 L603 177" stroke="#e7f1ff" stroke-width="2" opacity=".45"/></svg></div>
  </div>
  <div class="lb-info"><b id="lbPlayerName">المتسابق</b><small>جاهز للدرفت؟ · اختار عربيتك وانطلق</small></div>
- <div class="lb-actions"><button class="lb-action lb-start" id="lbStart">ابدأ درفت ⟵<small>اختار الماب وابدأ القيادة</small></button><button class="lb-action lb-garage" id="lbOpenGarage">🚘 الجراج<small>عربياتك والتطويرات</small></button><button class="lb-action lb-custom" id="lbEditChar">🎨 تعديل الشخصية<small>الشكل والملابس</small></button></div>
+ <div class="lb-actions"><button class="lb-action lb-start" id="lbStart">ابدأ درفت ⟵<small>اختار الماب وابدأ القيادة</small></button><button class="lb-action lb-garage" id="lbOpenGarage">🚘 الجراج<small>عربياتك والتطويرات</small></button><button class="lb-action lb-custom" id="lbOpenPurchase">💲 شراء<small>كل العربيات اللي لسه ما اشتريتهاش</small></button><button class="lb-action lb-custom" id="lbEditChar">🎨 تعديل الشخصية<small>الشكل والملابس</small></button></div>
 </div>
 <script>
 (()=>{
@@ -2767,8 +2868,10 @@ if(typeof _show==='function'){window.show=function(id){const r=_show.apply(this,
  $('lbStart').onclick=()=>{lobby.style.display='none';window.show('mode')};
  $('lbOpenGarage').onclick=()=>{lobby.style.display='none';if(typeof openGarage==='function')openGarage();else window.show('garage')};
  $('lbGarage').onclick=$('lbOpenGarage').onclick;
+ $('lbPurchase').onclick=()=>{lobby.style.display='none';if(typeof openPurchase==='function')openPurchase()};
+ $('lbOpenPurchase').onclick=()=>{lobby.style.display='none';if(typeof openPurchase==='function')openPurchase()};
  $('lbEditChar').onclick=()=>{lobby.style.display='none';window.show('char')};$('lbCharacter').onclick=$('lbEditChar').onclick;
- $('lbMaps').onclick=$('lbStart').onclick;
+ $('lbPlate').onclick=$('lbPlateShop').onclick=()=>{if(typeof window.openPlateShop==='function')window.openPlateShop()};$('lbMaps').onclick=$('lbStart').onclick;
  $('lbHome').onclick=()=>{document.querySelectorAll('.lb-tab').forEach(b=>b.classList.remove('active'));$('lbHome').classList.add('active');$('lbNotice').textContent='أهلاً بيك في درفت'};
  $('lbLogout').onclick=()=>{lobby.style.display='none';$('logoutName').click()};
  $('lbSearchBtn').onclick=()=>{$('lbNotice').textContent=$('lbFriendSearch').value.trim()?'البحث عن الأصدقاء جاهز للربط بنظام أونلاين.':'اكتب اسم الصديق للبحث.'};
@@ -2838,134 +2941,151 @@ if(typeof _show==='function'){window.show=function(id){const r=_show.apply(this,
 </script>
 
 
-<!-- تدوير تلقائي مع اتجاه الموبايل: يدعم الطولي والعرضي بدون فرض اتجاه ثابت -->
-<style id="auto-orientation-style">
-html,body{width:100%;height:100%;min-height:100%;}
-@media (orientation:landscape) and (max-height:600px){
-  .screen{gap:8px;padding:8px;}
-  .panel{padding:12px 16px;gap:8px;max-height:96dvh;overflow-y:auto;}
-  .brand-logo{width:min(35vw,250px);max-height:24dvh;}
-  .logo{font-size:clamp(34px,9vh,72px);}
-  h2{font-size:clamp(14px,3.5vh,22px);}
-  .tag{font-size:10px;letter-spacing:3px;}
-  .btn{padding:8px 18px;font-size:12px;}
-  .card{width:clamp(90px,18vw,145px);padding:6px;font-size:10px;}
-  .card canvas{max-height:17vh;}
-  #top{padding:4px 8px;}
-  #prog{top:43px;}
-  /* أزرار قيادة أصغر في الوضع العرضي حتى لا تغطي الطريق */
-  #wheel{width:clamp(64px,14vh,88px);height:clamp(64px,14vh,88px);bottom:5px;left:6px;}
-  .pedal{width:clamp(38px,8vw,52px);height:clamp(58px,17vh,76px);bottom:6px;padding-bottom:4px;border-radius:10px;font-size:9px;letter-spacing:0;}
-  #pb{right:clamp(52px,10vw,68px);}
-  #pg{right:6px;}
-  #ph{width:54px;height:38px;right:6px;bottom:clamp(68px,22vh,88px);border-radius:11px;font-size:9px;gap:0;}
-  #ph .hb-icon{font-size:14px;}
-  #ph .hb-label{font-size:8px;}
-  #ph .hb-hint{display:none;}
-  #hornBtn{width:40px;height:40px;left:6px;bottom:clamp(70px,23vh,92px);font-size:8px;}
-  #hornBtn .hornIcon{font-size:16px;}
-  #nitroBtn{width:48px;height:46px;right:6px;bottom:clamp(112px,34vh,138px);border-radius:11px;font-size:8px;}
-  #nitroBtn .nitro-icon{font-size:15px;}
-  #nitroBtn .nitro-label{font-size:7px;}
-  #nitroBtn .nitro-track{width:35px;height:4px;}
-  #nitroBtn .nitro-key{display:none;}
-  #arr{bottom:6px;left:6px;gap:6px;}
-  #arr button{width:42px;height:42px;font-size:20px;border-width:2px;}
+<!-- Responsive layout patch: adapts menus and driving controls to the available screen -->
+<style id="responsive-screen-fit">
+:root{
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-right:env(safe-area-inset-right,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --safe-left:env(safe-area-inset-left,0px);
+  --unit:min(1vw,1vh);
 }
-</style>
-<script id="auto-orientation-handler">
-(()=>{
-  let pending=false;
-  function refreshForRotation(){
-    if(pending)return;
-    pending=true;
-    requestAnimationFrame(()=>{
-      pending=false;
-      // أعد قياس مساحة العرض والكانفاس بعد تدوير الجهاز، من غير إعادة بدء اللعبة.
-      try{if(typeof rs==='function')rs();}catch(_){}
-      try{if(typeof rs3==='function')rs3();}catch(_){}
-      try{if(typeof resizeGarage3D==='function')resizeGarage3D();}catch(_){}
-      try{window.dispatchEvent(new Event('drift:viewportchange'));}catch(_){}
-    });
-  }
-  window.addEventListener('orientationchange',refreshForRotation,{passive:true});
-  window.addEventListener('resize',refreshForRotation,{passive:true});
-  if(window.visualViewport)window.visualViewport.addEventListener('resize',refreshForRotation,{passive:true});
-  // لو المتصفح كان قد فرض قفل اتجاه سابقًا، اسمح له باتباع وضع الجهاز الطبيعي.
-  try{if(screen.orientation&&typeof screen.orientation.unlock==='function')screen.orientation.unlock();}catch(_){}
-  refreshForRotation();
-})();
-</script>
-
-
-<style id="responsive-device-fit-v2">
-/* واجهة مرنة: نفس مساحة اللعب على الكمبيوتر والموبايل، ومقاسات تحكم متناسبة مع مساحة الشاشة */
-:root{--safe-b:env(safe-area-inset-bottom,0px);--safe-l:env(safe-area-inset-left,0px);--safe-r:env(safe-area-inset-right,0px)}
-html,body{width:100%;height:100%;height:100dvh;min-height:0;overflow:hidden}
-#cv,#c3{width:100vw;height:100dvh;max-width:100vw;max-height:100dvh}
-.screen{width:100vw;height:100dvh;min-height:0;overflow:auto;overscroll-behavior:contain;padding:clamp(8px,2.5vmin,18px);gap:clamp(8px,2.2vmin,16px)}
-.panel{max-height:calc(100dvh - 16px);overflow-y:auto;padding:clamp(12px,2.8vmin,26px) clamp(12px,3vw,22px);gap:clamp(8px,2vmin,16px)}
-@media(max-width:700px){
-  .logo{font-size:clamp(38px,12vw,76px);letter-spacing:2px}
-  .brand-logo{width:min(48vw,230px);max-height:24dvh}
-  .tag{font-size:clamp(9px,2.4vw,13px);letter-spacing:2px}
-  h2{font-size:clamp(15px,4vw,22px);letter-spacing:1px}
-  .btn{font-size:clamp(12px,3.2vw,15px);padding:clamp(9px,2.3vw,13px) clamp(16px,4vw,24px);letter-spacing:1px}
-  .card{width:clamp(90px,27vw,145px);padding:7px 5px}
-  input{font-size:16px;padding:10px 12px}
-  #top{padding:calc(5px + env(safe-area-inset-top,0px)) calc(6px + var(--safe-r)) 5px calc(6px + var(--safe-l));gap:4px}
-  #sel .pill{padding:4px 6px;font-size:9px}
-  #quit{width:29px;height:29px;font-size:13px}
-  #stat{font-size:10px;letter-spacing:0}
-  #spd{font-size:clamp(22px,6vw,30px)}
-  #spd small{font-size:8px}
-  #prog{top:44px;left:7px;right:7px}
-  /* أزرار صغيرة بصريًا، مع بقاء مساحة اللمس على نفس الزر */
-  #wheel{width:clamp(76px,20vw,96px);height:clamp(76px,20vw,96px);left:calc(6px + var(--safe-l));bottom:calc(6px + var(--safe-b))}
-  .pedal{width:clamp(43px,11vw,54px);height:clamp(72px,18vh,94px);bottom:calc(7px + var(--safe-b));padding-bottom:4px;border-radius:10px;font-size:9px;letter-spacing:0;border-width:1px}
-  #pb{right:calc(53px + var(--safe-r))}
-  #pg{right:calc(6px + var(--safe-r))}
-  #ph{right:calc(6px + var(--safe-r));bottom:calc(clamp(82px,21vh,108px) + var(--safe-b));width:52px;height:40px;border-radius:10px;font-size:9px;gap:0}
-  #ph .hb-icon{font-size:15px}#ph .hb-label{font-size:8px}#ph .hb-hint{display:none}
-  #hornBtn{left:calc(7px + var(--safe-l));bottom:calc(clamp(88px,23vh,116px) + var(--safe-b));width:44px;height:44px;border-width:2px;font-size:8px;border-radius:50%}
-  #hornBtn .hornIcon{font-size:17px}
-  #nitroBtn{right:calc(6px + var(--safe-r));bottom:calc(clamp(128px,33vh,158px) + var(--safe-b));width:52px;height:50px;border-radius:11px;font-size:8px;gap:1px}
-  #nitroBtn .nitro-icon{font-size:15px}#nitroBtn .nitro-label{font-size:7px}#nitroBtn .nitro-track{width:37px;height:3px;margin-top:1px}#nitroBtn .nitro-key{display:none}
-  #arr{left:calc(6px + var(--safe-l));bottom:calc(6px + var(--safe-b));gap:5px}
-  #arr button{width:38px;height:38px;font-size:17px;border-width:2px}
+html,body{width:100%;min-width:0;min-height:100%;overscroll-behavior:none}
+#cv{width:100vw;height:100dvh}
+.screen{
+  width:100vw;height:100dvh;min-height:0;
+  padding:clamp(8px,2.2vmin,22px);
+  padding-top:max(clamp(8px,2.2vmin,22px),var(--safe-top));
+  padding-right:max(clamp(8px,2.2vmin,22px),var(--safe-right));
+  padding-bottom:max(clamp(8px,2.2vmin,22px),var(--safe-bottom));
+  padding-left:max(clamp(8px,2.2vmin,22px),var(--safe-left));
+  gap:clamp(8px,2vmin,16px);
 }
-@media(max-width:700px) and (orientation:portrait){
-  /* في الوضع الطولي نسيب منتصف الشاشة فاضي للرؤية، ونحط التحكم عند الحواف السفلية */
-  #wheel{width:clamp(72px,19vw,88px);height:clamp(72px,19vw,88px)}
-  .pedal{height:clamp(68px,13vh,82px);width:clamp(40px,10vw,48px)}
-  #pb{right:calc(48px + var(--safe-r))}
-  #ph{bottom:calc(clamp(75px,15vh,92px) + var(--safe-b))}
-  #hornBtn{bottom:calc(clamp(78px,16vh,96px) + var(--safe-b))}
-  #nitroBtn{bottom:calc(clamp(118px,24vh,142px) + var(--safe-b))}
+.panel{
+  width:min(94vw,520px);max-width:94vw;max-height:calc(100dvh - 20px);
+  overflow-y:auto;padding:clamp(14px,3vmin,26px);
+  gap:clamp(9px,2vmin,16px);border-radius:clamp(12px,2.5vmin,20px)
 }
-@media(orientation:landscape) and (max-height:700px){
-  .screen{padding:5px;gap:5px}
-  .panel{padding:7px 12px;gap:6px;max-height:calc(100dvh - 10px)}
-  .brand-logo{width:min(25vw,180px);max-height:18dvh}
-  .logo{font-size:clamp(30px,7vh,54px)}
-  h2{font-size:clamp(12px,3vh,18px)}
-  .tag{font-size:9px;letter-spacing:2px}
-  .btn{padding:6px 14px;font-size:11px;letter-spacing:1px}
-  .card{width:clamp(76px,14vw,110px);padding:4px;font-size:9px;gap:3px}
-  .card .big{font-size:25px}
-  #wheel{width:clamp(58px,13vh,76px);height:clamp(58px,13vh,76px);left:calc(5px + var(--safe-l));bottom:calc(4px + var(--safe-b))}
-  .pedal{width:clamp(34px,7vw,45px);height:clamp(52px,15vh,65px);bottom:calc(4px + var(--safe-b));padding-bottom:3px;font-size:8px;border-radius:8px}
-  #pb{right:calc(clamp(39px,8vw,51px) + var(--safe-r))}
-  #pg{right:calc(4px + var(--safe-r))}
-  #ph{right:calc(4px + var(--safe-r));bottom:calc(clamp(58px,19vh,75px) + var(--safe-b));width:43px;height:31px;border-radius:8px;font-size:8px}
-  #ph .hb-icon{font-size:12px}#ph .hb-label{font-size:7px}#ph .hb-hint{display:none}
-  #hornBtn{left:calc(5px + var(--safe-l));bottom:calc(clamp(56px,19vh,76px) + var(--safe-b));width:34px;height:34px;border-width:1px;font-size:7px}
-  #hornBtn .hornIcon{font-size:13px}
-  #nitroBtn{right:calc(4px + var(--safe-r));bottom:calc(clamp(92px,30vh,112px) + var(--safe-b));width:42px;height:40px;border-radius:8px;font-size:7px}
-  #nitroBtn .nitro-icon{font-size:12px}#nitroBtn .nitro-label{font-size:6px}#nitroBtn .nitro-track{width:29px;height:3px}#nitroBtn .nitro-key{display:none}
-  #arr{left:calc(5px + var(--safe-l));bottom:calc(4px + var(--safe-b));gap:4px}
-  #arr button{width:32px;height:32px;font-size:15px;border-width:1px}
-  #stat{font-size:9px}#spd{font-size:24px}#spd small{font-size:8px}#prog{top:39px}
+h2{font-size:clamp(15px,3.5vmin,26px);letter-spacing:clamp(.5px,.4vmin,3px)}
+.logo{font-size:clamp(42px,12vmin,120px);letter-spacing:clamp(1px,.7vmin,4px)}
+.brand-logo{width:min(72vw,42vh,360px);max-height:32dvh}
+.tag{font-size:clamp(9px,2.4vmin,16px);letter-spacing:clamp(1px,.7vmin,6px)}
+.btn{
+  max-width:94vw;min-height:clamp(40px,6vmin,54px);
+  padding:clamp(9px,1.8vmin,14px) clamp(16px,3.8vmin,34px);
+  font-size:clamp(12px,2.5vmin,16px);letter-spacing:clamp(.5px,.45vmin,3px);
+  white-space:normal;overflow-wrap:anywhere
+}
+input{font-size:clamp(15px,3vmin,20px);width:min(82vw,320px);max-width:100%;padding:clamp(10px,2vmin,14px)}
+.row{width:100%;max-width:100%;gap:clamp(6px,1.6vmin,12px)}
+.card{width:clamp(94px,27vw,170px);max-width:46vw;padding:clamp(6px,1.5vmin,10px)}
+.card canvas{max-width:100%;height:auto}
+.card .big{font-size:clamp(25px,6vmin,38px)}
+.card b{font-size:clamp(10px,2vmin,12px)}
+.pill{font-size:clamp(9px,1.9vmin,11px);padding:clamp(5px,1.2vmin,8px) clamp(7px,1.8vmin,14px);letter-spacing:0}
+#ui{width:100vw;height:100dvh;overflow:hidden}
+#top{
+  top:var(--safe-top);left:var(--safe-left);right:var(--safe-right);
+  padding:clamp(5px,1.2vmin,10px);
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+  align-items:start;gap:clamp(4px,1vmin,8px)
+}
+#top>div:first-child{min-width:0;gap:clamp(3px,.8vmin,8px)!important}
+#sel{flex-wrap:wrap;justify-content:center;max-width:min(48vw,430px);gap:3px}
+#sel .pill{font-size:clamp(8px,1.6vmin,10px);padding:clamp(4px,.9vmin,6px) clamp(5px,1.2vmin,9px)}
+#quit{width:clamp(28px,5vmin,36px);height:clamp(28px,5vmin,36px);flex:0 0 auto}
+#stat{font-size:clamp(9px,1.8vmin,12px);letter-spacing:0;overflow-wrap:anywhere}
+#dmg{font-size:clamp(8px,1.6vmin,11px);padding:3px 5px}
+#spd{font-size:clamp(22px,5.5vmin,34px)}
+#spd small{font-size:clamp(8px,1.7vmin,10px)}
+#prog{top:calc(var(--safe-top) + clamp(43px,8vmin,62px));left:var(--safe-left);right:var(--safe-right)}
+#cd{font-size:clamp(48px,18vmin,160px)}
+.pedal{
+  bottom:max(clamp(10px,2vmin,18px),var(--safe-bottom));
+  width:clamp(48px,11vmin,92px);height:clamp(76px,20vmin,150px);
+  border-radius:clamp(9px,2vmin,14px);font-size:clamp(9px,1.8vmin,12px);
+  padding-bottom:clamp(5px,1.2vmin,8px);letter-spacing:clamp(0px,.25vmin,2px)
+}
+#pg{right:calc(var(--safe-right) + clamp(8px,1.8vw,12px))}
+#pb{right:calc(var(--safe-right) + clamp(62px,14vmin,114px))}
+#ph{
+  right:calc(var(--safe-right) + clamp(8px,1.8vw,12px));
+  bottom:calc(var(--safe-bottom) + clamp(92px,25vmin,180px));
+  width:clamp(68px,16vmin,118px);height:clamp(45px,8vmin,58px);
+  border-radius:clamp(10px,2.5vmin,18px)
+}
+#ph .hb-icon{font-size:clamp(18px,4vmin,24px)}
+#ph .hb-label{font-size:clamp(9px,1.8vmin,11px)}
+#ph .hb-hint{font-size:clamp(7px,1.4vmin,8px)}
+#wheel{
+  left:calc(var(--safe-left) + clamp(8px,1.8vw,12px));
+  bottom:calc(var(--safe-bottom) + clamp(8px,1.8vmin,14px));
+  width:clamp(84px,25vmin,160px);height:clamp(84px,25vmin,160px)
+}
+#arr{left:calc(var(--safe-left) + clamp(8px,1.8vw,14px));bottom:calc(var(--safe-bottom) + clamp(12px,2.5vmin,26px));gap:clamp(6px,1.8vmin,12px)}
+#arr button{width:clamp(48px,14vmin,84px);height:clamp(48px,14vmin,84px);font-size:clamp(20px,5vmin,28px)}
+#hornBtn{
+  left:calc(var(--safe-left) + clamp(10px,2.5vw,22px));
+  bottom:calc(var(--safe-bottom) + clamp(118px,31vmin,235px));
+  width:clamp(48px,11vmin,68px);height:clamp(48px,11vmin,68px);
+  font-size:clamp(8px,1.8vmin,11px)
+}
+#hornBtn .hornIcon{font-size:clamp(20px,4.5vmin,27px)}
+#nitroBtn{
+  right:calc(var(--safe-right) + clamp(8px,1.8vw,12px));
+  bottom:calc(var(--safe-bottom) + clamp(145px,35vmin,260px));
+  width:clamp(62px,13vmin,82px);height:clamp(60px,13vmin,78px);
+  border-radius:clamp(10px,2.5vmin,18px)
+}
+#nitroBtn .nitro-icon{font-size:clamp(16px,3.5vmin,20px)}
+#nitroBtn .nitro-label{font-size:clamp(7px,1.5vmin,9px)}
+#nitroBtn .nitro-track{width:75%;max-width:64px}
+#nitroBtn .nitro-key{font-size:7px}
+#garage,#char{max-height:100dvh;overflow-y:auto}
+@media (max-width:700px){
+  .screen{justify-content:center}
+  #top{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}
+  #sel{max-width:42vw}
+  #sel .pill{white-space:normal}
+}
+@media (max-width:430px){
+  #sel{max-width:39vw;gap:2px}
+  #top{gap:3px}
+  #top>div:first-child{gap:3px!important}
+  #spd{font-size:22px}
+  #dmg{max-width:100px;line-height:1.15}
+  #ph{bottom:calc(var(--safe-bottom) + 100px)}
+  #nitroBtn{bottom:calc(var(--safe-bottom) + 158px)}
+  #hornBtn{bottom:calc(var(--safe-bottom) + 126px)}
+}
+@media (max-height:500px){
+  .screen{gap:6px;padding-top:max(4px,var(--safe-top));padding-bottom:max(4px,var(--safe-bottom))}
+  .panel{padding:8px 12px;gap:6px;max-height:calc(100dvh - 8px)}
+  .brand-logo{max-height:22dvh;width:min(42vw,180px)}
+  .logo{font-size:clamp(30px,10vh,56px)}
+  .tag{font-size:9px}
+  .btn{min-height:32px;padding:6px 14px;font-size:11px}
+  .card{width:clamp(76px,17vw,125px);padding:5px;gap:3px}
+  .card canvas{width:70px;height:76px}
+  #top{padding-top:calc(3px + var(--safe-top))}
+  #prog{top:calc(var(--safe-top) + 42px)}
+  .pedal{height:clamp(54px,22vh,90px);bottom:calc(var(--safe-bottom) + 6px)}
+  #wheel{width:clamp(64px,22vh,100px);height:clamp(64px,22vh,100px);bottom:calc(var(--safe-bottom) + 5px)}
+  #arr{bottom:calc(var(--safe-bottom) + 8px)}
+  #arr button{width:clamp(42px,12vh,58px);height:clamp(42px,12vh,58px)}
+  #ph{bottom:calc(var(--safe-bottom) + 65px);height:42px;width:68px}
+  #ph .hb-icon{font-size:16px}
+  #hornBtn{bottom:calc(var(--safe-bottom) + 65px);width:46px;height:46px}
+  #hornBtn .hornIcon{font-size:18px}
+  #nitroBtn{bottom:calc(var(--safe-bottom) + 112px);width:60px;height:56px}
+  #nitroBtn .nitro-track{height:4px}
+}
+@media (orientation:landscape) and (max-height:500px){
+  #wheel{left:calc(var(--safe-left) + 6px)}
+  #pg{right:calc(var(--safe-right) + 7px)}
+  #pb{right:calc(var(--safe-right) + 58px)}
+  #ph{right:calc(var(--safe-right) + 7px)}
+  #hornBtn{left:calc(var(--safe-left) + 8px)}
 }
 </style>
 
