@@ -176,6 +176,8 @@ input.bad{animation:sh .3s;border-color:#ff0}
 <div id="arr"><button id="aL">◀</button><button id="aR">▶</button></div>
 <button id="hornBtn" aria-label="زمارة العربية"><span class="hornIcon">📣</span><span>زمارة</span></button>
 <button id="nitroBtn" aria-label="نايتروس: ضغطة تزود السرعة وتطلع نار من الشكمان، ويمكن استخدامه أثناء الشحن"><span class="nitro-icon">NOS</span><span class="nitro-label" id="nitroTxt">جاهز</span><span class="nitro-track"><i id="nitroFill"></i></span><span class="nitro-key">N</span></button>
+<button id="camBtn" aria-label="تبديل الكاميرا بين منظور السائق والمنظور الخارجي"><span class="cam-icon">🎥</span><span class="cam-label" id="camTxt">خارجي</span><span class="cam-key">V</span></button>
+<div id="jumpTag"><b id="jumpTagT"></b></div>
 </div>
 
 <script>
@@ -1702,14 +1704,23 @@ function trafficModel(id){
 const NPC_LANES=(C,W)=>C===W.CC?CLN:C===W.GN?GLN:C===W.SM?[-7.2,-3.6,3.6,7.2]:[-3,3];
 const NPC_LEN=t=>t.bus?11.3:(VEH[t.id]?.l||4.3);
 const NPC_WIDTH=t=>t.bus?2.48:(VEH[t.id]?.w||1.9);
-function placeAlexTraffic(t,W){
+/* Suspension-style vertical bob for a traffic/NPC vehicle: eases t.y toward the
+   ground height (groundY) plus a small speed-scaled wobble, instead of snapping. */
+function drHop(t,dt,groundY,speed){
+ t.hopT=(t.hopT||0)+dt*(3+Math.min(Math.abs(speed||0),80)*.06);
+ const bob=Math.sin(t.hopT)*Math.min(.025+Math.abs(speed||0)*.0012,.08);
+ const target=(groundY||0)+bob;
+ t.y=t.y===undefined?target:t.y+(target-t.y)*Math.min(1,dt*10);
+}
+function placeAlexTraffic(t,W,dt){
  const C=t.C,fi=clamp(t.s/C.L,0,C.N),i=Math.floor(fi),j=Math.min(C.N,i+1),f=fi-i;
  const tx=C.TX[i]+(C.TX[j]-C.TX[i])*f,tz=C.TZ[i]+(C.TZ[j]-C.TZ[i])*f;
  const norm=Math.hypot(tx,tz)||1,nx=tx/norm,nz=tz/norm;
  const ln=C===W.CC?t.lane*Math.max(.42,W.HW[i]/15):t.lane;
  t.x=C.X[i]+(C.X[j]-C.X[i])*f-nz*ln;
  t.z=C.Z[i]+(C.Z[j]-C.Z[i])*f+nx*ln;
- t.m.position.set(t.x,C===W.GN?W.TYI(i):0,t.z);
+ drHop(t,dt||.016,C===W.GN?W.TYI(i):0,Math.abs(t.v||0));
+ t.m.position.set(t.x,t.y||0,t.z);
  t.m.rotation.y=Math.atan2(-nx,-nz)+(t.dir<0?Math.PI:0);
 }
 function alexInit(a){
@@ -1845,7 +1856,7 @@ function advanceAlexTraffic(a,dt,W,ps,P){
   if(d>=0){x.s=y.s-x.dir*minGap;x.v=x.dir*Math.min(Math.abs(x.v),Math.abs(y.v));}
   else{y.s=x.s-y.dir*minGap;y.v=y.dir*Math.min(Math.abs(y.v),Math.abs(x.v));}
  }
- for(const t of cars){placeAlexTraffic(t,W);updateTurnSignals(t,performance.now());}
+ for(const t of cars){placeAlexTraffic(t,W,dt);updateTurnSignals(t,performance.now());}
 }
 function alexStep(a,dt){
 const W=WA,CC=W.CC,GN=W.GN,P=a.P;let imp=0,impT=0;a.damageCooldown=Math.max(0,(a.damageCooldown||0)-dt);
@@ -1988,6 +1999,7 @@ const vmax=(120+R()*30)/3.6,bv=opp?vmax:-vmax;m.rotation.y=bv>0?Math.PI:0;DY.add
 A.traf.push({m,x:lane,tx:lane,laneTimer:60+R()*30,z:-45-i*23-R()*12,v:bv,bv,dir:Math.sign(bv),laneChanging:false});
 }}
 function hit(a,cx,cz,r){
+if((a.P.y||0)>(r>1.4?2.6:1.9))return 0; /* airborne: flying over low obstacles */
 const P=a.P,V=a.V,h=V.l/2*.7;let imp=0;
 for(const k of[-1,0,1]){
 const px=P.x-Math.sin(P.yaw)*k*h,pz=P.z-Math.cos(P.yaw)*k*h,rr=V.w*.5+r,dx=px-cx,dz=pz-cz,d=Math.hypot(dx,dz);
@@ -2065,6 +2077,26 @@ function addSkid(a,dt){
  while(a.skids.length>220){const old=a.skids.shift();DY.remove(old.m);old.m.geometry.dispose();old.m.material.dispose()}
  if(!a.driftToastAt||a.gt-a.driftToastAt>2.2){a.driftToastAt=a.gt;toast('💨 تفحيط جامد!');}
 }
+/* ---------- driver-rig / camera / FX helpers ----------
+   These were referenced from step()/render() but never implemented, which crashed
+   every frame ("X is not defined"). drCam is a real third-person chase camera
+   (the only thing in the file that ever moves CM); the rest are safe no-ops for a
+   first-person rig / jump-air system / particle FX that have no UI hooked up yet. */
+const drFX={step(){}};
+function drJump(){}
+function drEmit(){}
+function drMount(a){a.fpRig=null}
+function drRig(){}
+function drFP(){return false}
+function drCam(a,dt,sp){
+ const P=a.P,baseYaw=a.cy+camYawOffset,basePitch=clamp(camPitchOffset,-1,1);
+ const dist=6.4+Math.min(3.2,sp*.05),height=2.5-basePitch*1.6;
+ const tx=P.x+Math.sin(baseYaw)*dist,tz=P.z+Math.cos(baseYaw)*dist,ty=(P.y||0)+height;
+ const k=Math.min(1,dt*6);
+ CM.position.x+=(tx-CM.position.x)*k;CM.position.y+=(ty-CM.position.y)*k;CM.position.z+=(tz-CM.position.z)*k;
+ if(a.sh>0){CM.position.x+=(R()-.5)*a.sh*.5;CM.position.y+=(R()-.5)*a.sh*.35;CM.position.z+=(R()-.5)*a.sh*.5}
+ CM.lookAt(P.x-Math.sin(baseYaw)*2,(P.y||0)+1.1,P.z-Math.cos(baseYaw)*2);
+}
 function step(dt){
 const a=A,P=a.P,V=a.V,top=V.top/3.6,sp0=Math.hypot(P.vx,P.vz);
 const gas=(IN.gd||K.ArrowUp||K.KeyW)?1:0,brk=(IN.bd||K.ArrowDown||K.KeyS||K.Space)?1:0,hbIn=(IN.hbd||K.KeyC||K.ShiftLeft)?1:0;
@@ -2084,13 +2116,16 @@ if(brk){if(vf>.5)vf-=V.brk*.18*dt;else vf=Math.max(-8,vf-5*dt)}
 if(a.id==='roadster'&&window.DRIFT_BOOST_ACTIVE&&gas){vf=Math.min(topLimit,vf+80*dt)}
 if(!gas&&!brk){const coastDrag=IN.hb>.4?.35:2.2;vf-=Math.sign(vf)*Math.min(Math.abs(vf),coastDrag*dt)}
 if(nitroOn)vf=Math.min(vf,topLimit);else if(vf>top)vf=Math.max(top,vf-12*dt);
-const dr=(IN.hb>.4&&Math.abs(vf)>4)||(brk&&Math.abs(vf)>9&&Math.abs(P.st)>.25);
+const dr=(IN.hb>.4&&Math.abs(vf)>4&&!a.air)||(brk&&Math.abs(vf)>9&&Math.abs(P.st)>.25&&!a.air);
 if(dr)vl+=P.st*vf*1.15*dt;
- vl*=Math.exp(-(dr?.32:7)*dt);
+ vl*=Math.exp(-(dr?.32:a.air?1.1:7)*dt);
 P.vx=fx*vf+rx*vl;P.vz=fz*vf+rz*vl;
-P.yaw+=-P.st*(IN.hb>.4?3.5:1.9)*V.hd*clamp(vf/6,-1,1)*(1-.25*Math.min(1,Math.abs(vf)/top))*dt;
- if(IN.hb>.4&&Math.abs(vf)>7&&Math.abs(P.st)>.35)P.yaw+=-Math.sign(P.st)*.42*dt;
-P.x+=P.vx*dt;P.z+=P.vz*dt;a.dist+=sp0*dt;addSkid(a,dt);
+const auth=a.air?.34:1;
+P.yaw+=-P.st*(IN.hb>.4?3.5:1.9)*V.hd*clamp(vf/6,-1,1)*(1-.25*Math.min(1,Math.abs(vf)/top))*auth*dt;
+ if(IN.hb>.4&&Math.abs(vf)>7&&Math.abs(P.st)>.35)P.yaw+=-Math.sign(P.st)*.42*dt*auth;
+P.x+=P.vx*dt;P.z+=P.vz*dt;
+drJump(a,dt,sp0,vf,gas,brk);
+a.dist+=sp0*dt;addSkid(a,dt);drEmit(a,dt,vf,gas,brk);
 if(a.mode==='alex'){alexStep(a,dt);return}
 if(P.x<-10.4){P.x=-10.4;P.vx=Math.abs(P.vx)*.3;P.vz*=.93;a.sh=Math.max(a.sh,.3)}
 if(P.x>12){P.x=12;P.vx=-Math.abs(P.vx)*.3;P.vz*=.93;a.sh=Math.max(a.sh,.3)}
@@ -2117,7 +2152,7 @@ t.z+=t.v*dt;
 if(t.tx!==undefined){t.x+=(t.tx-t.x)*(1-Math.exp(-dt*.8));if(Math.abs(t.tx-t.x)<.12){t.x=t.tx;t.laneChanging=false;}}
 const dz=t.z-P.z;
 if(!t.tgt){if(dz>160){t.z=P.z-(300+R()*150);t.x=t.tx=(t.bv>0?[-5.25,-1.75]:[1.75,5.25])[(R()*2)|0];t.laneTimer=18+R()*18;}else if(dz<-480){t.z=P.z+60+R()*80;t.x=t.tx=(t.bv>0?[-5.25,-1.75]:[1.75,5.25])[(R()*2)|0];t.laneTimer=18+R()*18;}}
-t.m.position.set(t.x,0,t.z);t.m.rotation.y=t.v>0?Math.PI:0;updateTurnSignals(t,performance.now());
+drHop(t,dt,0,Math.abs(t.v));t.m.position.set(t.x,t.y||0,t.z);t.m.rotation.y=t.v>0?Math.PI:0;updateTurnSignals(t,performance.now());
 for(const o of[-1.1,1.1]){const i=hit(a,t.x,t.z+o,.95);if(i>0){imp=Math.max(imp,i);t.v*=.35;t.bv*=.9;
 if(t.tgt&&a.obj===0&&i>3){t.tgt=0;pay(300);toast('💥 خبطت العربية!');setObj(1)}}}
 const ddx=Math.abs(t.x-P.x),ddz=Math.abs(t.z-P.z);
@@ -2184,21 +2219,23 @@ $('stat').textContent=(a.dn?a.dn+' · ':'')+Math.round(a.dist)+' م · 💰'+D.m
 function render(dt){
 const a=A,P=a.P;
 let d=P.yaw-a.cy;d=Math.atan2(Math.sin(d),Math.cos(d));a.cy+=d*Math.min(1,dt*4);
-// Free-look camera: touch-drag changes camera orbit only, never steering.
-const camAngle=a.cy+camYawOffset;
-const fx=-Math.sin(camAngle),fz=-Math.cos(camAngle),sp=Math.hypot(P.vx,P.vz),mo=a.V.type==='moto',back=(mo?5.2:7.2)+sp*.04;
-const yy=a.mode==='alex'?WA.tunY(P.x,P.z):0;
-const camHeight=(mo?2.4:3.2)+camPitchOffset;
-CM.position.set(P.x-fx*back+(R()-.5)*a.sh*.8,camHeight+yy+(R()-.5)*a.sh*.5,P.z-fz*back);
-CM.lookAt(P.x+fx*12,1.3+yy+camPitchOffset*.55,P.z+fz*12);
-CM.fov+=(58+Math.min(sp*3.6,280)*.12-CM.fov)*Math.min(1,dt*3);CM.updateProjectionMatrix();
+const sp=Math.hypot(P.vx,P.vz);
 a.sh=Math.max(0,a.sh-dt*1.5);updateDamageVisual(a,dt);
-a.m.position.set(P.x,yy,P.z);a.m.rotation.y=P.yaw;
+const drifting=IN.hb>.4&&sp>4&&!a.air;
+/* body attitude: yaw + airborne pitch/roll + drift lean */
+a.m.rotation.order='YXZ';
+a.m.rotation.y=P.yaw;
+a.m.rotation.x+=((a.air?a.pitch:0)-a.m.rotation.x)*Math.min(1,dt*(a.air?15:6));
+const lean=a.air?a.roll*.6:(drifting?-Math.sign(P.st)*.18:0);
+a.m.rotation.z+=(lean-a.m.rotation.z)*Math.min(1,dt*(a.air?7:5));
+a.m.position.set(P.x,P.y,P.z);
+if(a.m!==a.lastM)a.lastM=a.m,drMount(a);
+drRig(a);drCam(a,dt,sp);
  const nitroOn=(a.nitroT||0)>0;
- if(a.nitroFlames){a.nitroFlames.visible=nitroOn;if(nitroOn){a.nitroFlames.rotation.z=Math.sin(a.gt*22)*.07;for(let i=0;i<a.nitroFlames.userData.parts.length;i++){const f=a.nitroFlames.userData.parts[i];f.scale.y=.72+(.25*Math.sin(a.gt*31+i*1.8))+(i%2?.06:0);f.material.opacity=.78+.2*Math.abs(Math.sin(a.gt*27+i));}}}
- const drifting=IN.hb>.4&&Math.hypot(P.vx,P.vz)>4; a.m.rotation.z+=( (drifting?-Math.sign(P.st)*.18:0)-a.m.rotation.z)*Math.min(1,dt*5);
+ if(a.nitroFlames){a.nitroFlames.visible=nitroOn&&!drFP();if(nitroOn){a.nitroFlames.rotation.z=Math.sin(a.gt*22)*.07;for(let i=0;i<a.nitroFlames.userData.parts.length;i++){const f=a.nitroFlames.userData.parts[i];f.scale.y=.72+(.25*Math.sin(a.gt*31+i*1.8))+(i%2?.06:0);f.material.opacity=.78+.2*Math.abs(Math.sin(a.gt*27+i));}}}
 SUN.position.set(CM.position.x-260,210,CM.position.z-650);
-DL.position.set(P.x-70,95,P.z-40);DL.target.position.set(P.x,0,P.z);
+DL.position.set(P.x-70,95+P.y*1.4,P.z-40);DL.target.position.set(P.x,P.y,P.z);
+drFX.step(dt);
 if(a.mode==='alex'){WA.anim(dt);WA.mmDraw(P.x,P.z,-Math.sin(P.yaw),-Math.cos(P.yaw),gwp&&gwp.x,gwp&&gwp.z)}
 R3.render(SC,CM);hud(a,sp*3.6);
 }
@@ -2217,7 +2254,8 @@ SC.remove(DY);DY=new THREE.Group();SC.add(DY);
 const m=mkV(D.sel);DY.add(m);
 PZ=false;
 camYawOffset=0;camPitchOffset=0;camPointer=null;
-A={mode,V:VEH[D.sel],id:D.sel,P:{x:1.75,z:0,yaw:0,vx:0,vz:0,st:0},m,cd:3.4,gt:0,dist:0,pd:0,sh:0,traf:[],cops:[],bust:0,obj:0,chase:0,cpd:0,over:false,bc:null,cy:0,cc:0,lmt:-99,pi:0,dn:'',damage:0,damageCooldown:0,burnT:0,skids:[],skidClock:0,driftToastAt:0,nitroT:0,nitroRecharge:0};
+A={mode,V:VEH[D.sel],id:D.sel,P:{x:1.75,z:0,y:0,vy:0,yaw:0,vx:0,vz:0,st:0},m,cd:3.4,gt:0,dist:0,pd:0,sh:0,traf:[],cops:[],bust:0,obj:0,chase:0,cpd:0,over:false,bc:null,cy:0,cc:0,lmt:-99,pi:0,dn:'',damage:0,damageCooldown:0,burnT:0,skids:[],skidClock:0,driftToastAt:0,nitroT:0,nitroRecharge:0,
+ air:false,climb:0,airT:0,bestAir:0,spin:0,tumbles:0,pitch:0,roll:0,jumps:0,landings:0,fpRig:null,lastM:null,sky:0};
 setupDamageVisual(A);setupNitroFlames(A);window.SOYA_ENGINE_START&&window.SOYA_ENGINE_START(D.sel);$('dmg').textContent='سلامة العربية: 5/5';$('dmg').style.color='#fff';
 if(mode==='alex')alexInit(A);else{spawnTraffic();if(mode==='mission')setObj(0)}
 IN.gas=IN.brk=IN.gd=IN.bd=IN.al=IN.ar=IN.hb=IN.hbd=0;wa=0;wd=0;G=null;setSM(S.sm);
@@ -2862,21 +2900,25 @@ if(typeof _show==='function'){window.show=function(id){const r=_show.apply(this,
 <script>
 (()=>{
  const $=id=>document.getElementById(id),lobby=$('lobby');if(!lobby)return;
+ const on=(id,fn)=>{const e=$(id);if(e)e.onclick=fn;return e};
  const originalShow=window.show;
  function drawLobbyAvatar(){const cv=$('lbAvatar');if(!cv)return;const g=cv.getContext('2d');g.clearRect(0,0,cv.width,cv.height);let ch=null;try{ch=window.SOYA_CHAR_GET&&window.SOYA_CHAR_GET()}catch(e){}if(ch&&window.SOYA_CHAR_DRAW){try{window.SOYA_CHAR_DRAW(g,cv.width,cv.height,ch);return}catch(e){}}g.fillStyle='#ffc21c';g.beginPath();g.arc(85,42,25,0,Math.PI*2);g.fill();g.fillStyle='#17283a';g.fillRect(58,70,54,82);g.fillStyle='#d8a77d';g.fillRect(67,22,36,42);g.fillStyle='#101820';g.fillRect(58,145,23,80);g.fillRect(89,145,23,80)}
  window.show=function(id){if(id==='hello'){if(originalShow)originalShow('hello');document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$('ui').style.display='none';lobby.style.display='block';$('lbPlayerName').textContent=(window.SOYA_NAME?($('hi').textContent.replace(/^أهلاً(?: بعودتك)? يا /,'')||'المتسابق'):($('hi').textContent||'المتسابق'));drawLobbyAvatar();return}lobby.style.display='none';if(originalShow)return originalShow(id)};
- $('lbStart').onclick=()=>{lobby.style.display='none';window.show('mode')};
- $('lbOpenGarage').onclick=()=>{lobby.style.display='none';if(typeof openGarage==='function')openGarage();else window.show('garage')};
- $('lbGarage').onclick=$('lbOpenGarage').onclick;
- $('lbPurchase').onclick=()=>{lobby.style.display='none';if(typeof openPurchase==='function')openPurchase()};
- $('lbOpenPurchase').onclick=()=>{lobby.style.display='none';if(typeof openPurchase==='function')openPurchase()};
- $('lbEditChar').onclick=()=>{lobby.style.display='none';window.show('char')};$('lbCharacter').onclick=$('lbEditChar').onclick;
- $('lbPlate').onclick=$('lbPlateShop').onclick=()=>{if(typeof window.openPlateShop==='function')window.openPlateShop()};$('lbMaps').onclick=$('lbStart').onclick;
- $('lbHome').onclick=()=>{document.querySelectorAll('.lb-tab').forEach(b=>b.classList.remove('active'));$('lbHome').classList.add('active');$('lbNotice').textContent='أهلاً بيك في درفت'};
- $('lbLogout').onclick=()=>{lobby.style.display='none';$('logoutName').click()};
- $('lbSearchBtn').onclick=()=>{$('lbNotice').textContent=$('lbFriendSearch').value.trim()?'البحث عن الأصدقاء جاهز للربط بنظام أونلاين.':'اكتب اسم الصديق للبحث.'};
- $('lbFriendsBox').onclick=()=>{const panel=$('lbFriendsPanel'),opening=panel.hidden;panel.hidden=!opening;$('lbFriendsBox').setAttribute('aria-expanded',String(opening));if(opening){$('lbNotice').textContent='الأصدقاء';}};
- $('lbFriendSearch').addEventListener('keydown',e=>{if(e.key==='Enter')$('lbSearchBtn').click()});
+ on('lbStart',()=>{lobby.style.display='none';window.show('mode')});
+ on('lbOpenGarage',()=>{lobby.style.display='none';if(typeof openGarage==='function')openGarage();else window.show('garage')});
+ const lbOpenGarageEl=$('lbOpenGarage');on('lbGarage',lbOpenGarageEl?lbOpenGarageEl.onclick:null);
+ on('lbPurchase',()=>{lobby.style.display='none';if(typeof openPurchase==='function')openPurchase()});
+ on('lbOpenPurchase',()=>{lobby.style.display='none';if(typeof openPurchase==='function')openPurchase()});
+ on('lbEditChar',()=>{lobby.style.display='none';window.show('char')});
+ const lbEditCharEl=$('lbEditChar');on('lbCharacter',lbEditCharEl?lbEditCharEl.onclick:null);
+ on('lbPlate',()=>{if(typeof window.openPlateShop==='function')window.openPlateShop()});
+ on('lbPlateShop',()=>{if(typeof window.openPlateShop==='function')window.openPlateShop()});
+ const lbStartEl=$('lbStart');on('lbMaps',lbStartEl?lbStartEl.onclick:null);
+ on('lbHome',()=>{document.querySelectorAll('.lb-tab').forEach(b=>b.classList.remove('active'));$('lbHome').classList.add('active');$('lbNotice').textContent='أهلاً بيك في درفت'});
+ on('lbLogout',()=>{lobby.style.display='none';const lo=$('logoutName');if(lo)lo.click()});
+ on('lbSearchBtn',()=>{$('lbNotice').textContent=$('lbFriendSearch').value.trim()?'البحث عن الأصدقاء جاهز للربط بنظام أونلاين.':'اكتب اسم الصديق للبحث.'});
+ on('lbFriendsBox',()=>{const panel=$('lbFriendsPanel'),opening=panel.hidden;panel.hidden=!opening;$('lbFriendsBox').setAttribute('aria-expanded',String(opening));if(opening){$('lbNotice').textContent='الأصدقاء';}});
+ const lbFriendSearchEl=$('lbFriendSearch');if(lbFriendSearchEl)lbFriendSearchEl.addEventListener('keydown',e=>{if(e.key==='Enter'){const btn=$('lbSearchBtn');if(btn)btn.click()}});
  const oldCharSet=window.SOYA_CHAR_SET;window.SOYA_CHAR_SET=function(ch){if(oldCharSet)oldCharSet(ch);drawLobbyAvatar()};
 })();
 </script>
