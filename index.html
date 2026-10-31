@@ -2755,6 +2755,12 @@ if(id!=='tuktuk'&&V.type!=='moto'){
 return addTurnSignals(g,V.w||1.8,V.l||4.1)}
 function car(k,col,w,l){return addPl(buildModel(k==='jeep'?SP.jeep:k==='van'?SP.microbus:SP.toyota,col,w,l),l,.48,false)}
 function moto(col){return buildModel({nj:1},col)}
+/* V6 street life: palms, urban trees, pedestrian animation, non-graphic reactions, heritage models.
+ * Taxi Alexandria source files (original Babylon.js module, Vite main, UI styles)
+ * are included in the companion ZIP under original_taxi/. The original RealCity
+ * data files city/index.json, city/graph.json, city/places.json, city/tiles/*.json
+ * were not supplied. Therefore this active 3D map remains Drift's independently
+ * generated scene and is NOT represented as a completed asset-for-asset transfer. */
 /* ================= ALEXANDRIA MAP (the standalone map, variable-lane corniche) ================= */
 const CH=18.75,SWO=CH+4.2,WL=CH+4.6; /* corniche MAX half-width (5 lanes each way), sidewalk edge, sea wall. Actual asphalt width changes by area (see LANES block in buildAlex) */
 const TID=['p504','p504','p504','p504','microbus','microbus','lada','suzuki','toyota','fiat2','jeep','junk','tuktuk','scooter'];
@@ -2766,9 +2772,9 @@ const MC={};
 const LM=(c,e)=>{const k=c+'|'+(e||'');return MC[k]||(MC[k]=new THREE.MeshLambertMaterial({color:c,emissive:e||'#000000'}))};
 const RM=o=>new THREE.MeshLambertMaterial(Object.assign({side:THREE.DoubleSide},o));
 SC.background=tex(8,256,(x,w,h)=>{const g=x.createLinearGradient(0,0,0,h);[[0,'#2f78d0'],[.5,'#86bff0'],[.82,'#d9eaf6'],[1,'#f3eedd']].forEach(s=>g.addColorStop(s[0],s[1]));x.fillStyle=g;x.fillRect(0,0,w,h)});
-SC.fog=new THREE.Fog('#cfe0ec',140,860);
-SC.add(new THREE.HemisphereLight('#d6eaff','#7a755f',.85));
-const DLx=new THREE.DirectionalLight('#fff0d2',1.1);DLx.position.set(-80,100,-40);SC.add(DLx);SC.add(DLx.target);
+SC.fog=new THREE.Fog('#a6a9ad',180,1100);
+SC.add(new THREE.HemisphereLight('#b4d8f5','#675e4c',.83));
+const DLx=new THREE.DirectionalLight('#fff0d2',1.35);DLx.position.set(-80,100,-40);SC.add(DLx);SC.add(DLx.target);
 const SUNx=new THREE.Mesh(new THREE.SphereGeometry(24,16,12),new THREE.MeshBasicMaterial({color:'#fff6d0',fog:false}));SC.add(SUNx);
 const DYx=new THREE.Group();SC.add(DYx);
 
@@ -2799,7 +2805,7 @@ else if(st===3){gl(36,14,56,70);c.fillStyle='#7d776d';c.fillRect(63,14,3,70);c.f
 else if(st===4){c.fillStyle='#6d6860';c.fillRect(0,30,128,68);gl(0,34,128,60);c.fillStyle='#6d6860';for(let x=0;x<128;x+=32)c.fillRect(x,34,3,60)}
 else{gl(0,0,128,128);c.globalAlpha=.55;c.fillStyle=wall;c.fillRect(0,0,128,128);c.globalAlpha=1;c.strokeStyle='#dfe8ee';c.lineWidth=3;c.strokeRect(0,0,128,128);c.beginPath();c.moveTo(64,0);c.lineTo(64,128);c.stroke()}
 c.fillStyle='rgba(0,0,0,.10)';c.fillRect(0,122,128,6)})}
-const WC=['#efe6d2','#d9c7a3','#e8d0c0','#cfd6dc','#f4efe4','#c7a98a','#e3dccb','#b9c4cc','#dccfb0','#f0d9c4'],STY=[0,1,2,3,4,0,3,2,1,4,3,0,2,1];
+const WC=['#e5d9c0','#cdb998','#ddc7ae','#b6a695','#ebe1cb','#c9b394','#ddd1be','#a6b9bf','#d6c1a3','#e9d0b5'],STY=[0,1,3,3,0,1,3,2,0,3,1,0,3,1];
 const WM=STY.map((s,j)=>new THREE.MeshLambertMaterial({map:wtex(WC[j%10],s)}));
 const GM=['#355f7c','#4a7a8c','#6b7f99'].map(g=>new THREE.MeshLambertMaterial({map:wtex(g,5)}));
 
@@ -2857,21 +2863,27 @@ const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32Bu
 function ribbonVY(C,fa,fb,fya,fyb,mat,vs,i0,i1){const pos=[],uv=[],ix=[];
 for(let i=i0;i<=i1;i++){const nx=-C.TZ[i],nz=C.TX[i],a=fa(i),b=fb(i);pos.push(C.X[i]+nx*a,fya(i),C.Z[i]+nz*a,C.X[i]+nx*b,fyb(i),C.Z[i]+nz*b);const v=i*C.L/vs;uv.push(0,v,1,v);if(i>i0){const k=(i-i0)*2;ix.push(k-2,k-1,k,k-1,k+1,k)}}
 const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));g.setIndex(ix);g.computeVertexNormals();SC.add(new THREE.Mesh(g,mat))}
-const rt=k=>tex(k==='cor'?512:256,256,(c,w,h)=>{c.fillStyle='#3b3c41';c.fillRect(0,0,w,h);for(let i=0;i<3500;i++){c.fillStyle=R()>.5?'rgba(255,255,255,.05)':'rgba(0,0,0,.09)';c.fillRect(R()*w,R()*h,2,2)}
+const rt=k=>tex(k==='cor'?512:256,256,(c,w,h)=>{c.fillStyle='#292a30';c.fillRect(0,0,w,h);for(let i=0;i<3500;i++){c.fillStyle=R()>.5?'rgba(255,255,255,.05)':'rgba(0,0,0,.09)';c.fillRect(R()*w,R()*h,2,2)}
 c.fillStyle='#ececec';c.fillRect(4,0,4,h);c.fillRect(w-8,0,4,h);
 if(k==='cor'){c.fillStyle='#f2c200';c.fillRect(w/2-5,0,3,h);c.fillRect(w/2+2,0,3,h);c.fillStyle='#ececec';for(const f of[1,2,3,5,6,7])c.fillRect(w*f/8-2,0,4,100)}
 else if(k==='gan'){c.fillStyle='#f2c200';c.fillRect(w/2-5,0,3,h);c.fillRect(w/2+2,0,3,h);c.fillStyle='#ececec';for(const X of[w/4,w*.75])c.fillRect(X-2,0,4,100)}
 else{c.fillStyle='#ececec';c.fillRect(w/2-2,0,4,100)}});
 /* corniche asphalt texture for n total lanes (even n = double yellow in the middle, odd n = dashed only) */
-const rtn=n=>tex(512,256,(c,w,h)=>{c.fillStyle='#3b3c41';c.fillRect(0,0,w,h);for(let i=0;i<3500;i++){c.fillStyle=R()>.5?'rgba(255,255,255,.05)':'rgba(0,0,0,.09)';c.fillRect(R()*w,R()*h,2,2)}
+const rtn=n=>tex(512,256,(c,w,h)=>{c.fillStyle='#292a30';c.fillRect(0,0,w,h);for(let i=0;i<3500;i++){c.fillStyle=R()>.5?'rgba(255,255,255,.05)':'rgba(0,0,0,.09)';c.fillRect(R()*w,R()*h,2,2)}
 c.fillStyle='#ececec';c.fillRect(4,0,4,h);c.fillRect(w-8,0,4,h);
 for(let k=1;k<n;k++){if(n%2===0&&k===n/2){c.fillStyle='#f2c200';c.fillRect(w/2-5,0,3,h);c.fillRect(w/2+2,0,3,h)}else{c.fillStyle='#ececec';c.fillRect(w*k/n-2,0,4,100)}}});
 const po={polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2};
 const mCor=RM({map:rt('cor')}),mGan=RM(Object.assign({map:rt('gan')},po)),mCon=RM(Object.assign({map:rt('con')},po));
-const swk=RM({color:'#b4b1a7'}),wallM=RM({color:'#c9c6bc'}),curbM=RM({color:'#d7d4ca'});
+const taxiPaverTex=tex(256,256,(c,w,h)=>{c.fillStyle='#8e8d90';c.fillRect(0,0,w,h);
+for(let j=0;j<8;j++)for(let i=0;i<8;i++){
+ const x=i*32+(j%2?16:0),y=j*32;
+ c.fillStyle=(i+j)%3===0?'#a4a2a7':(i+j)%3===1?'#929099':'#82838b';c.fillRect(x+1,y+1,30,30);
+ c.fillStyle='rgba(235,234,228,.23)';c.fillRect(x+2,y+2,28,2);c.fillStyle='rgba(29,28,38,.28)';c.fillRect(x+2,y+28,28,2);
+}},1,1);
+const swk=RM({map:taxiPaverTex,color:'#ffffff'}),wallM=RM({color:'#c9c6bc'}),curbM=RM({color:'#d0c2a4'});
 /* sea + land */
 let mx=0,mz=0;for(let i=0;i<=CC.N;i+=10){mx+=CC.X[i];mz+=CC.Z[i]}mx/=(CC.N/10+1);mz/=(CC.N/10+1);
-const sea=new THREE.Mesh(new THREE.PlaneGeometry(16000,16000),new THREE.MeshLambertMaterial({map:tex(128,128,(x,w,h)=>{x.fillStyle='#1f84b8';x.fillRect(0,0,w,h);for(let i=0;i<260;i++){x.fillStyle=R()>.5?'rgba(255,255,255,.10)':'rgba(0,40,90,.12)';x.fillRect(R()*w,R()*h,10+R()*14,2)}},90,90),clippingPlanes:SEACLIP,clipIntersection:true}));
+const sea=new THREE.Mesh(new THREE.PlaneGeometry(16000,16000),new THREE.MeshLambertMaterial({map:tex(128,128,(x,w,h)=>{x.fillStyle='#216f9c';x.fillRect(0,0,w,h);for(let i=0;i<260;i++){x.fillStyle=R()>.5?'rgba(255,255,255,.10)':'rgba(0,40,90,.12)';x.fillRect(R()*w,R()*h,10+R()*14,2)}},90,90),clippingPlanes:SEACLIP,clipIntersection:true}));
 sea.rotation.x=-Math.PI/2;sea.position.set(mx,-.6,mz);SC.add(sea);
 const GRM=RM({color:'#9a978a'});
 {const f3=[T0,(T0+T1)>>1,T1].map(j=>nearIdx(CC,GN.X[j],GN.Z[j])),lo=Math.max(0,Math.min(...f3)-30),hi=Math.min(CC.N,Math.max(...f3)+30);
@@ -2993,19 +3005,65 @@ for(let k=-4;k<=4;k++)bp(B,LM('#5b7f94'),.4,5,2.2,13.4,6,k*6)}
 {/* Bibliotheca */
 const B=LB(CC,IP[11],-52,40,'مكتبة الإسكندرية','BIBLIOTHECA ALEXANDRINA',52);
 cp(B,LM('#c9c2b0'),34,34,.3,0,.2,0,40);cp(B,LM('#b9ad94'),28,28,22,0,11,0,40);cp(B,LM('#6f9fbf'),29,29,3,0,23.5,0,40);cp(B,LM('#2b6f9c'),24,24,.4,0,25.2,0,40);bp(B,LM('#8e8472'),3,12,56,-27,6,0)}
-{/* Qaitbay citadel on its own platform */
-const a=at(CC,IP[15],87),B=LB(CC,IP[15],87,52,'قلعة قايتباي','QAITBAY CITADEL',58);
-cp(B,LM('#e0cf9f'),52,52,1.2,0,-.2,0,40);bp(B,stn,50,10,50,0,5,0);
-for(const x of[-1,1])for(const z of[-1,1])cp(B,stn2,5.5,6,15,x*25,7.5,z*25,14);
-bp(B,stn,26,14,26,0,17,0);bp(B,stn2,12,16,12,0,32,0);bp(B,stn,13.5,1.5,13.5,0,40.8,0);cp(B,LM('#ffe9a8','#ffe9a8'),2.4,2.4,5,0,43.6,0,10);
-const cs=lin(CC.X[IP[15]]-CC.TZ[IP[15]]*(WL+.4),CC.Z[IP[15]]+CC.TX[IP[15]]*(WL+.4),a.x,a.z);ribbon(cs,[-6,.0],[6,.0],RM({color:'#d8c79a'}),10);
-QB={x:a.x,z:a.z,s:cs}}
-{/* Abu El Abbas mosque */
-const B=LB(CC,IP[16],-46,26,'مسجد أبو العباس المرسي','ABU EL-ABBAS MOSQUE',60),cr=LM('#efe4c8');
-bp(B,cr,34,12,34,0,6,0);bp(B,LM('#d7caa6'),35,1,35,0,12.5,0);
-const dome=(r,x,y,z)=>part(new THREE.SphereGeometry(r,14,8,0,Math.PI*2,0,Math.PI/2),cr,B,x,y,z);
-dome(10,0,13,0);for(const x of[-1,1])for(const z of[-1,1])dome(4,x*12,13,z*12);
-cp(B,cr,1.6,2.2,44,15,22,-15);cp(B,gold,2.8,2.8,.8,15,32,-15);cp(B,cr,.2,1.6,7,15,48,-15)}
+{/* Qaitbay Citadel — square Mamluk fort on its own promontory (original procedural geometry) */
+const a=at(CC,IP[15],87),B=LB(CC,IP[15],87,52,'قلعة قايتباي','QAITBAY CITADEL',59);
+const qStone=RM({map:tex(512,512,(c,w,h)=>{
+ c.fillStyle='#d0bd96';c.fillRect(0,0,w,h);
+ for(let y=0;y<h;y+=28){for(let x=-28+(y/28%2)*28;x<w;x+=56){
+  const shade=((Math.sin(x*2.2+y*.6)*43758)%1+1)%1;
+  c.fillStyle=shade>.72?'#d7c69f':shade<.25?'#c0ac88':'#cbb893';c.fillRect(x+1,y+1,54,26);
+  c.strokeStyle='rgba(59,49,35,.25)';c.lineWidth=2;c.strokeRect(x+.6,y+.6,55,27);
+  if(shade>.84){c.strokeStyle='rgba(99,74,47,.16)';c.beginPath();c.moveTo(x+9,y+4);c.lineTo(x+19,y+19);c.stroke()}
+ }}for(let k=0;k<2400;k++){const x=Math.random()*w,y=Math.random()*h;c.fillStyle=k%3?'rgba(70,55,36,.055)':'rgba(255,244,211,.10)';c.fillRect(x,y,2,2)}
+}),color:'#ffffff'}),qDark=LM('#443d36'),qShade=LM('#a18e70'),qCream=LM('#dec9a2'),qWood=LM('#4a3427');
+cp(B,LM('#d6c7a8'),53,53,.7,0,-.27,0,42);
+bp(B,qStone,49,3.2,48,0,1.65,0);
+// Four perimeter curtain walls, entrance opening on the south side.
+for(const sx of [-1,1])bp(B,qStone,2.8,11.5,48,sx*23.6,8.1,0);
+bp(B,qStone,48,11.5,2.8,0,8.1,23.6);
+for(const sx of [-1,1])bp(B,qStone,18.3,11.5,2.8,sx*14.9,8.1,-23.6);
+// Merlons arranged along all four battlements.
+for(let i=-21;i<=21;i+=4.5){
+ for(const zz of[-23.6,23.6])bp(B,qStone,2.4,2.3,2.6,i,15.0,zz);
+ for(const xx of[-23.6,23.6])bp(B,qStone,2.6,2.3,2.4,xx,15.0,i);
+}
+// Eight-sided corner turrets, projecting slightly beyond the walls.
+for(const xx of[-22.6,22.6])for(const zz of[-22.6,22.6]){
+ cp(B,qStone,4.9,5.5,16,xx,8.2,zz,8);
+ cp(B,qCream,5.4,5.4,1.1,xx,16.8,zz,8);
+ for(let k=0;k<8;k++){const t=k*Math.PI/4;bp(B,qStone,2,.98,1.45,xx+Math.sin(t)*4.7,17.8,zz+Math.cos(t)*4.7,t)}
+ for(let k=0;k<5;k++){const yy=4.3+k*2.25;bp(B,qDark,.14,1.1,.52,xx+5.02,yy,zz)}
+}
+// Central keep with strong lower mass, small arched openings and upper lookout.
+bp(B,qStone,24,17,25,0,16,2);bp(B,qStone,16,14,17,0,31,2);
+for(let f=0;f<5;f++)for(const zz of[-7,-2,3,8]){
+ const yy=11+f*5.1;
+ bp(B,qDark,.2,2.25,1.0,12.22,yy,zz);
+ bp(B,qShade,.26,.35,1.45,12.25,yy+1.25,zz);
+}
+for(let f=0;f<3;f++)for(const zz of[-5,1,7])bp(B,qDark,.2,2.1,1.0,-8.18,27+f*3.8,zz);
+for(let z=-7;z<=10;z+=3.6)for(const xx of[-8.5,8.5])bp(B,qStone,2.3,2.1,2.0,xx,39.15,z);
+for(let x=-8;x<=8;x+=3.5)for(const zz of[-6.7,10.7])bp(B,qStone,2.1,2.1,2.1,x,39.15,zz);
+// Heavy gate, stone arch outline, and entrance steps.
+bp(B,qWood,10.6,8,.32,0,4.2,-25.12);
+for(const xx of[-5.7,5.7])bp(B,qCream,.72,8.9,.95,xx,4.5,-25.4);
+bp(B,qCream,12.2,.8,1.15,0,9.3,-25.4);
+for(let k=0;k<4;k++)bp(B,qCream,12,.25,2.2,0,.18+k*.12,-28.4+k*1.5);
+const cs=lin(CC.X[IP[15]]-CC.TZ[IP[15]]*(WL+.4),CC.Z[IP[15]]+CC.TX[IP[15]]*(WL+.4),a.x,a.z);
+ribbon(cs,[-6,.0],[6,.0],RM({color:'#d8c79a'}),10);QB={x:a.x,z:a.z,s:cs}}
+{/* Abu al-Abbas al-Mursi: cream stone mosque, arcades, turquoise domes, minarets */
+const B=LB(CC,IP[16],-46,30,'مسجد أبو العباس المرسي','ABU EL-ABBAS MOSQUE',62);
+const cr=LM('#eee1c2'),gr=LM('#cbb88f'),turq=LM('#9bb2ad'),dark=LM('#30494e');
+bp(B,cr,40,15,38,0,7.5,0);bp(B,gr,41,1,39,0,15.5,0);
+const dome=(r,x,y,z)=>part(new THREE.SphereGeometry(r,18,10,0,Math.PI*2,0,Math.PI/2),turq,B,x,y,z);
+dome(10,0,16,0);for(const x of[-1,1])for(const z of[-1,1])dome(4,x*12,16,z*10);
+for(let k=-3;k<=3;k++){const z=k*4.5;bp(B,dark,.12,5,2.25,-20.1,5.3,z);bp(B,gr,.22,.6,3.0,-20.2,8.4,z)}
+for(const x of[-14,14])for(const z of[-14,14]){
+ cp(B,cr,1.45,2.1,42,x,21.5,z,10);cp(B,gr,2.7,2.7,.6,x,36,z,12);
+ cp(B,turq,2.1,2.1,1.1,x,43.2,z,12);cp(B,cr,.3,.6,4.1,x,46,z,10);
+}
+for(const x of[-15,15])for(const z of[-12,0,12]){bp(B,gr,4.0,.55,1.0,x,3.1,z)}
+}
 {/* Ras El Tin lighthouse */
 const B=LB(CC,Math.min(CC.N,IP[18]+30),-26,10,'فنار رأس التين','RAS EL TIN',48);
 cp(B,wh,3,4.2,36,0,18,0);cp(B,LM('#c0392b'),3.1,3.6,5,0,25,0);cp(B,LM('#ffe9a8','#ffe9a8'),2.2,2.2,3,0,37.5,0,10);cp(B,LM('#c0392b'),.1,2.6,3,0,40.5,0,10)}
@@ -3032,6 +3090,42 @@ part(new THREE.CylinderGeometry(64,64,12,40,1,true),new THREE.MeshLambertMateria
 cp(B,LM('#3f8a3a'),52,52,.3,0,.15,0,36);cp(B,LM('#e9e9e9'),10,10,.4,0,.2,0,24);
 for(const x of[-1,1])for(const z of[-1,1]){cp(B,LM('#8f9298'),.8,1,34,x*70,17,z*70,6);bp(B,LM('#fffbe0','#fffbe0'),7,2,3,x*70,35,z*70)}
 labx('ستاد الإسكندرية','ALEXANDRIA STADIUM',cx,48,cz,1.2)}
+/* Additional Alexandrian civic and historical landmarks, positioned approximately. */
+{/* Kom el-Dikka Roman Theatre: semicircular limestone seating and small archaeological court */
+ const B=LB(CC,Math.max(4,IP[12]-17),-172,39,'المسرح الروماني','KOM EL DIKKA',49),sand=LM('#d8c3a1'),stone=LM('#b7a78d');
+ bp(B,sand,70,.6,57,0,.3,0);for(let row=0;row<8;row++){
+  const radius=8+row*2.8;
+  for(let k=0;k<22;k++){
+   const ag=Math.PI*(.12+k/21*.76),x=Math.cos(ag)*radius,z=Math.sin(ag)*radius-11;
+   bp(B,(k+row)%3===0?stone:sand,2.8,.65,1.7,x,.5+row*.45,z,-ag);
+  }
+ }
+ for(let x=-1;x<=1;x++)bp(B,stone,3,6.8,3,x*11,3.4,-7);
+}
+{/* Alexandria National Museum: traditional urban palace with balanced windows and portico */
+ const B=LB(CC,IP[10]+5,-190,30,'متحف الإسكندرية القومي','ALEXANDRIA NATIONAL MUSEUM',43),cream2=LM('#d6bb92');
+ bp(B,cream2,42,17,29,0,8.5,0);bp(B,LM('#9d7e62'),43,.9,30,0,17.4,0);
+ for(let f=0;f<3;f++)for(let z=-13;z<=13;z+=6.2){bp(B,LM('#31434d'),.16,3.1,2.45,-21.13,4.1+f*5.2,z);bp(B,LM('#e8dcc9'),.25,.42,2.8,-21.3,5.85+f*5.2,z)}
+ for(let zz=-8;zz<=8;zz+=8)cp(B,LM('#e9d8b8'),.6,.75,8,-22,4.3,zz,10);
+ bp(B,LM('#bdb09c'),11,.85,20,-23,9.0,0);
+}
+{/* Sidi Gaber railway station: station hall and covered platforms */
+ const C=GN,i=nearIdx(C,CC.X[IP[8]],CC.Z[IP[8]]),B=LB(C,i,-72,30,'محطة سيدي جابر','SIDI GABER STATION',44);
+ bp(B,LM('#d9c9aa'),55,15,28,0,7.5,0);bp(B,LM('#87765e'),57,1.2,31,0,15.7,0);
+ for(let z=-20;z<=20;z+=8)bp(B,LM('#416075'),.2,5,4.4,-27.68,5,z);
+ bp(B,LM('#334d65'),12,.8,47,-29,9.6,0);for(let z=-21;z<=21;z+=7)bp(B,LM('#c5b58f'),.7,9,.7,-32,4.5,z);
+}
+{/* Alexandria Opera House (Sayed Darwish): Egyptian classical stone facade */
+ const B=LB(CC,IP[12]+8,-125,25,'دار أوبرا الإسكندرية','SAYED DARWISH THEATRE',44);
+ bp(B,LM('#d9c5a8'),35,15,28,0,7.5,0);bp(B,LM('#a58b6a'),36,1.2,30,0,15.7,0);
+ for(let z=-10;z<=10;z+=5){cp(B,LM('#e5d5b7'),.52,.67,9,-17.7,5.4,z,10);bp(B,LM('#242b33'),.1,4,2.4,-18.24,6.2,z)}
+ bp(B,LM('#c1ad8c'),6.4,4.6,26,0,19.0,0);bp(B,LM('#7d634e'),38,.75,33,0,21.65,0);
+}
+{/* Coastal fishermen's market: shaded fish stalls and low promenade shops */
+ const B=LB(CC,IP[16]+15,-115,22,'سوق بحري','BAHARI MARKET',30);
+ bp(B,LM('#d7ccb3'),24,5.7,45,0,2.85,0);
+ for(let z=-18;z<=18;z+=7){bp(B,LM('#214b68'),.3,2.25,5.6,-12.2,1.55,z);bp(B,LM('#b83c28'),3.6,.32,6.8,-14.0,3.3,z)}
+}
 {/* ===== 45 tunnel: lamps, side walls (colliders), label ===== */
 for(let j=T0+TR;j<=T0+TR+TF;j+=3)for(const o of[-3.6,3.6]){const p=at(GN,j,o);add(GB(.5,.12,1.4),LM('#fff3b0','#fff3b0'),MX(p.x,-.35,p.z,p.ry))}
 for(let j=T0;j<=T1;j++)for(const o of[-10,10]){const p=at(GN,j,o);addC(p.x,p.z,3.3)}
@@ -3098,7 +3192,12 @@ const DEST=[
 ['مكتبة الإسكندرية','#c9c2b0',lp(CC,IP[11],5.6)],
 ['محطة الرمل','#2a9df4',lp(CC,IP[12],5.6)],
 ['قلعة قايتباي','#e0cf9f',lp(CC,IP[15],5.6)],
-['بحري (أبو العباس)','#ffffff',lp(CC,IP[16],5.6)]
+['بحري (أبو العباس)','#ffffff',lp(CC,IP[16],5.6)],
+['المسرح الروماني','#d9bd91',lp(CC,Math.max(3,IP[12]-17),5.6)],
+['متحف الإسكندرية القومي','#d5b786',lp(CC,IP[10]+5,5.6)],
+['دار أوبرا الإسكندرية','#e3ad8a',lp(CC,IP[12]+8,5.6)],
+['محطة سيدي جابر','#4d9bbc',lp(GN,nearIdx(GN,CC.X[IP[8]],CC.Z[IP[8]]),3.5)],
+['سوق بحري','#f0c056',lp(CC,IP[16]+15,5.6)]
 ].map(d=>({ar:d[0],col:d[1],x:d[2].x,z:d[2].z,yaw:d[2].yaw}));
 /* Ferris wheel (animated) */
 const FW=new THREE.Group(),FWQ=[];
@@ -3117,16 +3216,85 @@ for(const s of[1,-1]){const a=at(CC,i,s*(CH+2.4)),ry=Math.atan2(-s*CC.TX[i],-s*C
 
 /* ---------- buildings ---------- */
 const AWN=['#b0282e','#1b3f8f','#2f7d32','#c98a12','#6a1b9a'];
+const SIGN_DATA=[
+ ['صيدلية','PHARMACY','#19a85b','#ffffff'],['حلويات','SWEETS','#c24d2c','#fff4d0'],['لبن وأجبان','DAIRY','#2d65c1','#ffffff'],
+ ['مخبز','BAKERY','#9c6a1c','#fff7dc'],['عطارة','SPICES','#7d3c98','#ffffff'],['كافيه','CAFE','#2c6e49','#fff5da'],
+ ['فطار','BREAKFAST','#b91c31','#fff6dc'],['موبايل','MOBILE','#0f75bc','#ffffff'],['ملابس','FASHION','#6a1b9a','#fff0f8'],
+ ['فطاطري','PASTRY','#c98a12','#ffffff'],['جزارة','BUTCHER','#9f1d20','#ffffff'],['خضار','FRUITS','#2f7d32','#fffce4']
+];
+const SIGN_MATS=SIGN_DATA.map(([ar,en,bg,fg])=>new THREE.MeshBasicMaterial({
+ map:tex(256,64,(x,w,h)=>{x.fillStyle=bg;x.fillRect(0,0,w,h);x.fillStyle='rgba(255,255,255,.15)';x.fillRect(0,0,w,8);x.fillStyle=fg;x.textAlign='center';x.textBaseline='middle';x.font='bold 28px Tahoma,Arial';x.fillText(ar,w/2,25);x.font='bold 14px Arial';x.fillText(en,w/2,47);x.fillStyle='rgba(0,0,0,.22)';x.fillRect(0,h-5,w,5)}),
+ side:THREE.DoubleSide
+}));
+const BAL_M=LM('#23252b'),BAL_F=LM('#ddd6c8'),AC_M=LM('#d6dbe0'),CLOTH=['#e63946','#2a9df4','#ffffff','#ffd166','#2a9d8f'];
+function addBalcony(B,s,w,d,H,levels){
+ const floors=Math.max(2,Math.min(levels||6,Math.floor(H/3.4)-1));
+ const z0=-w/2+2.8, z1=w/2-2.8, step=Math.max(5.2,Math.min(8,(w-5)/4));
+ for(let f=1;f<=floors;f++){
+  const y=f*3.4+.75;
+  for(let z=z0;z<=z1;z+=step){
+   bp(B,BAL_F,1.65,.16,4.4,s*(d/2+.72),y,z);
+   bp(B,BAL_M,.08,1.05,4.05,s*(d/2+1.48),y+.58,z);
+   bp(B,BAL_M,.7,.7,.08,s*(d/2+1.45),y+.22,z-1.92);
+   bp(B,BAL_M,.7,.7,.08,s*(d/2+1.45),y+.22,z+1.92);
+   if(f>1&&R()<.22){const col=LM(CLOTH[(R()*CLOTH.length)|0]);bp(B,col,.02,.9,1.3,s*(d/2+1.58),y+.25,z)}
+  }
+ }
+}
+function addShops(B,s,w,d){
+ const count=Math.max(2,Math.min(5,Math.floor(w/5.4))),gap=w/count;
+ for(let k=0;k<count;k++){
+  const z=-w/2+gap*(k+.5),ww=Math.max(3.2,gap-1.1),sg=SIGN_MATS[(R()*SIGN_MATS.length)|0],awn=LM(AWN[(R()*AWN.length)|0]);
+  bp(B,LM('#13202b','#081118'),.28,3.35,ww,s*(d/2+.06),1.75,z);
+  bp(B,awn,1.25,.22,ww-.18,s*(d/2+.82),3.62,z);
+  add(new THREE.PlaneGeometry(Math.max(3,ww-.25),1.15),sg,B.clone().multiply(MX(s*(d/2+.17),4.3,z,s<0?Math.PI/2:-Math.PI/2)));
+  if(R()<.8)bp(B,LM('#8cc8ff','#456579'),.06,1.6,ww-1.05,s*(d/2+.22),1.6,z);
+  if(R()<.35)bp(B,LM('#b9b5a9'),.34,.65,.55,s*(d/2+1.08),.34,z+(R()-.5)*(ww-1.3));
+  if(R()<.3)bp(B,AC_M,.18,.65,1.4,s*(d/2+1.02),2.42,z+(R()-.5)*(ww-1.4));
+ }
+}
+function roofDetail(B,w,d,H){
+ const para=LM('#c9bca6'),ac=LM('#dddeda');
+ // Plaster roof parapet, characteristic water tanks, AC and satellite-dish silhouettes.
+ bp(B,para,.55,1.2,w, d/2,H+.83,0);bp(B,para,.55,1.2,w,-d/2,H+.83,0);
+ bp(B,para,d,1.2,.55,0,H+.83,w/2);bp(B,para,d,1.2,.55,0,H+.83,-w/2);
+ if(R()<.78)cp(B,LM('#b8b8b8'),1.1,1.25,2.1,(R()-.5)*d*.45,H+1.4,(R()-.5)*w*.35,8);
+ if(R()<.55)bp(B,LM('#6d7b88'),2.8,1.1,1.8,(R()-.5)*d*.35,H+1.1,(R()-.5)*w*.35);
+ if(R()<.4)cp(B,LM('#9ca8b3'),.12,.16,6,(R()-.5)*d*.32,H+3.7,(R()-.5)*w*.28,5);
+ if(R()<.55)for(let f=1;f<Math.min(6,Math.floor(H/3.4));f+=2){
+  const z=(R()-.5)*w*.6;
+  bp(B,ac,.55,.62,.94,-(d/2+.38),f*3.4+1.25,z);
+  bp(B,LM('#63707a'),.59,.10,.98,-(d/2+.72),f*3.4+1.22,z);
+ }
+}
 function house(a,s,w,d,r){
-const B=MX(a.x,0,a.z,a.ry),t=R(),wm=WM[(R()*WM.length)|0],roof=LM(R()<.5?'#6b6a68':'#8a817a');
-const rr=Math.min(w,d)/2*.95,n=Math.max(1,Math.ceil(w/(2*rr)));
-for(let k=0;k<n;k++){const u=n>1?(-w/2+rr+(w-2*rr)*k/(n-1)):0;addC(a.x+Math.sin(a.ry)*u,a.z+Math.cos(a.ry)*u,rr)}
-if(t<.4){const f=5+((R()*(r?8:6))|0),H=f*3.4;part(wallG(w,H,d),wm,B,0,H/2,0);bp(B,roof,d+.4,.6,w+.4,0,H+.3,0);if(R()<.6)cp(B,LM('#b8b8b8'),1.2,1.2,2,(R()-.5)*d*.5,H+1.6,(R()-.5)*w*.5,8)}
-else if(t<.55){const f=3+((R()*4)|0),H=f*3.4;part(wallG(w,H,d),wm,B,0,H/2,0);bp(B,roof,d+.4,.5,w+.4,0,H+.25,0);part(wallG(w*.7,3.4,d*.7),wm,B,0,H+1.95,0);bp(B,roof,d*.7+.4,.5,w*.7+.4,0,H+3.65,0)}
-else if(t<.7){const q=Math.min(w,d)*.9;part(wallG(q,7,q),wm,B,0,3.5,0);part(new THREE.ConeGeometry(1,1,4),LM('#b5502f'),B,0,9.2,0,Math.PI/4,q*.75,4.4,q*.75)}
-else if(t<.82){const f=14+((R()*10)|0),H=f*3.4,q=Math.min(w,d)+4;part(wallG(q,H,q),GM[(R()*3)|0],B,0,H/2,0);bp(B,LM('#cfd6dc'),q*.5,6,q*.5,0,H+3,0);cp(B,LM('#aaaaaa'),.15,.2,10,0,H+9,0,5)}
-else if(t<.94){const f=2+((R()*2)|0),H=f*4;part(wallG(w,H,d),wm,B,0,H/2,0);bp(B,roof,d+.4,.5,w+.4,0,H+.25,0);bp(B,LM('#16222c','#0a1218'),.3,2.8,w-2,s*(d/2+.05),1.6,0);bp(B,LM(AWN[(R()*5)|0]),1.6,.25,w-3,s*(d/2+.9),3.6,0)}
-else{const cr=LM('#efe4c8');bp(B,cr,14,9,14,0,4.5,0);part(new THREE.SphereGeometry(5.5,14,8,0,Math.PI*2,0,Math.PI/2),cr,B,0,9,0);cp(B,gold,.2,.4,2.5,0,15.5,0,6);cp(B,cr,1,1.3,24,6.5,12,6.5,10);cp(B,gold,2,2,.6,6.5,24.3,6.5,10);cp(B,gold,.15,1.2,5,6.5,27,6.5,8)}
+ const B=MX(a.x,0,a.z,a.ry),t=R(),wm=WM[(R()*WM.length)|0],roof=LM(R()<.5?'#6b6a68':'#8a817a');
+ const rr=Math.min(w,d)/2*.95,n=Math.max(1,Math.ceil(w/(2*rr)));
+ for(let k=0;k<n;k++){const u=n>1?(-w/2+rr+(w-2*rr)*k/(n-1)):0;addC(a.x+Math.sin(a.ry)*u,a.z+Math.cos(a.ry)*u,rr)}
+ if(t<.4){
+  const f=6+((R()*(r?8:7))|0),H=f*3.4;part(wallG(w,H,d),wm,B,0,H/2,0);bp(B,roof,d+.45,.6,w+.45,0,H+.3,0);roofDetail(B,w,d,H);
+  if(R()<.8)addBalcony(B,s,w,d,H,Math.min(7,f-1));
+  if(!r||R()<.45)addShops(B,s,w,d);
+ }
+ else if(t<.55){
+  const f=4+((R()*4)|0),H=f*3.4;part(wallG(w,H,d),wm,B,0,H/2,0);bp(B,roof,d+.4,.5,w+.4,0,H+.25,0);part(wallG(w*.72,3.4,d*.72),wm,B,0,H+1.95,0);bp(B,roof,d*.72+.4,.5,w*.72+.4,0,H+3.65,0);roofDetail(B,w,d,H+3.4);addBalcony(B,s,w,d,H,Math.min(4,f));if(R()<.75)addShops(B,s,w,d);
+ }
+ else if(t<.7){const q=Math.min(w,d)*.9;part(wallG(q,7,q),wm,B,0,3.5,0);part(new THREE.ConeGeometry(1,1,4),LM('#b5502f'),B,0,9.2,0,Math.PI/4,q*.75,4.4,q*.75)}
+ else if(t<.82){const f=15+((R()*10)|0),H=f*3.4,q=Math.min(w,d)+4;part(wallG(q,H,q),GM[(R()*3)|0],B,0,H/2,0);bp(B,LM('#cfd6dc'),q*.5,6,q*.5,0,H+3,0);cp(B,LM('#aaaaaa'),.15,.2,10,0,H+9,0,5);if(R()<.6)addShops(B,s,Math.min(q-4,w+4),Math.min(d+2,q-4));}
+ else if(t<.94){const f=2+((R()*2)|0),H=f*4;part(wallG(w,H,d),wm,B,0,H/2,0);bp(B,roof,d+.4,.5,w+.4,0,H+.25,0);addShops(B,s,w,d);}
+ else{const cr=LM('#efe4c8');bp(B,cr,14,9,14,0,4.5,0);part(new THREE.SphereGeometry(5.5,14,8,0,Math.PI*2,0,Math.PI/2),cr,B,0,9,0);cp(B,gold,.2,.4,2.5,0,15.5,0,6);cp(B,cr,1,1.3,24,6.5,12,6.5,10);cp(B,gold,2,2,.6,6.5,24.3,6.5,10);cp(B,gold,.15,1.2,5,6.5,27,6.5,8)}
+}
+function cornicheFront(){
+ let idx=28;
+ for(let n=0;n<10;n++){
+  const w=20+(n%3)*4+R()*2,d=13.5+(n%2)*2+R()*1.4,H=(9+((R()*6)|0))*3.35,a=at(CC,idx,-(CH+7.8+d/2+(n%2)*1.4));
+  idx+=Math.max(6,Math.round((w+7)/CC.L));
+  if(!onLand(a.x,a.z)||nearRoad(a.x,a.z,Math.max(w,d)*.55)||!free(a.x,a.z,Math.max(w,d)*.42))continue;
+  const B=MX(a.x,0,a.z,a.ry),wm=WM[(n+2)%WM.length],roof=LM(n%2?'#7a756f':'#6d6a66');
+  part(wallG(w,H,d),wm,B,0,H/2,0);bp(B,roof,d+.55,.55,w+.55,0,H+.28,0);addBalcony(B,-1,w,d,H,Math.min(8,Math.floor(H/3.4)-1));addShops(B,-1,w,d);roofDetail(B,w,d,H);
+  if(R()<.7){for(let z=-w/2+3;z<w/2-2;z+=6){bp(B,LM('#16181d'),.06,2.2,1.1,-(d/2+1.52),1.15,z)}}
+  addC(a.x,a.z,Math.min(w,d)*.46);
+ }
 }
 function strip(C,hw,sides,rows){
 for(const s of sides)for(let r=0;r<rows;r++){
@@ -3136,20 +3304,161 @@ let ok=onLand(a.x,a.z)&&!nearRoad(a.x,a.z,m)&&!EXL.some(e=>(e[0]-a.x)**2+(e[1]-a
 if(ok){const tx=C.TX[i]*(w/2-rr),tz=C.TZ[i]*(w/2-rr);ok=!nearRoad(a.x+tx,a.z+tz,3)&&!nearRoad(a.x-tx,a.z-tz,3)&&free(a.x,a.z,rr)&&free(a.x+tx,a.z+tz,rr)&&free(a.x-tx,a.z-tz,rr)}
 if(ok&&!(r&&R()<.2))house(a,s,w,d,r);
 i+=Math.max(1,Math.round((w+(r?3+R()*8:1.5+R()*4))/C.L))}}}
-strip(CC,CH,[-1],2);strip(GN,7,[1,-1],2);strip(SM,SHW,[1,-1],1);for(const C of CON)strip(C,6,[1,-1],1);
+strip(CC,CH,[-1],2);strip(GN,7,[1,-1],2);strip(SM,SHW,[1,-1],1);for(const C of CON)strip(C,6,[1,-1],1);cornicheFront();
 
-/* ---------- props: palms, trees, lamps, umbrellas, boats ---------- */
-{const B0=MX(0,0,0,0),TRK=LM('#7a5a3a'),LEAF=LM('#3a8a30'),LAMP=LM('#4a4a50'),BUL=LM('#f4f1e6','#cfcab8'),TRG=new THREE.CylinderGeometry(.18,.3,7,5),CRG=new THREE.ConeGeometry(3,1.6,7),LPG=new THREE.CylinderGeometry(.1,.14,8,5),BLG=new THREE.SphereGeometry(.4,6,4),FLO=new THREE.SphereGeometry(2.6,7,5);const props=(C,hw,sides,pal)=>{for(let i=5;i<C.N;i+=3)for(const s of sides){
-const p=at(C,i,s*(hw+2.5));if(nearRoad(p.x,p.z,-1))continue;
-if(i%2===0){const k=.8+R()*.5;if(pal){add(TRG,TRK,MX(p.x,3.7*k,p.z,0,k,k,k));add(CRG,LEAF,MX(p.x,7.6*k,p.z,R()*6,k,k,k))}else{add(TRG,TRK,MX(p.x,3.2*k,p.z,0,.8*k,.8*k,.8*k));add(FLO,LEAF,MX(p.x,7*k,p.z,0,k,k*1.1,k))}}
-if(i%5===0){const q=at(C,i,s*(hw+1));add(LPG,LAMP,MX(q.x,4,q.z));add(BLG,BUL,MX(q.x,8.2,q.z))}}};
-props(CC,CH,[-1,1],true);props(GN,7,[-1,1],false);props(SM,SHW,[-1,1],false);
+/* ---------- contemporary landscaping: palms, jacarandas and urban ficus ---------- */
+{const TRK=LM('#72513b'),LAMP=LM('#464c51'),BUL=LM('#fff2b8','#776b52'),TRG=new THREE.CylinderGeometry(.19,.35,7.4,7),LPG=new THREE.CylinderGeometry(.1,.14,8,6),BLG=new THREE.SphereGeometry(.35,7,5);
+ const shades=[LM('#256c47'),LM('#32784d'),LM('#4d955d'),LM('#317c57'),LM('#23684e')];
+ const broad=[LM('#3a864e'),LM('#538e63'),LM('#457c69'),LM('#658f60'),LM('#6a8c7b')];
+ const FOL=new THREE.SphereGeometry(2.3,8,6),smallF=new THREE.SphereGeometry(1.75,8,6);
+ const fronds=[];
+ for(let n=0;n<7;n++){
+  const ang=n*Math.PI*2/7;
+  // Tilted tapered leaves radiating from the palm crown.
+  const geo=new THREE.ConeGeometry(.75,5.25,5);
+  geo.rotateZ(Math.PI/2+(.08+(n%2)*.10));geo.rotateY(ang);
+  fronds.push(geo);
+ }
+ function streetTree(x,z,seed,palm){
+  const k=.78+(seed%7)*.065;
+  if(palm){
+   add(TRG,TRK,MX(x,3.7*k,z,0,k,k,k));
+   for(let n=0;n<7;n++)add(fronds[n],shades[(n+seed)%shades.length],MX(x+Math.cos(n*Math.PI*2/7)*1.7*k,8.12*k,z+Math.sin(n*Math.PI*2/7)*1.7*k,0,k,k,k));
+   add(new THREE.ConeGeometry(.52,1.75,6),shades[seed%shades.length],MX(x,8.55*k,z,0,k,k,k));
+  }else{
+   add(TRG,TRK,MX(x,3.25*k,z,0,.8*k,.86*k,.8*k));
+   for(let n=0;n<5;n++){
+    const t=n*2.4,xx=x+Math.cos(t)*1.62*k,zz=z+Math.sin(t)*1.45*k,yy=(7.2+(n%2)*.8)*k;
+    add(n%2?smallF:FOL,broad[(seed+n)%broad.length],MX(xx,yy,zz,0,k,k*.7,k));
+   }
+  }
+  if(seed%5===0){const bed=LM('#8c8070');
+   add(new THREE.CylinderGeometry(1.6,1.7,.42,12),bed,MX(x,.26,z));
+   add(new THREE.CylinderGeometry(1.42,1.42,.09,12),LM('#326945'),MX(x,.52,z));
+  }
+ }
+ function plants(C,hw,sides,palm){
+  for(let i=8;i<C.N-7;i+=7)for(const sign of sides){
+   // Leave enough width for pedestrians to pass behind the trees.
+   const edge=C===CC?CH:hw;
+   const p=at(C,i,sign*(edge+3.35));
+   if(!onLand(p.x,p.z)||nearRoad(p.x,p.z,-1.4))continue;
+   streetTree(p.x,p.z,i+(sign>0?5:13),palm?i%5!==0:i%6===0);
+   if(i%21===8){const q=at(C,i,sign*(edge+1.65));add(LPG,LAMP,MX(q.x,4,q.z));add(BLG,BUL,MX(q.x,8.1,q.z))}
+  }
+ }
+ plants(CC,CH,[-1,1],true);plants(GN,7,[-1,1],false);plants(SM,SHW,[-1,1],false);
+ // Planters and palms in Montaza's garden area.
+ const mp=at(CC,IP[2],-85);
+ for(let n=0;n<14;n++){const ag=n*2.399,r=25+(n%4)*7;streetTree(mp.x+Math.cos(ag)*r,mp.z+Math.sin(ag)*r,n+3,n%3===0)}
 const UC=['#e63946','#2a9df4','#ffd166','#06d6a0','#ffffff'],UG=new THREE.ConeGeometry(2,1.1,8),UP=new THREE.CylinderGeometry(.06,.06,2.6,4),CAB=GB(2,2.6,2.4);
 for(let i=IP[0];i<IP[10];i+=3){const p=at(CC,i,24+R()*18);add(UG,LM(UC[(R()*5)|0]),MX(p.x,2.6,p.z,R()*6));add(UP,LM('#f4f1e6'),MX(p.x,1.3,p.z));if(i%5===0){const q=at(CC,i,22);add(CAB,LM(UC[(i/5|0)%4]),MX(q.x,1.3,q.z,q.ry))}}const HL=GB(1.7,.9,5.5),SL=GB(.1,3.2,3);
 for(let k=0;k<60;k++){const i=(k<35?IP[0]+R()*(IP[15]-IP[0]):IP[15]+R()*(IP[18]-IP[15]))|0,o=k<35?60+R()*160:45+R()*120,p=at(CC,i,o);
 if(Math.hypot(p.x-QB.x,p.z-QB.z)<70)continue;if(i>IP[7]-50&&i<IP[7]+50&&o<76)continue;
 const y=R()*6.28;add(HL,LM(['#e63946','#2a9d8f','#ffd166','#2a6fdb'][k%4]),MX(p.x,-.2,p.z,y));add(SL,LM('#f4f0e6'),MX(p.x,1.5,p.z,y))}}
 flush();
+
+/* ---------- pedestrians: two-way sidewalk walking + non-graphic knock-down/recovery ---------- */
+const PED_COUNT=62,PEDS=[],PED_ROOT=new THREE.Group(),PED_GEO={
+ head:new THREE.SphereGeometry(.21,9,7),hair:new THREE.SphereGeometry(.215,8,6),
+ chest:GB(.48,.72,.31),arm:GB(.16,.68,.17),leg:GB(.20,.83,.22),shoe:GB(.23,.11,.34),
+ bag:GB(.23,.37,.15)
+};
+SC.add(PED_ROOT); // Independent group persists when startA replaces the traffic/player group.
+const PED_COATS=['#205b87','#ad624c','#627b57','#ccb16d','#5b586b','#b94840','#e7e4dd','#317c86'].map(v=>LM(v));
+const PED_PANTS=['#2e3d46','#59616a','#34323c','#7c745d','#273f55'].map(v=>LM(v));
+const PED_SKIN=['#b67c5e','#c99b75','#8e5f46','#dbb189','#ad7758'].map(v=>LM(v));
+const PED_HAIR=LM('#262220'),PED_SHOES=LM('#252b33');
+function newPedestrian(id){
+ const person=new THREE.Group(),torso=new THREE.Group(),coat=PED_COATS[id%PED_COATS.length];torso.position.y=1.39;person.add(torso);
+ const box=(par,geo,mat,x,y,z,sy=1)=>{const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);o.scale.y=sy;par.add(o);return o};
+ box(torso,PED_GEO.chest,coat,0,0,0);box(torso,PED_GEO.head,PED_SKIN[id%PED_SKIN.length],0,.66,0);
+ if(id%4!==0)box(torso,PED_GEO.hair,PED_HAIR,0,.83,-.018,.44);
+ const arms=[],legs=[];
+ for(const sign of [-1,1]){
+  const arm=new THREE.Group();arm.position.set(sign*.32,.27,0);torso.add(arm);
+  box(arm,PED_GEO.arm,coat,0,-.34,0);arms.push(arm);
+  const leg=new THREE.Group();leg.position.set(sign*.145,.99,0);person.add(leg);
+  box(leg,PED_GEO.leg,PED_PANTS[id%PED_PANTS.length],0,-.43,0);
+  box(leg,PED_GEO.shoe,PED_SHOES,0,-.88,-.07);legs.push(leg);
+ }
+ if(id%5===0)box(torso,PED_GEO.bag,PED_PANTS[id%PED_PANTS.length],.4,-.16,0);
+ person.userData={torso,arms,legs};PED_ROOT.add(person);return person;
+}
+function choosePedRoad(x,z,id){
+ const opts=[CC,GN,SM];let arr=[];
+ for(const C of opts){const j=nearIdx(C,x,z),d=(C.X[j]-x)**2+(C.Z[j]-z)**2;arr.push({C,j,d});}
+ arr.sort((a,b)=>a.d-b.d);return id%6===0&&arr[1]?arr[1]:arr[0];
+}
+function relocatePed(p,origin,initial=false){
+ const near=choosePedRoad(origin.x,origin.z,p.id),C=near.C;
+ p.C=C;p.sign=(p.id%2?1:-1);p.dir=(p.id%4<2?1:-1);
+ const spread=initial?50:90;
+ p.s=Math.max(10,Math.min(C.N-12,near.j+Math.round((R()*2-1)*spread)));
+ if(C===GN&&p.s>=T0-4&&p.s<=T1+4)p.s=Math.max(12,T0-20);
+ p.speed=.86+R()*.55;p.walk=R()*7;p.down=0;p.life=0;p.vx=p.vz=p.vy=0;
+ p.group.visible=true;p.group.rotation.set(0,0,0);p.group.userData.torso.rotation.set(0,0,0);
+}
+function pedPlace(p){
+ const C=p.C,atI=Math.max(1,Math.min(C.N-1,p.s)),i=Math.floor(atI),f=atI-i,
+ tx=C.TX[i],tz=C.TZ[i],w=C===CC?Math.max(HW[i]+2.25,CH+1.35):C===GN?8.7:SHW+2.1,
+ o=p.sign*w;
+ p.x=C.X[i]+(C.X[i+1]-C.X[i])*f-tz*o;
+ p.z=C.Z[i]+(C.Z[i+1]-C.Z[i])*f+tx*o;
+ p.y=C===GN&&i>T0&&i<T1?TYI(i):.30;
+ p.heading=Math.atan2(-tx,-tz)+(p.dir<0?Math.PI:0);
+}
+for(let k=0;k<PED_COUNT;k++){
+ const p={id:k,group:newPedestrian(k),C:CC,s:0,x:0,y:.3,z:0,dir:1,sign:1,walk:0,down:0,life:0};
+ relocatePed(p,{x:CC.X[40],z:CC.Z[40]},true);p.s=Math.max(10,Math.min(CC.N-12,40+(k-31)*2.9));
+ p.C=CC;pedPlace(p);PEDS.push(p);
+}
+function knockPedestrian(p,vx,vz,speed){
+ if(p.down)return;
+ p.down=1;p.life=0;
+ const norm=Math.hypot(vx,vz)||1;
+ p.vx=vx/norm*Math.min(5,1.5+speed*.13);
+ p.vz=vz/norm*Math.min(5,1.5+speed*.13);
+ p.vy=2.35+Math.min(1.5,speed*.045);
+ p.impactSpin=(p.id%2?1:-1)*(1.1+Math.min(1.0,speed*.06));
+}
+function pedestriansStep(dt,carP,traffic){
+ const movingCars=traffic.filter(v=>Math.abs(v.x-carP.x)<95&&Math.abs(v.z-carP.z)<95);
+ let wasHit=false;
+ for(const p of PEDS){
+  const o=p.group;
+  const dist2=(p.x-carP.x)**2+(p.z-carP.z)**2;
+  if(dist2>330*330){relocatePed(p,carP);pedPlace(p);continue}
+  if(p.down){
+   p.life+=dt;p.x+=p.vx*dt;p.z+=p.vz*dt;
+   p.y+=p.vy*dt;p.vy-=11.4*dt;
+   if(p.y<.25){p.y=.25;p.vy=p.vy<0?-p.vy*.17:p.vy;if(Math.abs(p.vy)<.38)p.vy=0;}
+   p.vx*=Math.max(0,1-dt*1.65);p.vz*=Math.max(0,1-dt*1.65);
+   o.rotation.z+=p.impactSpin*dt/(1+p.life*2);
+   if(p.life>3.3){relocatePed(p,carP);pedPlace(p);}
+  }else{
+   p.s+=p.dir*p.speed*dt/p.C.L;
+   if(p.s<8||p.s>=p.C.N-9){p.dir*=-1;p.s=Math.max(9,Math.min(p.C.N-10,p.s))}
+   pedPlace(p);p.walk+=dt*(4.7+p.speed);
+   const swing=Math.sin(p.walk)*.36,rig=o.userData;
+   rig.legs[0].rotation.x=swing;rig.legs[1].rotation.x=-swing;
+   rig.arms[0].rotation.x=-swing*.9;rig.arms[1].rotation.x=swing*.9;
+   rig.torso.rotation.z=Math.sin(p.walk*.5)*.035;
+   const speed=Math.hypot(carP.vx||0,carP.vz||0);
+   if((p.x-carP.x)**2+(p.z-carP.z)**2<3.9&&speed>1.5){
+    knockPedestrian(p,p.x-carP.x+carP.vx*.2,p.z-carP.z+carP.vz*.2,speed);wasHit=true;
+   }else if(dist2<95*95){
+    for(const v of movingCars){if((v.x-p.x)**2+(v.z-p.z)**2<3.0){
+     knockPedestrian(p,p.x-v.x,p.z-v.z,Math.abs(v.v||10));break;
+    }}
+   }
+  }
+  o.position.set(p.x,p.y,p.z);
+  if(!p.down){o.rotation.set(0,p.heading,0)}
+  o.visible=(p.x-carP.x)**2+(p.z-carP.z)**2<290*290;
+ }
+ return wasHit;
+}
 
 /* ---------- minimap ---------- */
 const MM=document.createElement('canvas');MM.width=150;MM.height=115;
@@ -3175,7 +3484,7 @@ const q=gm(P.x,P.z,w,h);c.save();c.translate(q[0],q[1]);c.rotate(Math.atan2(-Mat
 const tunY=(x,z)=>{let b=-1,bd=1e18;const lo=Math.max(0,T0-30),hi=Math.min(GN.N,T1+30);for(let i=lo;i<=hi;i++){const d=(GN.X[i]-x)**2+(GN.Z[i]-z)**2;if(d<bd){bd=d;b=i}}return bd<64&&b>0?TYI(b):0};
 const segD=(x,z,s)=>{let b=1e9;for(let i=0;i<=s.N;i+=2)b=Math.min(b,Math.hypot(s.X[i]-x,s.Z[i]-z));return b};
 const nearCon=(x,z)=>CON.some(C=>segD(x,z,C)<8);
-return{SC,DY:DYx,DL:DLx,SUN:SUNx,CC,GN,IP,PT,QB,BG,gk,nearIdx,segD,mmDraw,anim,nearRoad,HW,nearCon,SM,NKM,CON,MONTAZA_ACCESS,T0,T1,TYI,tunY,DEST,gm,gpsDraw}}
+return{SC,DY:DYx,DL:DLx,SUN:SUNx,CC,GN,IP,PT,QB,BG,gk,nearIdx,segD,mmDraw,anim,pedestriansStep,nearRoad,HW,nearCon,SM,NKM,CON,MONTAZA_ACCESS,T0,T1,TYI,tunY,DEST,gm,gpsDraw}}
 
 /* ---------- Alexandria driving logic ---------- */
 const yawAt=(C,i)=>Math.atan2(-C.TX[i],-C.TZ[i]);
@@ -3382,6 +3691,11 @@ if(b>=CC.N-6){const sp=Math.hypot(P.vx,P.vz),i=30;P.x=CC.X[i]-CC.TZ[i]*5.6;P.z=C
 /* Traffic AI: braking, realistic headways, collision-free lane changes and red buses. */
 const ps=a.pi*CC.L;
 advanceAlexTraffic(a,dt,W,ps,P);
+if(W.pedestriansStep(dt,P,a.traf)){
+ a.sh=Math.max(a.sh,.25);
+ P.vx*=.72;P.vz*=.72;
+ const now=performance.now();if(now-(a.lastPedWarning||0)>3800){a.lastPedWarning=now;toast('⚠️ خلي بالك من المشاة على الرصيف');}
+}
 for(const t of a.traf){
  if(Math.abs(t.x-P.x)<9&&Math.abs(t.z-P.z)<10){
   const impact=hit(a,t.x,t.z,t.bus?1.75:1.05);
@@ -3797,7 +4111,7 @@ if(A){render(dt);onlineTick(t);}
 function startA(mode){
 loadT(()=>{
 try{if(!R3)init();if(!W0)W0={SC,DY,DL,SUN};if(mode==='alex'){if(!WA)WA=buildAlex();useW(WA)}else useW(W0)}catch(e){console.error(e);toast('جهازك مش بيدعم WebGL');return}
-R3.toneMapping=mode==='alex'?THREE.NoToneMapping:THREE.ACESFilmicToneMapping;
+R3.toneMapping=THREE.ACESFilmicToneMapping;R3.toneMappingExposure=mode==='alex'?1.05:1;
 CM.far=mode==='alex'?1800:900;
 SC.remove(DY);DY=new THREE.Group();SC.add(DY);
 const m=mkV(D.sel);attachPlayerRider(m,D.sel);DY.add(m);
