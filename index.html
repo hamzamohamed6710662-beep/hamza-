@@ -1544,11 +1544,148 @@ function taxiUpdateHailSign(a,p){
   sign.visible=true;sign.position.y=3.25+Math.sin((a.gt||0)*4.5)*.07;
  }else sign.visible=false;
 }
+function taxiRoadSideData(p){
+ const C=p.C||WA.CC,i=WA.nearIdx(C,p.x,p.z),side=p.sign<0?-1:1;
+ const half=C===WA.CC?WA.HW[i]:C===WA.SM?11.25:7;
+ return{C,i,side,half,tx:C.TX[i],tz:C.TZ[i]};
+}
 function taxiPlaceCrowd(a,point,visible=true){
- const people=a.taxiCrowd||[],yaw=point.yaw||0,fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);
+ // خلي ركاب الموقف يقفوا عند حافة الرصيف الملاصقة للشارع، بعيداً عن سور البحر.
+ const W=WA,people=a.taxiCrowd||[],yaw=point.yaw||0,fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);
+ const i=W.nearIdx(W.CC,point.x,point.z),roadEdge=W.HW[i]+1.35;
+ const baseSide=Math.max(.65,roadEdge-5.6);
  for(let i=0;i<people.length;i++){
-  const row=Math.floor(i/4),col=i%4,side=7.8+row*.95,along=(col-1.5)*1.2,g=people[i];
+  const row=Math.floor(i/4),col=i%4,side=baseSide+row*.78,along=(col-1.5)*1.2,g=people[i];
   g.position.set(point.x+rx*side+fx*along,.28,point.z+rz*side+fz*along);g.rotation.set(0,yaw+Math.PI/2,0);g.visible=visible;g.userData.taxiExit=null;
+ }
+}
+function taxiHailPickupPoint(p){
+ // الشخص يقف عند طرف الرصيف القريب من العربيات، ودائرة الصعود تكون داخل الأسفلت.
+ const q=taxiRoadSideData(p),roadOffset=Math.max(1.5,q.half-3.35),side=q.side*roadOffset;
+ return{x:q.C.X[q.i]-q.tz*side,z:q.C.Z[q.i]+q.tx*side};
+}
+function taxiMakeHailMarker(p){
+ const g=new THREE.Group();
+ // دائرة صفراء كبيرة فوق الأسفلت مع إطار أبيض واضح حتى تظهر من مسافة.
+ const pad=new THREE.Mesh(new THREE.CircleGeometry(2.28,64),new THREE.MeshBasicMaterial({color:'#ffcf24',transparent:true,opacity:.40,side:THREE.DoubleSide,depthWrite:false}));
+ pad.rotation.x=-Math.PI/2;pad.position.y=.045;g.add(pad);
+ const outer=new THREE.Mesh(new THREE.TorusGeometry(2.52,.105,10,72),new THREE.MeshBasicMaterial({color:'#fff8cf',transparent:true,opacity:1,side:THREE.DoubleSide,depthWrite:false}));
+ outer.rotation.x=-Math.PI/2;outer.position.y=.08;g.add(outer);
+ const ring=new THREE.Mesh(new THREE.TorusGeometry(2.22,.22,12,72),new THREE.MeshBasicMaterial({color:'#ffd21f',transparent:true,opacity:1,side:THREE.DoubleSide,depthWrite:false}));
+ ring.rotation.x=-Math.PI/2;ring.position.y=.13;g.add(ring);
+ const center=new THREE.Mesh(new THREE.CircleGeometry(.46,40),new THREE.MeshBasicMaterial({color:'#fff5b0',transparent:true,opacity:1,side:THREE.DoubleSide,depthWrite:false}));
+ center.rotation.x=-Math.PI/2;center.position.y=.16;g.add(center);
+ // عمود ضوئي وسهم عائم يوضحان مكان الوقوف من مسافة بعيدة.
+ const beam=new THREE.Mesh(new THREE.CylinderGeometry(.18,.56,1.9,20,1,true),new THREE.MeshBasicMaterial({color:'#ffd21f',transparent:true,opacity:.25,side:THREE.DoubleSide,depthWrite:false}));
+ beam.position.y=1.10;g.add(beam);
+ const stem=new THREE.Mesh(new THREE.CylinderGeometry(.105,.105,.58,12),new THREE.MeshBasicMaterial({color:'#fff2a0',transparent:true,opacity:1}));
+ stem.position.y=1.88;g.add(stem);
+ const arrow=new THREE.Mesh(new THREE.ConeGeometry(.43,.84,10),new THREE.MeshBasicMaterial({color:'#ffe34f',transparent:false}));
+ arrow.position.y=2.58;g.add(arrow);
+ const point=taxiHailPickupPoint(p);g.position.set(point.x,.02,point.z);g.visible=false;SC.add(g);return g;
+}
+function taxiSetupHailers(a){
+ a.taxiHailers=WA.taxiMarkHailers();a.taxiHailMarkers=[];
+ for(const p of a.taxiHailers){
+  const sign=taxiMakeHailSign();sign.position.set(0,3.10,0);sign.visible=false;p.group.add(sign);p.taxiHailSign=sign;
+  a.taxiHailMarkers.push({ped:p,marker:taxiMakeHailMarker(p)});
+ }
+}
+function taxiStepHailers(a,dt){
+ const P=a.P;a.taxiHailToastCooldown=Math.max(0,(a.taxiHailToastCooldown||0)-dt);
+ for(const item of a.taxiHailMarkers||[]){
+  const p=item.ped,m=item.marker;if(!p.taxiHailer){m.visible=false;continue;}
+  const d=Math.hypot(p.x-P.x,p.z-P.z);
+  if(!p.taxiHailActive&&d<25){p.taxiHailActive=true;}
+  const pickup=taxiHailPickupPoint(p);
+  m.position.set(pickup.x,.02,pickup.z);m.rotation.y+=dt*.75;
+  const pulse=1+Math.sin((a.gt||0)*4.5+p.id)*.09;m.scale.setScalar(pulse);
+  m.visible=p.taxiHailActive&&d<165&&p.group.visible;
+  if(p.taxiHailSign)p.taxiHailSign.visible=p.taxiHailActive;
+  if(p.taxiHailActive&&!p.taxiHailCalled&&a.taxiHailToastCooldown<=0){toast('🧍 على جنب يا أسطى!');p.taxiHailCalled=true;a.taxiHailToastCooldown=2.8;}
+ }
+}
+function taxiCleanupHailers(a){
+ if(!a)return;
+ for(const item of a.taxiHailMarkers||[]){if(item.marker&&item.marker.parent)item.marker.parent.remove(item.marker);}
+ for(const p of a.taxiHailers||[])if(WA&&WA.taxiRemoveHailSign)WA.taxiRemoveHailSign(p);
+ a.taxiHailMarkers=[];a.taxiHailers=[];
+}
+function taxiLocalToWorld(a,x,z){
+ const yaw=a.P.yaw,cs=Math.cos(yaw),sn=Math.sin(yaw);
+ return{x:a.P.x+x*cs+z*sn,z:a.P.z-x*sn+z*cs};
+}
+function taxiPassengerSeat(a,index){
+ const id=a.id;
+ if(id==='tuktuk')return{pos:{x:index===0?-.27:.27,y:.22,z:.62},scale:.56};
+ if(id==='lada'){
+  const seats=[{x:.40,y:.25,z:-.46},{x:-.43,y:.25,z:.60},{x:0,y:.25,z:.67},{x:.43,y:.25,z:.60}];
+  const q=seats[index%seats.length];return{pos:q,scale:.53};
+ }
+ if(id==='suzuki'){
+  const seats=[{x:.34,y:.25,z:-.62},{x:-.34,y:.25,z:.12},{x:.34,y:.25,z:.12},{x:-.04,y:.25,z:.94},{x:.34,y:.25,z:.94}];
+  return{pos:seats[index%seats.length],scale:.55};
+ }
+ const seats=[
+  {x:.42,y:.25,z:-.82},{x:-.43,y:.25,z:-.05},{x:.43,y:.25,z:-.05},
+  {x:-.43,y:.25,z:.72},{x:.43,y:.25,z:.72},{x:-.43,y:.25,z:1.48},
+  {x:.43,y:.25,z:1.48},{x:-.43,y:.25,z:2.13},{x:.43,y:.25,z:2.13},{x:0,y:.25,z:2.32}
+ ];
+ return{pos:seats[index%seats.length],scale:.54};
+}
+function taxiBeginTrip(a,peds=null){
+ if(a.taxiState==='trip'||a.taxiState==='boarding'||a.taxiPassengers>0)return;
+ const info=taxiVehicleInfo(a.id),entries=[];
+ if(info.kind==='street'){
+  const list=(peds||[]).slice(0,a.taxiCapacity).filter(p=>p&&p.taxiHailer&&!p.down&&!p.taxiOnboard);
+  if(!list.length)return;
+  for(const p of list){p.taxiBoarding=true;p.taxiHailer=false;p.taxiHailActive=false;if(p.taxiHailSign)p.taxiHailSign.visible=false;entries.push({ped:p,group:p.group});}
+ }else{
+  for(const g of a.taxiCrowd||[])entries.push({ped:null,group:g});
+  if(!entries.length)return;
+  if(a.taxiStopMarker)a.taxiStopMarker.visible=false;
+ }
+ const dest=taxiChooseDestination(a);if(!dest){toast('مش قادر أحدد وجهة للرحلة دلوقتي');return;}
+ a.taxiPendingDestination=dest;a.taxiPassengers=entries.length;a.taxiBoardingEntries=[];a.taxiBoardingClock=0;
+ for(const item of a.taxiHailMarkers||[])if(entries.some(e=>e.ped===item.ped))item.marker.visible=false;
+ const half=info.id==='tuktuk'?.72:info.id==='suzuki'?1.18:info.id==='microbus'?1.35:1.08;
+ entries.forEach((entry,i)=>{
+  const g=entry.group;
+  const start={x:g.position.x,z:g.position.z};
+  const lane=Math.floor(i/2),sideIndex=i%2;
+  const door=taxiLocalToWorld(a,half+.42+sideIndex*.20,-1.15+lane*.48);
+  a.taxiBoardingEntries.push({...entry,start,end:door,delay:i*.16,done:false,index:i});
+ }
+ );
+ // ثبّت العربية فور بدء الصعود؛ لا نترك أي سرعة متبقية تسحبها للخلف.
+ a.P.vx=0;a.P.vz=0;a.P.st=0;
+ a.taxiState='boarding';
+ toast('🚶 الركاب بيتحركوا ناحيتك وبيطلعوا يركبوا...');
+}
+function taxiAdvanceBoarding(a,dt){
+ const entries=a.taxiBoardingEntries||[];a.taxiBoardingClock+=dt;let allDone=true;
+ for(const entry of entries){
+  if(entry.done)continue;
+  const t=clamp((a.taxiBoardingClock-entry.delay)/1.8,0,1),e=t*t*(3-2*t),g=entry.group;
+  allDone=false;
+  const wx=entry.start.x+(entry.end.x-entry.start.x)*e,wz=entry.start.z+(entry.end.z-entry.start.z)*e;
+  g.position.set(wx,.28,wz);
+  if(entry.ped){entry.ped.x=wx;entry.ped.z=wz;entry.ped.y=.28;}
+  g.rotation.y=Math.atan2(entry.start.x-entry.end.x,entry.start.z-entry.end.z);
+  const rig=g.userData;if(rig&&rig.legs){const swing=Math.sin(a.taxiBoardingClock*8+entry.index)*.38;rig.legs[0].rotation.x=swing;rig.legs[1].rotation.x=-swing;}
+  if(t>=1){
+   const seat=taxiPassengerSeat(a,entry.index);
+   if(entry.ped)WA.taxiAttachPedToCar(entry.ped,a.m,seat.pos,seat.scale);
+   else WA.taxiAttachCrowdToCar(g,a.m,seat.pos,seat.scale);
+   entry.done=true;
+  }
+ }
+ if(allDone||entries.every(e=>e.done)){
+  a.taxiTarget=a.taxiPendingDestination;a.taxiPendingDestination=null;
+  if(!a.taxiTarget){a.taxiState='pickup';a.taxiPassengers=0;return;}
+  a.taxiTargetMarker=taxiMakeZone(a.taxiTarget,'نزول الركاب','#ffcf35');a.taxiState='trip';a.taxiStopSlowWarn=0;
+  a.taxiPassengerRefs=entries.filter(e=>e.ped).map(e=>e.ped);
+  toast('🗣️ الركاب ركبوا! وصلنا '+a.taxiTarget.ar+' — اتحرك يا أسطى!');
  }
 }
 function taxiChooseDestination(a){
@@ -1564,37 +1701,22 @@ function taxiChooseDestination(a){
  a.taxiRecentDestinations=(a.taxiRecentDestinations||[]).concat(dest.ar).slice(-4);
  return dest;
 }
-function taxiBeginTrip(a,peds=null){
- if(a.taxiState==='trip'||a.taxiPassengers>0)return;
- if(taxiVehicleInfo(a.id).kind==='street'){
-  const list=(peds||[]).slice(0,a.taxiCapacity).filter(p=>WA.taxiBoardPed(p));
-  if(!list.length)return;
-  a.taxiPassengerRefs=list;a.taxiPassengers=list.length;
- }else{
-  a.taxiPassengers=a.taxiCapacity;
-  for(const g of a.taxiCrowd||[])g.visible=false;
-  if(a.taxiStopMarker)a.taxiStopMarker.visible=false;
- }
- const dest=taxiChooseDestination(a);
- if(!dest){toast('مش قادر أحدد وجهة للرحلة دلوقتي');return}
- a.taxiTarget=dest;a.taxiTargetMarker=taxiMakeZone(dest,'نزول الركاب','#ffcf35');a.taxiState='trip';a.taxiStopSlowWarn=0;
- toast('🗣️ الركاب: وصلنا '+dest.ar+' — اتحرك يا أسطى!');
-}
 function taxiInit(a){
  const W=WA,CC=W.CC,id=a.id,info=taxiVehicleInfo(id),P=a.P;
  const stopIndex=Math.max(70,Math.min(CC.N-90,(W.IP[12]||250)-4));
  const pointAt=(i)=>({x:CC.X[i]-CC.TZ[i]*5.6,z:CC.Z[i]+CC.TX[i]*5.6,yaw:Math.atan2(-CC.TX[i],-CC.TZ[i])});
- a.taxiCapacity=info.capacity;a.taxiFare=info.fare;a.taxiFareMode=info.fareMode||'passenger';a.taxiPassengers=0;a.taxiTrips=0;a.taxiEarnings=0;a.taxiTarget=null;a.taxiTargetMarker=null;a.taxiPassengerRefs=[];a.taxiPassengerPed=null;a.taxiState='pickup';a.taxiHailCooldown=0;a.taxiDropWarn=0;a.taxiRecentDestinations=[];a.taxiCrowd=info.kind==='street'?[]:W.taxiMakeCrowd(info.capacity);
+ a.taxiCapacity=info.capacity;a.taxiFare=info.fare;a.taxiFareMode=info.fareMode||'passenger';a.taxiPassengers=0;a.taxiTrips=0;a.taxiEarnings=0;a.taxiTarget=null;a.taxiTargetMarker=null;a.taxiPassengerRefs=[];a.taxiPassengerPed=null;a.taxiState='pickup';a.taxiHailCooldown=0;a.taxiDropWarn=0;a.taxiRecentDestinations=[];a.taxiCrowd=info.kind==='street'?[]:W.taxiMakeCrowd(info.capacity);a.taxiBoardingEntries=[];a.taxiHailers=[];a.taxiHailMarkers=[];
  a.taxiPickupPoint=pointAt(stopIndex);a.taxiStopMarker=info.kind==='stand'?taxiMakeZone(a.taxiPickupPoint,id==='microbus'?'موقف الميكروباص':'موقف السوزوكي','#f7bd35'):null;
  if(info.kind==='street'){
-  // Tuk Tuk and the existing Alexandria Lada taxi pick up pedestrians directly from the sidewalk.
+  // Only a random two or three people from each group of five are taxi callers.
   const i=40;P.x=CC.X[i]-CC.TZ[i]*5.6;P.z=CC.Z[i]+CC.TX[i]*5.6;P.yaw=a.cy=Math.atan2(-CC.TX[i],-CC.TZ[i]);a.pi=i;
-  toast(id==='tuktuk'?'🛺 ابدأ لفّ بالتوك توك؛ الركاب هينادوا عليك من الرصيف.':'🚕 تاكسي إسكندرية جاهز؛ دور على الركاب اللي بينادوا عليك.');
+  taxiSetupHailers(a);
+  toast(id==='tuktuk'?'🛺 ابدأ لفّ بالتوك توك؛ ناس معينة بس هتنادي عليك من الرصيف.':'🚕 تاكسي إسكندرية جاهز؛ دور على الركاب اللي بينادوا عليك.');
  }else{
-  // The Suzuki and microbus start at their stand with a ready-to-board group.
+  // Suzuki and microbus passengers wait at the stop and walk over only after a full stop.
   const i=stopIndex;P.x=CC.X[i]-CC.TZ[i]*5.6;P.z=CC.Z[i]+CC.TX[i]*5.6;P.yaw=a.cy=Math.atan2(-CC.TX[i],-CC.TZ[i]);a.pi=i;
   taxiPlaceCrowd(a,a.taxiPickupPoint,true);
-  taxiBeginTrip(a,null);
+  toast(id==='microbus'?'🚐 قف عند علامة الموقف عشان الركاب يركبوا.':'🚐 قف عند علامة الموقف عشان الركاب يركبوا.');
  }
 }
 function taxiCompleteTrip(a){
@@ -1608,7 +1730,7 @@ function taxiCompleteTrip(a){
   const yaw=dest.yaw||0,fx=-Math.sin(yaw),fz=-Math.cos(yaw),rx=Math.cos(yaw),rz=-Math.sin(yaw);
   for(let i=0;i<(a.taxiCrowd||[]).length;i++){
    const row=Math.floor(i/4),col=i%4,g=a.taxiCrowd[i],side=2.7+row*.85,along=(col-1.5)*1.1;
-   g.position.set(dest.x+rx*side+fx*along,.28,dest.z+rz*side+fz*along);g.rotation.set(0,yaw+Math.PI/2,0);g.visible=true;g.userData.taxiExit={vx:rx*.52+fx*.20,vz:rz*.52+fz*.20,t:0,phase:i*.16};
+   WA.taxiDropCrowd(g,dest.x+rx*side+fx*along,dest.z+rz*side+fz*along,yaw+Math.PI/2);g.visible=true;g.userData.taxiExit={vx:rx*.52+fx*.20,vz:rz*.52+fz*.20,t:0,phase:i*.16};
   }
   a.taxiState='exit';a.taxiExitStart=a.gt;
   if(a.taxiStopMarker)a.taxiStopMarker.visible=false;
@@ -1621,25 +1743,25 @@ function taxiStep(a,dt){
  const P=a.P,speed=Math.hypot(P.vx,P.vz),kmh=speed*3.6,info=taxiVehicleInfo(a.id);
  if(a.taxiState==='pickup'){
   if(info.kind==='street'){
-   const signPed=WA.taxiFindPeds(P.x,P.z,34,1)[0];
-   taxiUpdateHailSign(a,signPed||null);
-   const peds=WA.taxiFindPeds(P.x,P.z,18,a.taxiCapacity),nearest=peds[0];
-   a.taxiHailCooldown=Math.max(0,(a.taxiHailCooldown||0)-dt);
-   if(signPed&&Math.hypot(signPed.x-P.x,signPed.z-P.z)<19&&a.taxiHailCooldown<=0){toast('🧍 على جنب يا أسطى!');a.taxiHailCooldown=8}
-   if(nearest){const d=Math.hypot(nearest.x-P.x,nearest.z-P.z);if(d<8.5&&speed<1.35)taxiBeginTrip(a,peds.filter(p=>Math.hypot(p.x-P.x,p.z-P.z)<10));}
+   taxiStepHailers(a,dt);
+   // الصعود يبدأ فقط عندما تقف العربية داخل الدائرة الصفراء أمام الشخص الذي يلوّح.
+   const pickups=(a.taxiHailMarkers||[])
+    .map(item=>({ped:item.ped,marker:item.marker,d:Math.hypot(item.marker.position.x-P.x,item.marker.position.z-P.z)}))
+    .filter(q=>q.ped&&q.marker&&q.marker.visible&&q.ped.taxiHailer&&q.ped.taxiHailActive&&!q.ped.down&&!q.ped.taxiOnboard&&q.d<=3.0)
+    .sort((x,y)=>x.d-y.d).slice(0,a.taxiCapacity).map(q=>q.ped);
+   if(pickups.length&&speed<.55)taxiBeginTrip(a,pickups);
   }else if(a.taxiPickupPoint){
-   taxiUpdateHailSign(a,null);
    const d=Math.hypot(a.taxiPickupPoint.x-P.x,a.taxiPickupPoint.z-P.z);
-   // Board immediately when the vehicle reaches its stand; there is no waiting timer.
-   if(d<8.5&&kmh<45)taxiBeginTrip(a,null);
+   // Passengers only approach after the taxi or microbus has come to a complete stop.
+   if(d<8.5&&speed<.65)taxiBeginTrip(a,a.taxiCrowd);
   }
+ }else if(a.taxiState==='boarding'){
+  taxiAdvanceBoarding(a,dt);
  }else if(a.taxiState==='trip'&&a.taxiTarget){
-  taxiUpdateHailSign(a,null);
   const d=Math.hypot(a.taxiTarget.x-P.x,a.taxiTarget.z-P.z);
   if(d<16&&speed>1.8&&a.taxiDropWarn<=0){toast('🟡 هدي العربية ووقف جوه الدايرة الصفرا عشان الركاب ينزلوا');a.taxiDropWarn=2.5}else a.taxiDropWarn=Math.max(0,a.taxiDropWarn-dt);
   if(d<9.5&&speed<1.8)taxiCompleteTrip(a);
  }else if(a.taxiState==='exit'){
-  taxiUpdateHailSign(a,null);
   const elapsed=a.gt-(a.taxiExitStart||a.gt);
   for(const g of a.taxiCrowd||[]){
    const w=g.userData.taxiExit;if(!w)continue;
@@ -1880,8 +2002,8 @@ function mkHiace(col,w,l){
  const b=new CB(),half=w/2,F=-l/2,B=l/2;
  const white=MS('#d5d9da',.72,.08), roof=MS('#e0e4e3',.77,.06),trim=MT('#171a1b'),
   trimSoft=MS('#313637',.87,.02),shadowBlack=MT('#090d11'),
-  glass=MS('#526b77',.18,.10),glassDark=MS('#273b47',.21,.08),
-  glassLit=MS('#778b94',.16,.06),chrome=MS('#b4bec2',.27,.58),
+  glass=new THREE.MeshStandardMaterial({color:'#526b77',roughness:.18,metalness:.10,transparent:true,opacity:.43,depthWrite:false,side:THREE.DoubleSide}),glassDark=new THREE.MeshStandardMaterial({color:'#273b47',roughness:.21,metalness:.08,transparent:true,opacity:.39,depthWrite:false,side:THREE.DoubleSide}),
+  glassLit=new THREE.MeshStandardMaterial({color:'#778b94',roughness:.16,metalness:.06,transparent:true,opacity:.23,depthWrite:false,side:THREE.DoubleSide}),chrome=MS('#b4bec2',.27,.58),
   steel=MS('#b7c2c7',.43,.50), steelSh=MS('#818d94',.63,.22),
   light=MT('#eaf1ee','#464747'),indicator=MT('#d99126','#402002'),
   red=MT('#d82f2d','#5b0808'), reverse=MT('#cfd6d4'),tyre=MT('#15181a'),
@@ -2181,7 +2303,7 @@ function mkSuzukiCarry(col,w,l){
  const b=new CB(), F=-l/2,B=l/2, half=w*.5;
  const white=MS('#e9eeed',.54,.10),frontWhite=MS('#f4f6f3',.46,.09),shade=MS('#c7cecd',.68,.08),
   roof=MS('#f3f4f1',.62,.08),trim=MT('#171c20'),matte=MS('#252b30',.85,.02),
-  glass=new THREE.MeshStandardMaterial({color:'#13202b',roughness:.18,metalness:.12,side:THREE.DoubleSide}),
+  glass=new THREE.MeshStandardMaterial({color:'#13202b',roughness:.18,metalness:.12,transparent:true,opacity:.38,depthWrite:false,side:THREE.DoubleSide}),
   glint=new THREE.MeshStandardMaterial({color:'#3d5666',roughness:.16,metalness:.17,side:THREE.DoubleSide}),
   chrome=MS('#c7d0d3',.29,.63),steel=MS('#adb6b9',.39,.43),rim=MS('#e0e5e4',.58,.23),
   tread=MS('#101214',.97,0),darkHub=MT('#363e44'),
@@ -2574,7 +2696,7 @@ function mkLadaTaxi(col,w,l){
  const yellow=MS('#f2c522',.45,.18),sunYellow=MS('#ffdd2a',.43,.14),ochre=MS('#dba91d',.56,.13),
   black=MS('#121517',.66,.15),roof=MS('#171a1c',.83,.08),rubber=MS('#0d0e10',.94,.025),
   doorBlack=MS('#151719',.73,.11),frontBlack=MS('#1f2224',.68,.1),
-  glass=new THREE.MeshStandardMaterial({color:'#55769e',roughness:.20,metalness:.22,side:THREE.DoubleSide}),
+  glass=new THREE.MeshStandardMaterial({color:'#55769e',roughness:.20,metalness:.22,transparent:true,opacity:.42,depthWrite:false,side:THREE.DoubleSide}),
   glassBright=MS('#8199c0',.23,.16),
   seal=new THREE.MeshStandardMaterial({color:'#0a0d11',roughness:.88,metalness:.04,side:THREE.DoubleSide}),chrome=MS('#ccd3d4',.23,.72),silver=MS('#aeb7c1',.45,.58),
   grill=MS('#394146',.82,.08),head=MT('#ecebdd','#656454'),marker=MT('#e99622','#683100'),
@@ -3869,30 +3991,114 @@ flush();
 
 /* ---------- pedestrians: two-way sidewalk walking + non-graphic knock-down/recovery ---------- */
 const PED_COUNT=62,PEDS=[],PED_ROOT=new THREE.Group(),PED_GEO={
- head:new THREE.SphereGeometry(.21,9,7),hair:new THREE.SphereGeometry(.215,8,6),
- chest:GB(.48,.72,.31),arm:GB(.16,.68,.17),leg:GB(.20,.83,.22),shoe:GB(.23,.11,.34),
- bag:GB(.23,.37,.15)
+ head:new THREE.SphereGeometry(.21,16,12),hair:new THREE.SphereGeometry(.215,14,10),
+ detail:new THREE.SphereGeometry(1,10,8),unitBox:GB(1,1,1),facePlane:new THREE.PlaneGeometry(.36,.30),
+ chest:GB(.48,.72,.31),arm:GB(.16,.68,.17),leg:GB(.20,.83,.22),shoe:GB(.23,.11,.34),bag:GB(.23,.37,.15),
+ glasses:new THREE.TorusGeometry(.052,.010,6,14),galabeya:new THREE.CylinderGeometry(.255,.37,1.08,12),
+ cap:new THREE.CylinderGeometry(.145,.18,.105,12),pocket:GB(.105,.13,.025),belt:GB(.55,.055,.34)
 };
 SC.add(PED_ROOT); // Independent group persists when startA replaces the traffic/player group.
-const PED_COATS=['#205b87','#ad624c','#627b57','#ccb16d','#5b586b','#b94840','#e7e4dd','#317c86'].map(v=>LM(v));
-const PED_PANTS=['#2e3d46','#59616a','#34323c','#7c745d','#273f55'].map(v=>LM(v));
-const PED_SKIN=['#b67c5e','#c99b75','#8e5f46','#dbb189','#ad7758'].map(v=>LM(v));
-const PED_HAIR=LM('#262220'),PED_SHOES=LM('#252b33');
+const PED_COATS=['#205b87','#ad624c','#627b57','#ccb16d','#5b586b','#b94840','#e7e4dd','#317c86','#365b78','#8c5d42','#526b57','#8b718c'].map(v=>LM(v));
+const PED_PANTS=['#2e3d46','#59616a','#34323c','#7c745d','#273f55','#343d47','#6c6255'].map(v=>LM(v));
+const PED_SKIN=['#b67c5e','#c99b75','#8e5f46','#dbb189','#ad7758','#e0b895','#9b6b50'].map(v=>LM(v));
+const PED_HIJABS=['#435b72','#8e5060','#647a58','#b58c55','#554c73','#263e50'].map(v=>LM(v));
+const PED_ROBES=['#e8e1d0','#d5dce0','#bfc8c3','#d8c5a5','#a9b6bb'].map(v=>LM(v));
+const PED_VESTS=['#4a4038','#354a45','#6a5140','#3d4654'].map(v=>LM(v));
+const PED_SHIRTS=['#d9e1df','#e3bd72','#4c8290','#bd7657','#6d7b91','#d0c7b8'].map(v=>LM(v));
+const PED_HAIR=LM('#262220'),PED_HAIR2=LM('#49352b'),PED_SHOES=LM('#252b33');
+const PED_GLASSES=LM('#202a34');
+const PED_FACE_MAP=(()=>{
+ const c=document.createElement('canvas');c.width=128;c.height=128;const x=c.getContext('2d');
+ x.clearRect(0,0,128,128);
+ for(const ex of [43,85]){x.fillStyle='#fff4e8';x.beginPath();x.ellipse(ex,54,11,7,0,0,Math.PI*2);x.fill();x.fillStyle='#241d1a';x.beginPath();x.arc(ex,54,4.2,0,Math.PI*2);x.fill();x.fillStyle='#ffffff';x.beginPath();x.arc(ex-1.2,52.5,1.3,0,Math.PI*2);x.fill();x.strokeStyle='#392b25';x.lineWidth=4;x.lineCap='round';x.beginPath();x.moveTo(ex-11,39);x.lineTo(ex+9,37);x.stroke();}
+ x.strokeStyle='rgba(100,62,48,.8)';x.lineWidth=3;x.beginPath();x.moveTo(64,59);x.lineTo(61,73);x.lineTo(67,75);x.stroke();
+ x.strokeStyle='#79443d';x.lineWidth=3;x.lineCap='round';x.beginPath();x.moveTo(55,91);x.quadraticCurveTo(64,97,73,91);x.stroke();
+ const t=new THREE.CanvasTexture(c);t.encoding=THREE.sRGBEncoding;t.anisotropy=4;return t;
+})();
+const PED_FACE_MAT=new THREE.MeshBasicMaterial({map:PED_FACE_MAP,transparent:true,depthWrite:false,side:THREE.DoubleSide});
+const PED_BAG_COLORS=['#3d4a55','#70513f','#4a6359'].map(v=>LM(v));
 function newPedestrian(id){
- const person=new THREE.Group(),torso=new THREE.Group(),coat=PED_COATS[id%PED_COATS.length];torso.position.y=1.39;person.add(torso);
- const box=(par,geo,mat,x,y,z,sy=1)=>{const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);o.scale.y=sy;par.add(o);return o};
- box(torso,PED_GEO.chest,coat,0,0,0);box(torso,PED_GEO.head,PED_SKIN[id%PED_SKIN.length],0,.66,0);
- if(id%4!==0)box(torso,PED_GEO.hair,PED_HAIR,0,.83,-.018,.44);
+ // A shared, varied Egyptian street-crowd model used by Alexandria, the normal
+ // roads, race scenes and the taxi passenger groups.
+ const style=((id%8)+8)%8,skin=PED_SKIN[(id*3+1)%PED_SKIN.length];
+ const isHijabi=style===0||style===4,isGalabeya=style===1,isGlasses=style===2,isElder=style===7;
+ const isShort=style===2||id%13===0;
+ const person=new THREE.Group(),torso=new THREE.Group();
+ const coat=isHijabi?PED_HIJABS[(id+2)%PED_HIJABS.length]:isGalabeya?PED_ROBES[(id+1)%PED_ROBES.length]:PED_COATS[(id*5+style)%PED_COATS.length];
+ torso.position.y=1.39;person.add(torso);
+ if(isShort)person.scale.set(.86,.84,.88);else if(style===5)person.scale.set(1.02,1.04,1.02);
+ const box=(par,geo,mat,x,y,z,sx=1,sy=1,sz=1)=>{const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);o.scale.set(sx,sy,sz);par.add(o);return o};
+ const ball=(par,mat,x,y,z,sx,sy,sz)=>box(par,PED_GEO.detail,mat,x,y,z,sx,sy,sz);
+ const bar=(par,mat,x,y,z,sx,sy,sz)=>box(par,PED_GEO.unitBox,mat,x,y,z,sx,sy,sz);
+ box(torso,PED_GEO.chest,coat,0,0,0);
+ // A shared transparent face texture keeps eyes, brows, nose and mouth crisp
+ // while avoiding dozens of extra draw calls for the large pedestrian crowds.
+ box(torso,PED_GEO.head,skin,0,.66,.018,1,1,1);
+ box(torso,PED_GEO.facePlane,PED_FACE_MAT,0,.66,.236);
+ const hairMat=id%3===0?PED_HAIR2:PED_HAIR;
+ if(!isHijabi&&!isGalabeya){
+  ball(torso,hairMat,0,.825,-.035,.238,.13,.225);
+  for(const side of [-1,1])ball(torso,hairMat,side*.183,.70,-.018,.065,.16,.17);
+ }
+ if(isHijabi){
+  const hijab=PED_HIJABS[(id+2)%PED_HIJABS.length];
+  // Soft hood behind the face plus a draped shoulder/chest scarf.
+  ball(torso,hijab,0,.715,-.075,.255,.29,.22);
+  ball(torso,hijab,0,.30,-.018,.355,.23,.255);
+  ball(torso,hijab,0,.105,.145,.245,.34,.085);
+  ball(torso,hijab,0,.89,-.015,.238,.115,.22);
+  // Face stays uncovered; scarf edges frame rather than hide facial features.
+ }
+ if(isGalabeya){
+  const robe=PED_ROBES[(id+1)%PED_ROBES.length],vest=PED_VESTS[(id+2)%PED_VESTS.length];
+  box(torso,PED_GEO.galabeya,robe,0,-.40,.015);
+  bar(torso,vest,0,-.28,.205,.025,.58,.018);
+  box(torso,PED_GEO.pocket,vest,-.13,-.10,.19,1,1,1);
+  box(torso,PED_GEO.cap,robe,0,.875,-.01);
+  ball(torso,vest,0,.93,-.02,.19,.055,.19);
+  // A small traditional neck opening and chest trim.
+  bar(torso,vest,0,.18,.177,.075,.018,.018);
+ }
+ if(isGlasses){
+  for(const side of [-1,1]){
+   const lens=box(torso,PED_GEO.glasses,PED_GLASSES,side*.074,.694,.250,1,1,1);
+   lens.rotation.z=0;
+   bar(torso,PED_GLASSES,side*.145,.694,.238,.075,.012,.012);
+  }
+  bar(torso,PED_GLASSES,0,.696,.252,.035,.012,.012);
+ }
+ if(isElder){
+  ball(torso,PED_HAIR,0,.505,.165,.13,.09,.065);
+  for(const side of [-1,1])ball(torso,PED_HAIR,side*.055,.526,.205,.075,.035,.035);
+  // Subtle grey hair at the temples.
+  const grey=LM('#a9a49a');for(const side of [-1,1])ball(torso,grey,side*.19,.76,-.005,.035,.075,.07);
+ }
+ // Small everyday details vary with each pedestrian so the crowd is not cloned.
+ const pants=PED_PANTS[(id*2+1)%PED_PANTS.length];
  const arms=[],legs=[];
  for(const sign of [-1,1]){
   const arm=new THREE.Group();arm.position.set(sign*.32,.27,0);torso.add(arm);
   box(arm,PED_GEO.arm,coat,0,-.34,0);arms.push(arm);
   const leg=new THREE.Group();leg.position.set(sign*.145,.99,0);person.add(leg);
-  box(leg,PED_GEO.leg,PED_PANTS[id%PED_PANTS.length],0,-.43,0);
+  box(leg,PED_GEO.leg,pants,0,-.43,0);
   box(leg,PED_GEO.shoe,PED_SHOES,0,-.88,-.07);legs.push(leg);
  }
- if(id%5===0)box(torso,PED_GEO.bag,PED_PANTS[id%PED_PANTS.length],.4,-.16,0);
- person.userData={torso,arms,legs};PED_ROOT.add(person);return person;
+ if(!isGalabeya&&!isHijabi&&style!==6){
+  const shirtDetail=PED_SHIRTS[(id+style)%PED_SHIRTS.length];
+  box(torso,PED_GEO.pocket,shirtDetail,-.135,.035,.167,1,1,1);
+  if(style===3||style===5)box(torso,PED_GEO.belt,PED_GLASSES,0,-.30,.012);
+ }
+ if(style===6){
+  // Hooded sweatshirt and front pocket.
+  ball(torso,coat,0,.80,-.12,.255,.19,.15);
+  box(torso,PED_GEO.pocket,PED_PANTS[(id+1)%PED_PANTS.length],0,-.22,.17,2.1,1.1,1);
+ }
+ if(id%5===0){
+  const bag=box(torso,PED_GEO.bag,PED_BAG_COLORS[(id/5|0)%PED_BAG_COLORS.length],.40,-.16,-.045);
+  bag.rotation.z=-.08;
+  bar(torso,PED_GLASSES,.31,.16,.015,.025,.42,.025);
+ }
+ person.userData={torso,arms,legs,style,isHijabi,isGalabeya,isGlasses};PED_ROOT.add(person);return person;
 }
 function choosePedRoad(x,z,id){
  const opts=[CC,GN,SM];let arr=[];
@@ -3910,7 +4116,9 @@ function relocatePed(p,origin,initial=false){
 }
 function pedPlace(p){
  const C=p.C,atI=Math.max(1,Math.min(C.N-1,p.s)),i=Math.floor(atI),f=atI-i,
- tx=C.TX[i],tz=C.TZ[i],w=C===CC?Math.max(HW[i]+2.25,CH+1.35):C===GN?8.7:SHW+2.1,
+ tx=C.TX[i],tz=C.TZ[i],roadHalf=C===CC?HW[i]:C===GN?7:SHW,
+ // ركاب التاكسي يقفون عند حافة الرصيف القريبة من الأسفلت، على جانبي الطريق.
+ w=p.taxiHailer?roadHalf+1.35:(C===CC?Math.max(HW[i]+2.25,CH+1.35):C===GN?8.7:SHW+2.1),
  o=p.sign*w;
  p.x=C.X[i]+(C.X[i+1]-C.X[i])*f-tz*o;
  p.z=C.Z[i]+(C.Z[i+1]-C.Z[i])*f+tx*o;
@@ -3936,9 +4144,9 @@ function pedestriansStep(dt,carP,traffic){
  let wasHit=false;
  for(const p of PEDS){
   const o=p.group;
-  if(p.taxiOnboard){o.visible=false;continue;}
+  if(p.taxiOnboard){if(!p.taxiAttachedToCar)o.visible=false;continue;}
   const dist2=(p.x-carP.x)**2+(p.z-carP.z)**2;
-  if(dist2>330*330){relocatePed(p,carP);pedPlace(p);continue}
+  if(dist2>330*330){if(p.taxiHailActive||p.taxiBoarding){o.visible=false;continue;}relocatePed(p,carP);pedPlace(p);continue}
   if(p.down){
    p.life+=dt;p.x+=p.vx*dt;p.z+=p.vz*dt;
    p.y+=p.vy*dt;p.vy-=11.4*dt;
@@ -3946,6 +4154,16 @@ function pedestriansStep(dt,carP,traffic){
    p.vx*=Math.max(0,1-dt*1.65);p.vz*=Math.max(0,1-dt*1.65);
    o.rotation.z+=p.impactSpin*dt/(1+p.life*2);
    if(p.life>3.3){relocatePed(p,carP);pedPlace(p);}
+  }else if(p.taxiBoarding){
+   p.walk+=dt*7;const swing=Math.sin(p.walk)*.42,rig=o.userData;
+   rig.legs[0].rotation.x=swing;rig.legs[1].rotation.x=-swing;
+   rig.arms[0].rotation.x=-swing*.8;rig.arms[1].rotation.x=swing*.8;
+  }else if(p.taxiHailer&&p.taxiHailActive){
+   // Selected taxi callers stop and wave only after the player approaches.
+   p.walk+=dt*2.4;const rig=o.userData;
+   rig.legs[0].rotation.x=rig.legs[1].rotation.x=0;
+   rig.arms[0].rotation.x=-.85+Math.sin(p.walk*2)*.20;
+   rig.arms[1].rotation.x=.10;rig.torso.rotation.z=Math.sin(p.walk)*.025;
   }else{
    p.s+=p.dir*p.speed*dt/p.C.L;
    if(p.s<8||p.s>=p.C.N-9){p.dir*=-1;p.s=Math.max(9,Math.min(p.C.N-10,p.s))}
@@ -3973,12 +4191,51 @@ function pedestriansStep(dt,carP,traffic){
 /* ---------- Taxi Map helpers: reuse Alexandria's real sidewalk pedestrians ---------- */
 function taxiFindPeds(x,z,maxDistance,count=1){
  const max2=maxDistance*maxDistance;
- return PEDS.filter(p=>!p.down&&!p.taxiOnboard&&p.group.visible)
+ return PEDS.filter(p=>p.taxiHailer&&p.taxiHailActive&&!p.taxiBoarding&&!p.down&&!p.taxiOnboard&&p.group.visible)
   .map(p=>({p,d:(p.x-x)*(p.x-x)+(p.z-z)*(p.z-z)}))
   .filter(q=>q.d<=max2).sort((a,b)=>a.d-b.d).slice(0,count).map(q=>q.p);
 }
-function taxiBoardPed(p){if(!p||p.down||p.taxiOnboard)return false;p.taxiOnboard=true;p.group.visible=false;return true;}
-function taxiReleasePed(p,x,z){if(!p)return;p.taxiOnboard=false;p.down=0;relocatePed(p,{x,z});pedPlace(p);p.group.visible=true;}
+function taxiMarkHailers(){
+ for(const p of PEDS){p.taxiHailer=false;p.taxiHailActive=false;p.taxiHailCalled=false;p.taxiBoarding=false;p.taxiAttachedToCar=false;}
+ // In each group of five pedestrians, only two or three are randomly selected to hail a taxi.
+ for(let i=0;i<PEDS.length;i+=5){
+  const group=PEDS.slice(i,i+5).filter(p=>!p.down&&!p.taxiOnboard);
+  for(let j=group.length-1;j>0;j--){const k=(R()*(j+1))|0;[group[j],group[k]]=[group[k],group[j]];}
+  const take=Math.min(group.length,2+(R()<.45?1:0));
+  for(let j=0;j<take;j++){const p=group[j];p.taxiHailer=true;p.taxiHailActive=false;p.taxiHailCalled=false;p.taxiHailHeading=p.heading;}
+ }
+ return PEDS.filter(p=>p.taxiHailer);
+}
+function taxiRemoveHailSign(p){
+ const sign=p&&p.taxiHailSign;if(!sign)return;
+ if(sign.parent)sign.parent.remove(sign);
+ if(sign.material){if(sign.material.map)sign.material.map.dispose();sign.material.dispose();}
+ p.taxiHailSign=null;
+}
+function taxiAttachPedToCar(p,vehicle,pos,scale=.5){
+ if(!p||!vehicle)return;
+ taxiRemoveHailSign(p);p.taxiHailer=false;p.taxiHailActive=false;p.taxiBoarding=false;p.taxiOnboard=true;p.taxiAttachedToCar=true;
+ if(p.group.parent)p.group.parent.remove(p.group);vehicle.add(p.group);
+ p.group.position.set(pos.x,pos.y,pos.z);p.group.rotation.set(0,0,0);p.group.scale.setScalar(scale);p.group.visible=true;
+ const rig=p.group.userData;if(rig&&rig.legs){rig.legs[0].rotation.x=1.05;rig.legs[1].rotation.x=1.05;}if(rig&&rig.arms){rig.arms[0].rotation.x=-.12;rig.arms[1].rotation.x=-.12;}
+}
+function taxiReleasePed(p,x,z){
+ if(!p)return;
+ if(p.group.parent)p.group.parent.remove(p.group);PED_ROOT.add(p.group);
+ p.group.scale.set(1,1,1);p.taxiAttachedToCar=false;p.taxiBoarding=false;p.taxiOnboard=false;p.taxiHailer=false;p.taxiHailActive=false;p.down=0;
+ const rig=p.group.userData;if(rig&&rig.legs){rig.legs[0].rotation.x=0;rig.legs[1].rotation.x=0;}if(rig&&rig.arms){rig.arms[0].rotation.x=0;rig.arms[1].rotation.x=0;}
+ relocatePed(p,{x,z});pedPlace(p);p.group.visible=true;
+}
+function taxiAttachCrowdToCar(g,vehicle,pos,scale=.46){
+ if(!g||!vehicle)return;if(g.parent)g.parent.remove(g);vehicle.add(g);
+ g.position.set(pos.x,pos.y,pos.z);g.rotation.set(0,0,0);g.scale.setScalar(scale);g.visible=true;
+ const rig=g.userData;if(rig&&rig.legs){rig.legs[0].rotation.x=1.05;rig.legs[1].rotation.x=1.05;}if(rig&&rig.arms){rig.arms[0].rotation.x=-.12;rig.arms[1].rotation.x=-.12;}
+}
+function taxiDropCrowd(g,x,z,yaw=0){
+ if(!g)return;if(g.parent)g.parent.remove(g);PED_ROOT.add(g);
+ g.scale.set(1,1,1);g.position.set(x,.28,z);g.rotation.set(0,yaw,0);g.visible=true;
+ const rig=g.userData;if(rig&&rig.legs){rig.legs[0].rotation.x=0;rig.legs[1].rotation.x=0;}if(rig&&rig.arms){rig.arms[0].rotation.x=0;rig.arms[1].rotation.x=0;}
+}
 function taxiMakeCrowd(count){
  const list=[];
  for(let i=0;i<count;i++){const g=newPedestrian(100+i);PED_ROOT.add(g);g.visible=false;list.push(g)}
@@ -4010,7 +4267,7 @@ const q=gm(P.x,P.z,w,h);c.save();c.translate(q[0],q[1]);c.rotate(Math.atan2(-Mat
 const tunY=(x,z)=>{let b=-1,bd=1e18;const lo=Math.max(0,T0-30),hi=Math.min(GN.N,T1+30);for(let i=lo;i<=hi;i++){const d=(GN.X[i]-x)**2+(GN.Z[i]-z)**2;if(d<bd){bd=d;b=i}}return bd<64&&b>0?TYI(b):0};
 const segD=(x,z,s)=>{let b=1e9;for(let i=0;i<=s.N;i+=2)b=Math.min(b,Math.hypot(s.X[i]-x,s.Z[i]-z));return b};
 const nearCon=(x,z)=>CON.some(C=>segD(x,z,C)<8);
-return{SC,DY:DYx,DL:DLx,SUN:SUNx,CC,GN,IP,PT,QB,BG,gk,nearIdx,segD,mmDraw,anim,pedestriansStep,nearRoad,HW,nearCon,SM,NKM,CON,MONTAZA_ACCESS,T0,T1,TYI,tunY,DEST,gm,gpsDraw,taxiFindPeds,taxiBoardPed,taxiReleasePed,taxiMakeCrowd,taxiRemoveCrowd}}
+return{SC,DY:DYx,DL:DLx,SUN:SUNx,CC,GN,IP,PT,QB,BG,gk,nearIdx,segD,mmDraw,anim,pedestriansStep,nearRoad,HW,nearCon,SM,NKM,CON,MONTAZA_ACCESS,T0,T1,TYI,tunY,DEST,gm,gpsDraw,taxiFindPeds,taxiMarkHailers,taxiRemoveHailSign,taxiAttachPedToCar,taxiReleasePed,taxiAttachCrowdToCar,taxiDropCrowd,taxiMakeCrowd,taxiRemoveCrowd}}
 
 /* ---------- Alexandria driving logic ---------- */
 const yawAt=(C,i)=>Math.atan2(-C.TX[i],-C.TZ[i]);
@@ -4978,7 +5235,8 @@ function drCam(a,dt,sp){
 }
 function step(dt){
 const a=A,P=a.P,V=a.V,top=V.top/3.6,sp0=Math.hypot(P.vx,P.vz);
-const gas=Math.max((IN.gd||K.ArrowUp||K.KeyW)?1:0,IN.padGas||0),brk=Math.max((IN.bd||K.ArrowDown||K.KeyS||K.Space)?1:0,IN.padBrake||0),hbIn=Math.max((IN.hbd||K.KeyC||K.ShiftLeft)?1:0,IN.padHandbrake||0);
+const taxiBoarding=a.mode==='taxi'&&a.taxiState==='boarding';
+const gas=taxiBoarding?0:Math.max((IN.gd||K.ArrowUp||K.KeyW)?1:0,IN.padGas||0),brk=taxiBoarding?1:Math.max((IN.bd||K.ArrowDown||K.KeyS||K.Space)?1:0,IN.padBrake||0),hbIn=taxiBoarding?0:Math.max((IN.hbd||K.KeyC||K.ShiftLeft)?1:0,IN.padHandbrake||0);
 IN.gas+=(gas-IN.gas)*Math.min(1,dt*4);IN.brk+=(brk-IN.brk)*Math.min(1,dt*10);IN.hb+=(hbIn-IN.hb)*Math.min(1,dt*14);
 if(!wd)wa*=1-Math.min(1,dt*7);IN.wheel=clamp(wa/1.1,-1,1);
 P.st+=(steerT()-P.st)*Math.min(1,dt*9);
@@ -4995,6 +5253,8 @@ if(brk){if(vf>.5)vf-=V.brk*.18*dt;else vf=Math.max(-8,vf-5*dt)}
 if(a.id==='roadster'&&window.DRIFT_BOOST_ACTIVE&&gas){vf=Math.min(topLimit,vf+80*dt)}
 if(!gas&&!brk){const coastDrag=IN.hb>.4?.35:2.2;vf-=Math.sign(vf)*Math.min(Math.abs(vf),coastDrag*dt)}
 if(nitroOn)vf=Math.min(vf,topLimit);else if(vf>top)vf=Math.max(top,vf-12*dt);
+// أثناء ركوب الركاب، اقفل السرعة في الاتجاهين: الفرامل العادية لا يجب أن تعكس الحركة للخلف.
+if(taxiBoarding){vf=0;vl=0;}
 const dr=(IN.hb>.4&&Math.abs(vf)>4&&!a.air)||(brk&&Math.abs(vf)>9&&Math.abs(P.st)>.25&&!a.air);
 if(dr)vl+=P.st*vf*1.15*dt;
  vl*=Math.exp(-(dr?.32:a.air?1.1:7)*dt);
@@ -5093,9 +5353,10 @@ else if(a.obj===4){D.mis=(D.mis||0)+1;pay(1000);fin('المهمة تمت! 🏆',
 function hud(a,sp){
 $('spd').firstChild.nodeValue=Math.round(sp);
 {const wb=$('wpb');
-if(gwp&&a.mode==='alex'){const dx=gwp.x-a.P.x,dz=gwp.z-a.P.z,dd=Math.hypot(dx,dz);
-if(dd<30){if(gwp.bc&&gwp.bc.parent)gwp.bc.parent.remove(gwp.bc);toast('✔ وصلت: '+gwp.ar);gwp=null;wb.style.display='none'}
-else{const yw=a.P.yaw,fx=-Math.sin(yw),fz=-Math.cos(yw),rx=Math.cos(yw),rz=-Math.sin(yw);$('wpa').style.transform='rotate('+Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz)+'rad)';$('wpt').textContent=gwp.ar+' · '+(dd>=1000?(dd/1000).toFixed(1)+' كم':Math.round(dd)+' م');wb.style.display='flex'}
+const navTarget=a.mode==='taxi'?a.taxiTarget:(gwp&&a.mode==='alex'?gwp:null);
+if(navTarget){const dx=navTarget.x-a.P.x,dz=navTarget.z-a.P.z,dd=Math.hypot(dx,dz);
+if(a.mode==='alex'&&dd<30){if(gwp.bc&&gwp.bc.parent)gwp.bc.parent.remove(gwp.bc);toast('✔ وصلت: '+gwp.ar);gwp=null;wb.style.display='none'}
+else{const yw=a.P.yaw,fx=-Math.sin(yw),fz=-Math.cos(yw),rx=Math.cos(yw),rz=-Math.sin(yw);$('wpa').style.transform='rotate('+Math.atan2(dx*rx+dz*rz,dx*fx+dz*fz)+'rad)';$('wpt').textContent=(a.mode==='taxi'?'GPS · ':'')+navTarget.ar+' · '+(dd>=1000?(dd/1000).toFixed(1)+' كم':Math.round(dd)+' م');wb.style.display='flex'}
 }else if(wb)wb.style.display='none'}
 $('pg').style.transform='perspective(300px) rotateX('+IN.gas*28+'deg)';$('pb').style.transform='perspective(300px) rotateX('+IN.brk*28+'deg)';
 $('ph').classList.toggle('on',IN.hb>.4);nitroUI(a);
@@ -5114,7 +5375,7 @@ if(a.mode==='offroad3d'){
 const p=OB[a.obj][1],tg=a.traf.find(t=>t.tgt),q=p||(tg?[tg.x,tg.z]:null);
 $('stat').textContent=OB[a.obj][0]+(q?' · '+Math.round(Math.hypot(a.P.x-q[0],a.P.z-q[1]))+' م':'')+(a.cops.length?' · 🚨 '+Math.round(a.bust/5*100)+'%':'');
 }else if(a.mode==='taxi'){
- const place=a.taxiTarget?'→ '+a.taxiTarget.ar:(taxiVehicleInfo(a.id).kind==='street'?'دور على راكب يناديك':'ارجع لموقف الركاب');
+ const place=a.taxiState==='boarding'?'الركاب بيركبوا':a.taxiTarget?'→ '+a.taxiTarget.ar:(taxiVehicleInfo(a.id).kind==='street'?'دور على راكب يناديك':'ارجع لموقف الركاب');
  const load=a.taxiPassengers?(' · الركاب '+a.taxiPassengers+'/'+a.taxiCapacity):'';
  $('stat').textContent='🚕 ماب التاكسي · '+place+load+' · مشاوير '+(a.taxiTrips||0)+' · 💰 '+D.money.toLocaleString('ar-EG');
 }else if(a.mode==='alex'){
@@ -5257,7 +5518,7 @@ try{
 });
 }
 window.SOYA_START_OFFROAD_3D=()=>{try{if(S.veh&&VEH[S.veh])D.sel=S.veh;save();startA('offroad3d')}catch(err){console.error('Off-road 3D launch failed:',err);toast('⚠️ تعذر تشغيل الطرق الوعرة ثلاثية الأبعاد')}};
-function stopA(){if(onlineActive)closeOnline();if(A){taxiRemoveZone(A.taxiTargetMarker);taxiRemoveZone(A.taxiStopMarker);if(A.taxiHailSign){if(A.taxiHailSign.parent)A.taxiHailSign.parent.remove(A.taxiHailSign);if(A.taxiHailSign.material.map)A.taxiHailSign.material.map.dispose();A.taxiHailSign.material.dispose()}if(A.taxiCrowd&&WA&&WA.taxiRemoveCrowd)WA.taxiRemoveCrowd(A.taxiCrowd)}window.SOYA_ENGINE_STOP&&window.SOYA_ENGINE_STOP();A=null;nitroUI(null);cancelAnimationFrame(raf);$('c3').style.display='none';$('mm').style.display='none';$('gpsb').style.display='none';$('wpb').style.display='none';gwp=null;gpsClose();$('retry').onclick=startGame;$('menu').onclick=()=>{G=null;show('mode')}}
+function stopA(){if(onlineActive)closeOnline();if(A){taxiRemoveZone(A.taxiTargetMarker);taxiRemoveZone(A.taxiStopMarker);taxiCleanupHailers(A);if(A.taxiCrowd&&WA&&WA.taxiRemoveCrowd)WA.taxiRemoveCrowd(A.taxiCrowd)}window.SOYA_ENGINE_STOP&&window.SOYA_ENGINE_STOP();A=null;nitroUI(null);cancelAnimationFrame(raf);$('c3').style.display='none';$('mm').style.display='none';$('gpsb').style.display='none';$('wpb').style.display='none';gwp=null;gpsClose();$('retry').onclick=startGame;$('menu').onclick=()=>{G=null;show('mode')}}
 /* ---------- GPS map: button 📍 (or key G) -> pick a place -> arrow or instant teleport ---------- */
 let gsel=-1,gwp=null;
 const gov=()=>$('gpsov');
